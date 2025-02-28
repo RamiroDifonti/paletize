@@ -9,6 +9,13 @@ import mongoose from 'mongoose'
 import { PORT, MONGO_URI } from './utils/config'
 import router from './routes/routes'
 
+/// TODO INTENTAR EXTRAER ESTE FICHERO A UN CUSTOM.D.TS
+declare module "express" {
+  interface Request {
+      user?: any;
+  }
+}
+
 const app = express();
 
 // middlewares
