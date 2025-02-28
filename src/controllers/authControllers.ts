@@ -6,6 +6,8 @@ import { SALT_ROUNDS } from '../utils/config';
 import { User } from '../models/User';
 import { JWT_SECRET } from '../utils/config';
 
+
+/// TODO mover esto
 export const getUsers = () => User.find();
 export const getUsersByEmail = (email: string) => User.findOne({ email });
 export const getUsersByUsername = (username: string) => User.findOne({ username });
@@ -18,6 +20,13 @@ export const createUser = (values: Record<string, any>) => new User(values)
 export const deleteUserById = (id: string) => User.findByIdAndDelete(id);
 export const updateUserById = (id: string, values: Record<string, any>) =>
     User.findByIdAndUpdate(id, values);
+///
+
+export const defaultController = async (req: express.Request, res: express.Response): Promise <void> => {
+    const user = req.user;
+    res.send(user);
+    return;
+}
 
 export const login = async (req: express.Request, res: express.Response): Promise <void> => {
     try {
@@ -78,7 +87,6 @@ export const login = async (req: express.Request, res: express.Response): Promis
 
 export const register = async (req: express.Request, res: express.Response): Promise <void> => {
     const { firstName, lastName, username, email, password} = req.body
-
     try {
         // Verificar si el usuario o email está en uso
         const userByEmail = await getUsersByEmail(email);
@@ -117,25 +125,13 @@ export const register = async (req: express.Request, res: express.Response): Pro
 }
 
 export const protectedSession = async (req: express.Request, res: express.Response): Promise <void> => {
-    const token = req.cookies.sessionToken;
-    // if (!token) {
-    //     res.status(401).json({message: 'Unauthorized'});
-    //     return;
-    // }
-    try {
-        if (!JWT_SECRET) {
-            res.status(500).json({ message: 'JWT_SECRET is not defined' });
-            return;
-        }
-        const data = jwt.verify(token, JWT_SECRET);
-        // res.render('protected', { data });
-        res.send(data);
-        return;
-    } catch (e) {
-        console.log(e);
+    const user = req.user;
+    if (!user) {
         res.status(401).json({message: 'Unauthorized'});
         return;
     }
+    res.send(user);
+    return;
 }
 
 export const logout = async (_req: express.Request, res: express.Response): Promise <void> => {
