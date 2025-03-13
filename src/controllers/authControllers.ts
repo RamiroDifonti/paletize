@@ -5,15 +5,13 @@ import jwt from 'jsonwebtoken';
 import { SALT_ROUNDS } from '../utils/config';
 import { User } from '../models/User';
 import { JWT_SECRET } from '../utils/config';
+import path from 'path';
 
 
 /// TODO mover esto
 export const getUsers = () => User.find();
 export const getUsersByEmail = (email: string) => User.findOne({ email });
 export const getUsersByUsername = (username: string) => User.findOne({ username });
-export const getUserBySessionToken = (sessionToken: string) => User.findOne({
-    'authentication.sessionToken': sessionToken
-});
 export const getUserById = (id: string) => User.findById(id);
 export const createUser = (values: Record<string, any>) => new User(values)
     .save().then((user) => user.toObject());
@@ -22,16 +20,16 @@ export const updateUserById = (id: string, values: Record<string, any>) =>
     User.findByIdAndUpdate(id, values);
 ///
 
-export const defaultController = async (req: express.Request, res: express.Response): Promise <void> => {
-    const user = req.user;
-    res.send(user);
+export const defaultController = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.redirect('/index.html');
+    // const user = req.user;
+    // res.send(user);
     return;
 }
 
 export const login = async (req: express.Request, res: express.Response): Promise <void> => {
     try {
-        const { email, password } = req.body;
-
+        const {email, password } = req.body;
 
         const user = await getUsersByEmail(email).select('+authentication.salt +authentication.password');
         if (!user || !user.authentication) {
@@ -45,15 +43,15 @@ export const login = async (req: express.Request, res: express.Response): Promis
         }
 
         const token = jwt.sign(
-            { 
+            {
                 id: user._id,
                 username: user.username,
                 email: user.email,
                 savedPalettes: user.savedPalettes
             },
             JWT_SECRET,
-            { 
-                expiresIn: '1h' 
+            {
+                expiresIn: '1h'
             });
 
         const isValidPassword = await bcrypt.compare(password, user.authentication.password);
@@ -137,5 +135,15 @@ export const protectedSession = async (req: express.Request, res: express.Respon
 export const logout = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.clearCookie('sessionToken');
     res.status(200).json({message: 'Logged out'});
+    return;
+}
+
+export const getLogin = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/login.html"));
+    return;
+}
+
+export const getIndex = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/index.html"));
     return;
 }

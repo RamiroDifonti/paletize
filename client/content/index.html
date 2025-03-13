@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+</head>
+<body>
+    <h1>Bienvenido a la página principal</h1>
+    <button id="logout-btn">Cerrar sesión</button>
+
+    <script>
+        // Función para hacer logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            fetch('/logout', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Redirigir al login después de logout
+                        window.location.href = '../login.html';
+                    } else {
+                        alert('Error al cerrar sesión');
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
