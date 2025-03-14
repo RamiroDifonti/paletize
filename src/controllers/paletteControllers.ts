@@ -4,9 +4,10 @@ import { Palette } from "../models/Palette";
 
 export const createPalette = async (req: express.Request, res: express.Response): Promise<void> => {
     try {
-        const { colors, private: isPrivate } = req.body;
+        const { name, colors, private: isPrivate } = req.body;
         const creator = req.user._id;
         const palette = new Palette({
+            name,
             colors,
             creator,
             private: isPrivate
