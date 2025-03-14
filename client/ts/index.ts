@@ -1,19 +1,21 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const response = await fetch("/protected", { credentials: "include" });
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetch("/api/logout", {
+                method: "POST", // Es una solicitud POST para logout
+                credentials: "include", // Para enviar cookies de sesión si están activadas
+            });
 
-        if (!response.ok) {
-            throw new Error("Unauthorized");
+            if (response.ok) {
+                window.location.href = "/login"; // Redirigir al login después de cerrar sesión
+            } else {
+                console.error("No se pudo cerrar sesión");
+                alert("Error al cerrar sesión");
+            }
+        } catch (error) {
+            console.error("Error de red:", error);
+            alert("Error al intentar cerrar sesión");
         }
-
-        const data = await response.json();
-        const userEmailElement = document.getElementById("userEmail");
-
-        if (userEmailElement) {
-            userEmailElement.textContent = data.username;
-        }
-    } catch (error) {
-        console.log("No autorizado, redirigiendo a login...");
-        window.location.href = "/login.html";
-    }
-});
+    });
+}
