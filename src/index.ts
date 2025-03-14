@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 // activar archivos estaticos y estilos
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static(path.join(__dirname, "../client"))); // HTML
 app.use('/css', express.static(path.join(__dirname, '../client')));
 
 app.use(compression());
