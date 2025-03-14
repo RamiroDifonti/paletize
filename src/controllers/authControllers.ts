@@ -20,13 +20,6 @@ export const updateUserById = (id: string, values: Record<string, any>) =>
     User.findByIdAndUpdate(id, values);
 ///
 
-export const defaultController = async (_req: express.Request, res: express.Response): Promise <void> => {
-    res.redirect('/index.html');
-    // const user = req.user;
-    // res.send(user);
-    return;
-}
-
 export const login = async (req: express.Request, res: express.Response): Promise <void> => {
     try {
         const {email, password } = req.body;
@@ -45,6 +38,8 @@ export const login = async (req: express.Request, res: express.Response): Promis
         const token = jwt.sign(
             {
                 id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 username: user.username,
                 email: user.email,
                 savedPalettes: user.savedPalettes
@@ -138,6 +133,91 @@ export const logout = async (_req: express.Request, res: express.Response): Prom
     return;
 }
 
+export const apiProfile = async (req: express.Request, res: express.Response): Promise <void> => {
+    res.json({
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        username: req.user.username,
+        // fotoPerfil: req.user.fotoPerfil, // URL de la imagen
+    });
+    return;
+}
+
+export const changeEmail = async (req: express.Request, res: express.Response): Promise <void> => {
+    const { newEmail } = req.body;
+    if (newEmail) {
+        try {
+            // Verificar si el correo ya está en uso (opcional)
+            const existingUser = await User.findOne({ email: newEmail });
+            if (existingUser) {
+                res.status(400).json({ message: "El correo ya está en uso" });
+                return;
+            }
+    
+            // Actualizar solo el email del usuario por su ID
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user.id, // ID del usuario a actualizar
+                { email: newEmail }, // Solo actualizamos el email
+                { new: true } // Devuelve el documento actualizado
+            );
+                
+            if (!updatedUser) {
+                throw new Error('Usuario no encontrado');
+            }
+            updatedUser.save();
+            res.status(200).json({ message: "Correo actualizado correctamente" });
+            return;
+        } catch (error) {
+            res.status(500).json({ message: "Error al actualizar el correo" });
+            return;
+        }
+    }
+    res.status(400).json({ message: "El correo es obligatorio" });
+    return;
+}
+
+export const changePassword = async (req: express.Request, res: express.Response): Promise <void> => {
+    const {currentPassword, newPassword } = req.body;
+    if (!currentPassword) {
+        res.status(400).json({ message: "La contraseña actual es obligatoria" });
+        return;
+    }
+    const user = await getUserById(req.user.id).select('+authentication.salt +authentication.password');
+    if (!user || !user.authentication) {
+        res.status(404).json({ message: 'Error al cambiar la contraseña. Usuario no encontrado' });
+        return;
+    }
+    const isValidPassword = await bcrypt.compare(currentPassword, user.authentication.password);
+    if (!isValidPassword) {
+        res.status(400).json({ message: "La contraseña actual es incorrecta" });
+        return;
+    }
+    if (newPassword) {
+        try {
+            const salt = await bcrypt.genSalt(SALT_ROUNDS);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            user.authentication.password = hashedPassword;
+            user.authentication.salt = salt;
+            user.save();
+            res.status(200).json({ message: "Actualizado correctamente" });
+            return;
+        } catch (error) {
+            res.status(500).json({ message: "Error al actualizar la contraseña" });
+            return;
+        }
+    }
+    res.status(400).json({ message: "La nueva contraseña es obligatoria" });
+    return;
+    
+}
+
+
+
+export const getProfile = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/profile.html"));
+    return;
+}
+
 export const getLogin = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.sendFile(path.join(__dirname, "../../client/content/login.html"));
     return;
@@ -145,5 +225,10 @@ export const getLogin = async (_req: express.Request, res: express.Response): Pr
 
 export const getIndex = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.sendFile(path.join(__dirname, "../../client/content/index.html"));
+    return;
+}
+
+export const getAccount = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/account.html"));
     return;
 }
