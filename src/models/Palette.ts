@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const PaletteSchema = new mongoose.Schema(
   {
+    name: { type: String, required: true },
     colors: {
       type: [
         {
@@ -10,8 +11,8 @@ const PaletteSchema = new mongoose.Schema(
         },
       ],
       validate: [
-        (val: { hsl: string; rgb: string }[]) => val.length === 2 || val.length === 3 || val.length === 5,
-        "Debe contener 2, 3 o 5 colores",
+        (val: { hsl: string; rgb: string }[]) => val.length <= 5,
+        "Debe contener como máximo 5 colores",
       ],
       required: true,
     },
