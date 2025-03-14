@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Cuenta</title>
+    <!-- <link rel="stylesheet" href="/styles/styles.css"> -->
+</head>
+<body>
+    <div class="account-container">
+        <h1>Cambiar Contraseña y Correo Electrónico</h1>
+
+        <!-- Formulario para cambiar el correo electrónico -->
+        <form id="changeEmailForm">
+            <div>
+                <label for="newEmail">Nuevo Correo Electrónico</label>
+                <input type="email" id="newEmail" name="newEmail" required>
+            </div>
+            <button type="submit">Cambiar Correo Electrónico</button>
+        </form>
+
+        <hr>
+
+        <!-- Formulario para cambiar la contraseña -->
+        <form id="changePasswordForm">
+            <div>
+                <label for="currentPassword">Contraseña Actual</label>
+                <input type="password" id="currentPassword" name="currentPassword" required>
+            </div>
+            <div>
+                <label for="newPassword">Nueva Contraseña</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
+            <div>
+                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit">Cambiar Contraseña</button>
+        </form>
+
+        <div id="errorMessage" style="color: red; display: none;">
+            <p>Las contraseñas no coinciden. Por favor, inténtelo de nuevo.</p>
+        </div>
+
+        <div id="successMessage" style="color: green; display: none;">
+            <p>Los cambios se han guardado correctamente.</p>
+        </div>
+    </div>
+
+    <script src="/js/account.js"></script>
+</body>
+</html>
