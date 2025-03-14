@@ -6,22 +6,11 @@
     <title>Página Principal</title>
 </head>
 <body>
-    <h1>Bienvenido a la página principal</h1>
-    <button id="logout-btn">Cerrar sesión</button>
+    <div>
+        <h1>Bienvenido a la Página de Inicio</h1>
+        <button id="logoutBtn">Cerrar Sesión</button>
+    </div>
 
-    <script>
-        // Función para hacer logout
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            fetch('/logout', { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        // Redirigir al login después de logout
-                        window.location.href = '../login.html';
-                    } else {
-                        alert('Error al cerrar sesión');
-                    }
-                });
-        });
-    </script>
+    <script src="/js/index.js"></script> <!-- Archivo JavaScript -->
 </body>
 </html>
