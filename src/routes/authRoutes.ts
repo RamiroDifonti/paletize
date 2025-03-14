@@ -1,16 +1,22 @@
 import express from 'express';
-import { login, register, protectedSession, logout, defaultController, getIndex, getLogin } from '../controllers/authControllers'
+import { login, register, protectedSession, logout, apiProfile, changeEmail, changePassword } from '../controllers/authControllers'
+import { getIndex, getProfile, getLogin, getAccount } from '../controllers/authControllers';
 import { authMiddleware } from '../middlewares/authMiddleware';
 
 export default (router: express.Router) => {
-    router.post("/register", register);
-    router.post("/logout", logout);
-    router.post("/login", login);
-    router.get("/protected", authMiddleware, protectedSession);
-    router.get("/", authMiddleware, defaultController);
-    router.get("/login.html", getLogin);
-    router.get("/index.html", getIndex);
-
+    // Rutas para la api
+    router.post("/api/register", register);
+    router.post("/api/logout", logout);
+    router.post("/api/login", login);
+    router.get("/api/protected", authMiddleware, protectedSession);
+    router.get("/api/profile", authMiddleware, apiProfile);
+    router.post("/api/account/email", authMiddleware, changeEmail);
+    router.post("/api/account/password", authMiddleware, changePassword);
+    // Rutas para el cliente
+    router.get("/", authMiddleware, getIndex);
+    router.get("/profile", authMiddleware, getProfile);
+    router.get("/login", getLogin);
+    router.get("/account", authMiddleware, getAccount);
 };
 
 
