@@ -4,9 +4,8 @@ import jwt from "jsonwebtoken";
 export const authMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const token = req.cookies.sessionToken;
     req.user = null;
-    console.log(token);
     if (!token) {
-        res.redirect("/login.html");
+        res.redirect("/login");
         return;
     }
     try {
@@ -14,7 +13,7 @@ export const authMiddleware = async (req: express.Request, res: express.Response
         req.user = user;
         next();
     } catch (error) {
-        res.redirect("/login.html");
+        res.redirect("/login");
         return;
     }
 };
