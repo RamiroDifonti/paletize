@@ -1,0 +1,235 @@
+:root {
+  --color-1: 14, 100%, 50%;
+  --color-2: 194, 100%, 50%;
+  --color-3: 44, 100%, 50%;
+  --color-4: 224, 100%, 50%;
+  --color-5: 104, 100%, 50%;
+  --background-color: #444;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+/* Estilos IDs */
+#color-1 {
+  background-color: var(--color-1);
+}
+#color-2 {
+  background-color: var(--color-2);
+}
+#color-3 {
+  background-color: var(--color-3);
+}
+#color-4 {
+  background-color: var(--color-4);
+}
+#color-5 {
+  background-color: var(--color-5);
+}
+
+
+.container {
+  display: grid;
+  grid-template-rows: 50px 50px 1fr auto 50px;
+  grid-template-columns: 1fr;
+  height: 100vh;
+  grid-gap: 5px;
+  padding: 5px;
+  font-weight: 600;
+  font-size: 20px;
+  grid-template-areas: 
+    "header"
+    "sidebar"
+    "content"
+    "lower-content"
+    "footer";
+  background-color: #444;
+}
+/* Header */
+.header {
+  display: flex;
+  grid-area: header;
+  background-color: yellow;
+  justify-content: space-between;
+}
+
+.logo img {
+  height: 50px; /* o el tamaño que te guste */
+  max-width: 100%;
+}
+.center-header {
+  align-self: center;
+}
+
+.perfil img {
+  height: 50px;
+  width: 100%;
+}
+
+/* Side bar */
+.sidebar {
+  display: flex;
+  grid-area: sidebar;
+  align-items: center;
+  padding: 0 0 0 20px;
+  gap: 10px;
+  background-color: red;
+}
+
+.colorblind {
+
+}
+.color-type {
+
+}
+/* Main content */
+.content {
+  height: 100%;
+  width: 100%;
+  grid-area: content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #888;
+}
+
+/* Lower content */
+.lower-content {
+  grid-area: lower-content;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+}
+.lower-content:last-child {
+  border-right: 1px solid black;
+}
+
+.colors {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.color-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+.color-container.selected {
+  border: 3px solid #0099ff;
+}
+
+.color {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.edit-icon {
+  display: none;
+  position: absolute;
+  font-size: 15px;
+  background-color: transparent;
+  border: transparent;
+}
+
+
+.tooltip {
+  visibility: hidden;
+  width: 80px;
+  background-color: #444;
+  color: #ddd;
+  text-align: center;
+  border-radius: 6px;
+  padding: 3px 0;
+  font-size: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 110%;
+  left: 50%;
+  margin-left: -40px;
+}
+
+.edit-icon:hover .tooltip {
+  visibility: visible;
+}
+
+/* Editor de colores */
+.editor-panel {
+  display: none;
+  position: relative;
+  font-size: 15px;
+  background-color: #ddd;
+  width: 100%;
+}
+
+/* Media Queries */
+@media (min-width: 678px) {
+  .container {
+    grid-template-rows: 80px 1fr auto 50px;
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-areas: 
+      "header header header"
+      "sidebar content content"
+      "sidebar lower-content lower-content"
+      "footer footer footer";
+  }
+  .logo img {
+    height: 80px;
+    max-width: 100%;
+  }
+  .perfil img {
+    height: 80px;
+    width: 100%;
+  }
+  .sidebar {
+    flex-direction: column;
+    padding: 20px 0 0 0;
+  }
+  .sidebar select {
+    width: 80%;
+  }
+  .color {
+    height: 100px;
+  }
+  .edit-icon {
+    font-size: 20px;
+  }
+  .tooltip {
+    width: 90px;
+    font-size: 12px;
+    margin-left: -45px;
+  }
+  .color:hover .edit-icon {
+    display: inline-block;
+  }
+/* TODO: cambiar a grid */
+  .editor-panel.show {
+    display: flex;
+    flex-direction: column;
+  }
+  .slider-container {
+    margin-bottom: 10px;
+  }
+}
+/* Tablet */
+@media (min-width: 769px) and (min-height: 630px)  {
+  .color-test {
+    height: 100%;
+    width: 50%;
+    background-color: green;
+  }
+  .wheel-container {
+    height: 100%;
+    width: 50%;
+  }
+}
+  
