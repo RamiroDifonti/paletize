@@ -1,0 +1,14 @@
+.wheel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    height: 100%;
+    position: relative;
+}
+  
+#color-wheel-saturation, #color-wheel-lightness  {
+    width: 75%;
+    max-width: 350px;
+    max-height: 350px;
+}
