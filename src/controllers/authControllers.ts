@@ -232,3 +232,8 @@ export const getAccount = async (_req: express.Request, res: express.Response): 
     res.sendFile(path.join(__dirname, "../../client/content/account.html"));
     return;
 }
+
+export const getPalette = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/palette.html"));
+    return;
+}
