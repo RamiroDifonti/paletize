@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../styles/palette.css">
+        <link rel="stylesheet" href="../styles/colorWheel.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    </head>
+    <body>
+        <main class="container">
+            <header class="header">
+                <a href="/" class="logo">
+                    <img src="../images/logo.png" alt="Logo">
+                </a>
+                <div class="center-header">
+                    <input type="text" placeholder="Escribe algo...">
+                    <button>Guardar</button>
+                </div>
+                <a href="/profile" class="perfil">
+                    <img src="../images/logo.png" alt="Perfil">
+                </a>
+            </header>
+            <nav class="sidebar">
+                <select name="colorblind">
+                    <option disabled selected>Daltonismos</option>
+                    <option value="ninguno">Ninguno</option>
+                    <option value="deuteranopia">Deuteranopía</option>
+                    <option value="protanopia">Protanopía</option>
+                    <option value="tritanopia">Tritanopía</option>
+                </select>
+
+                <select name="color-type">
+                    <option disabled selected>Tipo de colores</option>
+                    <option value="complementarios">Complementarios</option>
+                    <option value="analogos">Análogos</option>
+                    <option value="triadicos">Triádicos</option>
+                    <option value="monocromaticos">Monocromáticos</option>
+                </select>
+            </nav>
+            <div class="content">
+
+                <div class="wheel-container">
+                    
+                    <canvas id="color-wheel-saturation"></canvas>
+                    <div class = "outer-circle"></div>
+                </div>
+                <div class="wheel-container">
+                    <canvas id="color-wheel-lightness"></canvas>
+                </div>
+                <div class="color-test">
+                </div>
+            </div>
+            <div class="lower-content">
+                <section class="colors">
+                    <!-- c1 -->
+                    <div class="color-container" id="color-container-1">
+                        <div class="color" id = "color-1">
+                            <button class="bi bi-sliders edit-icon">
+                                <span class="tooltip">Editar color</span>
+                            </button>
+                        </div>
+                        <div class="editor-panel" id="panel-1">
+                            <div class="slider-container">
+                              <label>H:</label>
+                              <input type="range" id="hue-1" min="0" max="360" value="14">
+                              <input type="number" id="hue-value-1" min="0" max="360" value="14" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>S:</label>
+                              <input type="range" id="saturation-1" min="0" max="100" value="100">
+                              <input type="number" id="saturation-value-1" min="0" max="100" value="100" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>L:</label>
+                              <input type="range" id="lightness-1" min="0" max="100" value="50">
+                              <input type="number" id="lightness-value-1" min="0" max="100" value="50" class="value-input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- c2 -->
+                    <div class="color-container" id="color-container-2">
+                        <div class="color" id="color-2">
+                            <button class="bi bi-sliders edit-icon">
+                                <span class="tooltip">Editar color</span>
+                            </button>
+                        </div>
+                        <div class="editor-panel" id="panel-2">
+                            <div class="slider-container">
+                                <label>H:</label>
+                                <input type="range" id="hue-2" min="0" max="360" value="194">
+                                <input type="number" id="hue-value-2" min="0" max="360" value="194" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                                <label>S:</label>
+                                <input type="range" id="saturation-2" min="0" max="100" value="100">
+                                <input type="number" id="saturation-value-2" min="0" max="100" value="100" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                                <label>L:</label>
+                                <input type="range" id="lightness-2" min="0" max="100" value="50">
+                                <input type="number" id="lightness-value-2" min="0" max="100" value="50" class="value-input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- c3 -->
+                    <div class="color-container" id="color-container-3">
+                        <div class="color" id="color-3">
+                            <button class="bi bi-sliders edit-icon">
+                                <span class="tooltip">Editar color</span>
+                            </button>
+                        </div>
+                        <div class="editor-panel" id="panel-3">
+                            <div class="slider-container">
+                                <label>H:</label>
+                                <input type="range" id="hue-3" min="0" max="360" value="44">
+                                <input type="number" id="hue-value-3" min="0" max="360" value="44" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                                <label>S:</label>
+                                <input type="range" id="saturation-3" min="0" max="100" value="100">
+                                <input type="number" id="saturation-value-3" min="0" max="100" value="100" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                                <label>L:</label>
+                                <input type="range" id="lightness-3" min="0" max="100" value="50">
+                                <input type="number" id="lightness-value-3" min="0" max="100" value="50" class="value-input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- c4 -->
+                    <div class="color-container" id="color-container-4">
+                        <div class="color" id="color-4">
+                            <button class="bi bi-sliders edit-icon">
+                                <span class="tooltip">Editar color</span>
+                            </button>
+                        </div>
+                        <div class="editor-panel" id="panel-4">
+                            <div class="slider-container">
+                              <label>H:</label>
+                              <input type="range" id="hue-4" min="0" max="360" value="224">
+                              <input type="number" id="hue-value-4" min="0" max="360" value="224" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>S:</label>
+                              <input type="range" id="saturation-4" min="0" max="100" value="100">
+                              <input type="number" id="saturation-value-4" min="0" max="100" value="100" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>L:</label>
+                              <input type="range" id="lightness-4" min="0" max="100" value="50">
+                              <input type="number" id="lightness-value-4" min="0" max="100" value="50" class="value-input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- c5 -->
+                    <div class="color-container" id="color-container-5">
+                        <div class="color" id="color-5">
+                            <button class="bi bi-sliders edit-icon">
+                                <span class="tooltip">Editar color</span>
+                            </button>
+                        </div>
+                        <div class="editor-panel" id="panel-5">
+                            <div class="slider-container">
+                              <label>H:</label>
+                              <input type="range" id="hue-5" min="0" max="360" value="104">
+                              <input type="number" id="hue-value-5" min="0" max="360" value="104" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>S:</label>
+                              <input type="range" id="saturation-5" min="0" max="100" value="100">
+                              <input type="number" id="saturation-value-5" min="0" max="100" value="100" class="value-input">
+                            </div>
+                            <div class="slider-container">
+                              <label>L:</label>
+                              <input type="range" id="lightness-5" min="0" max="100" value="60">
+                              <input type="number" id="lightness-value-5" min="0" max="100" value="50" class="value-input">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- <section class="colors duplicate" id="duplicate-colors-container">
+
+                </section> -->
+            </div>
+        </main>
+        <script src="../js/palette.js"></script>
+        <script src="../js/colorWheel.js"></script>
+    </body>
+</html>
