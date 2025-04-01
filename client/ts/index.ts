@@ -1,3 +1,5 @@
+import * as culori from 'culori';
+
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
