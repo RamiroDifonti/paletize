@@ -42,221 +42,241 @@
                         <option value="hsl">HSL</option>
                         <option value="oklch">OKLCH</option>
                     </select>
+
                     <section class = "color-section">
-                        <div class="color-selector">
+                        <div id = "separation-triad" class="selector hidden separation">
+                            <label for="c">Separación de los colores</label>
+                            <input type="range" id="triad" min="0" max="180" step="1" value="120">
+                            <input type="number" id="triad-value" min="0" max="180" value="120" class="value-input">
+                        </div>
+                        <div id = "separation-analogous" class="selector hidden separation">
+                            <label for="c">Separación de los colores</label>
+                            <input type="range" id="analogous" min="0" max="30" step="1" value="10">
+                            <input type="number" id="analogous-value" min="0" max="30" value="10" class="value-input">
+                        </div>
+                        <div id = "separation-split" class="selector hidden separation">
+                            <label for="c">Separación de los colores</label>
+                            <input type="range" id="split" min="0" max="30" step="1" value="30">
+                            <input type="number" id="split-value" min="0" max="30" value="30" class="value-input">
+                        </div>
+                        <div id = "separation-complementary" class="selector hidden separation">
+                            <label for="c">Separación de los colores</label>
+                            <input type="range" id="complementary" min="0" max="360" step="1" value="180">
+                            <input type="number" id="complementary-value" min="0" max="360" value="180" class="value-input">
+                        </div>
+                        <div class="selector">
                             <label for="l">L1:</label>
                             <input type="range" id="l-1" min="0" max="100" step="1" value="75">
                             <input type="number" id="l-1-value" min="0" max="100" value="75" class="value-input">
                         </div>
-                        <div class="color-selector">
+                        <div class="selector">
                             <label for="c">S1:</label>
                             <input type="range" id="s-1" min="0" max="100" step="1" value="50">
                             <input type="number" id="s-1-value" min="0" max="100" value="50" class="value-input">
                         </div>
-                        <div class="color-selector">
+                        <div class="selector">
                             <label for="l2">L2:</label>
                             <input type="range" id="l-2" min="0" max="100" step="1" value="75">
                             <input type="number" id="l-2-value" min="0" max="100" value="75" class="value-input">
                         </div>
-                        <div class="color-selector">
+                        <div class="selector">
                             <label for="c2">S2:</label>
                             <input type="range" id="s-2" min="0" max="100" step="1" value="50">
                             <input type="number" id="s-2-value" min="0" max="100" value="50" class="value-input">
                         </div>
-                        <div class="color-selector">
+                        <div class="selector">
                             <label for="h">H:</label>
                             <input type="range" id="h" min="0" max="360" step="1" value="0">
                             <input type="number" id="h-value" min="0" max="360" value="0" class="value-input">
                         </div>
                     </section>
                 </aside>
-                <div class="wheel-container">
-                    <canvas id="color-wheel-1"></canvas>
-                    <div class="palette" id="palette-1"></div>
-                </div>
-                <div class="wheel-container">
-                    <canvas id="color-wheel-2"></canvas>
-                    <div class="palette" id="palette-2"></div>
-                </div>
-                <!-- <div class="color-test">
-                </div> -->
-            </section>
-            <section class="lower-content">
-                <section class="palette">
-                    <!-- c1 -->   
-                    <div class="color-container" id="color-container-1">
-                        <div class="color" id = "color-1">
-                            <button class="bi bi-sliders edit-icon">
-                                <span class="tooltip">Editar color</span>
-                            </button>
+                <section class="main-content">
+                    <div class="color-wheels">
+                        <div class="wheel-container">
+                            <canvas id="color-wheel-1"></canvas>
+                            <div class="palette" id="palette-1"></div>
                         </div>
-                        <div class="editor-panel" id="panel-1">
-                            <div class="slider-container">
-                              <label>H:</label>
-                              <input type="range" id="hue-1" min="0" max="360" value="14">
-                              <input type="number" id="hue-value-1" min="0" max="360" value="14" class="value-input">
-                            </div>
-                            <!-- HSL -->
-                            <div class="slider-container slider-hsl">
-                              <label>S:</label>
-                              <input type="range" id="saturation-1" min="0" max="100" value="100">
-                              <input type="number" id="saturation-value-1" min="0" max="100" value="100" class="value-input">
-                            </div>
-                            <!-- OKLCH -->
-                            <div class="slider-container slider-oklch">
-                                <label>C:</label>
-                                <input type="range" id="chroma-1" min="0" max="0.4" step="0.01" value="0.1">
-                                <input type="number" id="chroma-value-1" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
-                            </div>
-                            
-                            <div class="slider-container">
-                              <label>L:</label>
-                              <input type="range" id="lightness-1" min="0" max="100" value="50">
-                              <input type="number" id="lightness-value-1" min="0" max="100" value="50" class="value-input">
-                            </div>
+                        <div class="wheel-container">
+                            <canvas id="color-wheel-2"></canvas>
+                            <div class="palette" id="palette-2"></div>
                         </div>
                     </div>
-                    <!-- c2 -->
-                    <div class="color-container" id="color-container-2">
-                        <div class="color" id="color-2">
-                            <button class="bi bi-sliders edit-icon">
-                                <span class="tooltip">Editar color</span>
-                            </button>
-                        </div>
-                        <div class="editor-panel" id="panel-2">
-                            <div class="slider-container">
-                                <label>H:</label>
-                                <input type="range" id="hue-2" min="0" max="360" value="194">
-                                <input type="number" id="hue-value-2" min="0" max="360" value="194" class="value-input">
+                    <section class="palette">
+                        <!-- c1 -->   
+                        <div class="color-container hidden" id="color-container-1">
+                            <div class="color" id = "color-1">
+                                <button class="bi bi-sliders edit-icon">
+                                    <span class="tooltip">Editar color</span>
+                                </button>
                             </div>
-                            <!-- HSL -->
-                            <div class="slider-container slider-hsl">
-                                <label>S:</label>
-                                <input type="range" id="saturation-2" min="0" max="100" value="100">
-                                <input type="number" id="saturation-value-2" min="0" max="100" value="100" class="value-input">
-                            </div>
-                            <!-- OKLCH -->
-                            <div class="slider-container slider-oklch">
-                                <label>C:</label>
-                                <input type="range" id="chroma-2" min="0" max="0.4" step="0.01" value="0.1">
-                                <input type="number" id="chroma-value-2" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
-                            </div>
-
-                            <div class="slider-container">
-                                <label>L:</label>
-                                <input type="range" id="lightness-2" min="0" max="100" value="50">
-                                <input type="number" id="lightness-value-2" min="0" max="100" value="50" class="value-input">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- c3 -->
-                    <div class="color-container" id="color-container-3">
-                        <div class="color" id="color-3">
-                            <button class="bi bi-sliders edit-icon">
-                                <span class="tooltip">Editar color</span>
-                            </button>
-                        </div>
-                        <div class="editor-panel" id="panel-3">
-                            <div class="slider-container">
-                                <label>H:</label>
-                                <input type="range" id="hue-3" min="0" max="360" value="44">
-                                <input type="number" id="hue-value-3" min="0" max="360" value="44" class="value-input">
-                            </div>
-                            <!-- HSL -->
-                            <div class="slider-container slider-hsl">
-                                <label>S:</label>
-                                <input type="range" id="saturation-3" min="0" max="100" value="100">
-                                <input type="number" id="saturation-value-3" min="0" max="100" value="100" class="value-input">
-                            </div>
-                            <!-- OKLCH -->
-                            <div class="slider-container slider-oklch">
-                                <label>C:</label>
-                                <input type="range" id="chroma-3" min="0" max="0.4" step="0.01" value="0.1">
-                                <input type="number" id="chroma-value-3" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
-                            </div>
-
-                            <div class="slider-container">
-                                <label>L:</label>
-                                <input type="range" id="lightness-3" min="0" max="100" value="50">
-                                <input type="number" id="lightness-value-3" min="0" max="100" value="50" class="value-input">
+                            <div class="editor-panel" id="panel-1">
+                                <div class="slider-container">
+                                    <label>H:</label>
+                                    <input type="range" id="hue-1" min="0" max="360" value="14">
+                                    <input type="number" id="hue-value-1" min="0" max="360" value="14" class="value-input">
+                                </div>
+                                <!-- HSL -->
+                                <div class="slider-container slider-hsl">
+                                    <label>S:</label>
+                                    <input type="range" id="saturation-1" min="0" max="100" value="100">
+                                    <input type="number" id="saturation-value-1" min="0" max="100" value="100" class="value-input">
+                                </div>
+                                <!-- OKLCH -->
+                                <div class="slider-container slider-oklch">
+                                    <label>C:</label>
+                                    <input type="range" id="chroma-1" min="0" max="0.4" step="0.01" value="0.1">
+                                    <input type="number" id="chroma-value-1" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                                </div>
+                                
+                                <div class="slider-container">
+                                    <label>L:</label>
+                                    <input type="range" id="lightness-1" min="0" max="100" value="50">
+                                    <input type="number" id="lightness-value-1" min="0" max="100" value="50" class="value-input">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- c4 -->
-                    <div class="color-container" id="color-container-4">
-                        <div class="color" id="color-4">
-                            <button class="bi bi-sliders edit-icon">
-                                <span class="tooltip">Editar color</span>
-                            </button>
-                        </div>
-                        <div class="editor-panel" id="panel-4">
-                            <div class="slider-container">
-                              <label>H:</label>
-                              <input type="range" id="hue-4" min="0" max="360" value="224">
-                              <input type="number" id="hue-value-4" min="0" max="360" value="224" class="value-input">
+                        <!-- c2 -->
+                        <div class="color-container hidden" id="color-container-2">
+                            <div class="color" id="color-2">
+                                <button class="bi bi-sliders edit-icon">
+                                    <span class="tooltip">Editar color</span>
+                                </button>
                             </div>
-                            <!-- HSL -->
-                            <div class="slider-container slider-hsl">
-                              <label>S:</label>
-                              <input type="range" id="saturation-4" min="0" max="100" value="100">
-                              <input type="number" id="saturation-value-4" min="0" max="100" value="100" class="value-input">
-                            </div>
-                            <!-- OKLCH -->
-                            <div class="slider-container slider-oklch">
-                                <label>C:</label>
-                                <input type="range" id="chroma-4" min="0" max="0.4" step="0.01" value="0.1">
-                                <input type="number" id="chroma-value-4" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
-                            </div>
-
-                            <div class="slider-container">
-                              <label>L:</label>
-                              <input type="range" id="lightness-4" min="0" max="100" value="50">
-                              <input type="number" id="lightness-value-4" min="0" max="100" value="50" class="value-input">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- c5 -->
-                    <div class="color-container" id="color-container-5">
-                        <div class="color" id="color-5">
-                            <button class="bi bi-sliders edit-icon">
-                                <span class="tooltip">Editar color</span>
-                            </button>
-                        </div>
-                        <div class="editor-panel" id="panel-5">
-                            <div class="slider-container">
-                              <label>H:</label>
-                              <input type="range" id="hue-5" min="0" max="360" value="104">
-                              <input type="number" id="hue-value-5" min="0" max="360" value="104" class="value-input">
-                            </div>
-                            <!-- HSL -->
-                            <div class="slider-container slider-hsl">
-                              <label>S:</label>
-                              <input type="range" id="saturation-5" min="0" max="100" value="100">
-                              <input type="number" id="saturation-value-5" min="0" max="100" value="100" class="value-input">
-                            </div>
-                            <!-- OKLCH -->
-                            <div class="slider-container slider-oklch">
-                                <label>C:</label>
-                                <input type="range" id="chroma-5" min="0" max="0.4" step="0.01" value="0.1">
-                                <input type="number" id="chroma-value-5" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
-                            </div>
-
-                            <div class="slider-container">
-                              <label>L:</label>
-                              <input type="range" id="lightness-5" min="0" max="100" value="60">
-                              <input type="number" id="lightness-value-5" min="0" max="100" value="50" class="value-input">
+                            <div class="editor-panel" id="panel-2">
+                                <div class="slider-container">
+                                    <label>H:</label>
+                                    <input type="range" id="hue-2" min="0" max="360" value="194">
+                                    <input type="number" id="hue-value-2" min="0" max="360" value="194" class="value-input">
+                                </div>
+                                <!-- HSL -->
+                                <div class="slider-container slider-hsl">
+                                    <label>S:</label>
+                                    <input type="range" id="saturation-2" min="0" max="100" value="100">
+                                    <input type="number" id="saturation-value-2" min="0" max="100" value="100" class="value-input">
+                                </div>
+                                <!-- OKLCH -->
+                                <div class="slider-container slider-oklch">
+                                    <label>C:</label>
+                                    <input type="range" id="chroma-2" min="0" max="0.4" step="0.01" value="0.1">
+                                    <input type="number" id="chroma-value-2" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                                </div>
+        
+                                <div class="slider-container">
+                                    <label>L:</label>
+                                    <input type="range" id="lightness-2" min="0" max="100" value="50">
+                                    <input type="number" id="lightness-value-2" min="0" max="100" value="50" class="value-input">
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <!-- c3 -->
+                        <div class="color-container hidden" id="color-container-3">
+                            <div class="color" id="color-3">
+                                <button class="bi bi-sliders edit-icon">
+                                    <span class="tooltip">Editar color</span>
+                                </button>
+                            </div>
+                            <div class="editor-panel" id="panel-3">
+                                <div class="slider-container">
+                                    <label>H:</label>
+                                    <input type="range" id="hue-3" min="0" max="360" value="44">
+                                    <input type="number" id="hue-value-3" min="0" max="360" value="44" class="value-input">
+                                </div>
+                                <!-- HSL -->
+                                <div class="slider-container slider-hsl">
+                                    <label>S:</label>
+                                    <input type="range" id="saturation-3" min="0" max="100" value="100">
+                                    <input type="number" id="saturation-value-3" min="0" max="100" value="100" class="value-input">
+                                </div>
+                                <!-- OKLCH -->
+                                <div class="slider-container slider-oklch">
+                                    <label>C:</label>
+                                    <input type="range" id="chroma-3" min="0" max="0.4" step="0.01" value="0.1">
+                                    <input type="number" id="chroma-value-3" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                                </div>
+        
+                                <div class="slider-container">
+                                    <label>L:</label>
+                                    <input type="range" id="lightness-3" min="0" max="100" value="50">
+                                    <input type="number" id="lightness-value-3" min="0" max="100" value="50" class="value-input">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- c4 -->
+                        <div class="color-container hidden" id="color-container-4">
+                            <div class="color" id="color-4">
+                                <button class="bi bi-sliders edit-icon">
+                                    <span class="tooltip">Editar color</span>
+                                </button>
+                            </div>
+                            <div class="editor-panel" id="panel-4">
+                                <div class="slider-container">
+                                    <label>H:</label>
+                                    <input type="range" id="hue-4" min="0" max="360" value="224">
+                                    <input type="number" id="hue-value-4" min="0" max="360" value="224" class="value-input">
+                                </div>
+                                <!-- HSL -->
+                                <div class="slider-container slider-hsl">
+                                    <label>S:</label>
+                                    <input type="range" id="saturation-4" min="0" max="100" value="100">
+                                    <input type="number" id="saturation-value-4" min="0" max="100" value="100" class="value-input">
+                                </div>
+                                <!-- OKLCH -->
+                                <div class="slider-container slider-oklch">
+                                    <label>C:</label>
+                                    <input type="range" id="chroma-4" min="0" max="0.4" step="0.01" value="0.1">
+                                    <input type="number" id="chroma-value-4" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                                </div>
+        
+                                <div class="slider-container">
+                                    <label>L:</label>
+                                    <input type="range" id="lightness-4" min="0" max="100" value="50">
+                                    <input type="number" id="lightness-value-4" min="0" max="100" value="50" class="value-input">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- c5 -->
+                        <div class="color-container hidden" id="color-container-5">
+                            <div class="color" id="color-5">
+                                <button class="bi bi-sliders edit-icon">
+                                    <span class="tooltip">Editar color</span>
+                                </button>
+                            </div>
+                            <div class="editor-panel" id="panel-5">
+                                <div class="slider-container">
+                                    <label>H:</label>
+                                    <input type="range" id="hue-5" min="0" max="360" value="104">
+                                    <input type="number" id="hue-value-5" min="0" max="360" value="104" class="value-input">
+                                </div>
+                                <!-- HSL -->
+                                <div class="slider-container slider-hsl">
+                                    <label>S:</label>
+                                    <input type="range" id="saturation-5" min="0" max="100" value="100">
+                                    <input type="number" id="saturation-value-5" min="0" max="100" value="100" class="value-input">
+                                </div>
+                                <!-- OKLCH -->
+                                <div class="slider-container slider-oklch">
+                                    <label>C:</label>
+                                    <input type="range" id="chroma-5" min="0" max="0.4" step="0.01" value="0.1">
+                                    <input type="number" id="chroma-value-5" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                                </div>
+        
+                                <div class="slider-container">
+                                    <label>L:</label>
+                                    <input type="range" id="lightness-5" min="0" max="100" value="60">
+                                    <input type="number" id="lightness-value-5" min="0" max="100" value="50" class="value-input">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </section>
-                <!-- <section class="palette colorblind">
-
-                </section> -->   
+                <div class="color-test">
+                </div>
             </section>
-            <footer>
-                TFG: Ramiro Difonti
-            </footer>     
         </main>
+        <footer>
+            TFG: Ramiro Difonti
+        </footer>   
         <script src="../js/palette-tmp.js"></script>
         <script src="../js/colorWheel-tmp.js"></script>
     </body>
