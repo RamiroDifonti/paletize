@@ -1,288 +1,619 @@
-const wheelSaturationCanvas = document.getElementById('color-wheel-saturation') as HTMLCanvasElement;
-const wheelLigthnessCanvas = document.getElementById('color-wheel-lightness') as HTMLCanvasElement;
-const TOTAL_COLORS = 5; // Total de colores a mostrar
-const WHEEL_PROPORTION = 0.8; // Proporción de la rueda de color (80% del canvas)
+const content = document.querySelector<HTMLElement>(".content");
+
+const firstWheelCanvas = document.getElementById('color-wheel-1') as HTMLCanvasElement;
+const secondWheelCanvas = document.getElementById('color-wheel-2') as HTMLCanvasElement;
+
+const palette1 = document.getElementById("palette-1") as HTMLElement;
+const palette2 = document.getElementById("palette-2") as HTMLElement;
+
+const hslContainers = document.querySelectorAll<HTMLElement>(".slider-hsl");
+const oklchContainers = document.querySelectorAll<HTMLElement>(".slider-oklch");
+
+const colorScheme = document.querySelector<HTMLSelectElement>(".color-type");
+const select = document.querySelector<HTMLSelectElement>(".representation-wheel");
+
+const separationTriad = document.getElementById("separation-triad") as HTMLElement;
+const separationComplementary = document.getElementById("separation-complementary") as HTMLElement;
+const separationAnalogous = document.getElementById("separation-analogous") as HTMLElement;
+const separationSplit = document.getElementById("separation-split") as HTMLElement;
+const triadSlider = document.getElementById("triad") as HTMLInputElement;
+const complementarySlider = document.getElementById("complementary") as HTMLInputElement;
+const analogousSlider = document.getElementById("analogous") as HTMLInputElement;
+const splitSlider = document.getElementById("split") as HTMLInputElement;
+
+const satSlider1 = document.querySelector<HTMLInputElement>("#s-1");
+const lightSlider1 = document.querySelector<HTMLInputElement>("#l-1");
+const hueSlider = document.querySelector<HTMLInputElement>("#h");
+const satSlider2 = document.querySelector<HTMLInputElement>("#s-2");
+const lightSlider2 = document.querySelector<HTMLInputElement>("#l-2");
+const hueValue = document.querySelector<HTMLInputElement>("#h-value");
+const satValue1 = document.querySelector<HTMLInputElement>("#s-1-value");
+const lightValue1 = document.querySelector<HTMLInputElement>("#l-1-value");
+const satValue2 = document.querySelector<HTMLInputElement>("#s-2-value");
+const lightValue2 = document.querySelector<HTMLInputElement>("#l-2-value");
+
 let selectedColorId: number | null = 1; // Por defecto, color 1 seleccionado
-const LIGHTNESS = getSelectedLightness();
-const SATURATION = getSelectedSaturation();
+
 const BACKGROUND_COLOR = "#444"; // Color de fondo del canvas
+const CIRCLE_RADIUS = 20;
 
 // Dibujar rueda de color
 // TODO: Estudiar el cambio por un canvas para mejorar la velocidad de renderizado
 // TODO: Cambiar la rueda para que se recargue cuando se mueve el tamaño de la página
 //       https://www.w3schools.com/Js/js_events.asp
+
+window.addEventListener("DOMContentLoaded", updateSeparation);
+select?.addEventListener("change", updateAll);
+colorScheme?.addEventListener("change", () => {
+  // Si el esquema acepta variaciones en la separación de los colores, que se muestre
+  updateSeparation();
+  // Borrar los colores de las paletas
+  palette1.innerHTML = "";
+  palette2.innerHTML = "";
+  for (let i = 1; i <= 5; i++) {
+    const slot = document.getElementById(`color-${i}`);
+    if (slot) {
+      slot.style.backgroundColor = "";
+      slot.parentElement?.classList.add("hidden");
+    }
+  }
+  updateAll();
+});
+
+// Función para actualizar el slider con la separación de los colores
+function updateSeparation() {
+  let separation: HTMLElement | null = null;
+  if (colorScheme?.value === "triad") {
+    separation = separationTriad;
+    separationComplementary.classList.contains("hidden") ? "" : separationComplementary.classList.add("hidden");
+    separationAnalogous.classList.contains("hidden") ? "" : separationAnalogous.classList.add("hidden");
+    separationSplit.classList.contains("hidden") ? "" : separationSplit.classList.add("hidden");
+  } else if (colorScheme?.value === "complementary") {
+    separation = separationComplementary;
+    separationTriad.classList.contains("hidden") ? "" : separationTriad.classList.add("hidden");
+    separationAnalogous.classList.contains("hidden") ? "" : separationAnalogous.classList.add("hidden");
+    separationSplit.classList.contains("hidden") ? "" : separationSplit.classList.add("hidden");
+  } else if (colorScheme?.value === "analogous") {
+    separation = separationAnalogous;
+    separationComplementary.classList.contains("hidden") ? "" : separationComplementary.classList.add("hidden");
+    separationTriad.classList.contains("hidden") ? "" : separationTriad.classList.add("hidden");
+    separationSplit.classList.contains("hidden") ? "" : separationSplit.classList.add("hidden");
+  } else if (colorScheme?.value === "split-complementary") {
+    separation = separationSplit;
+    separationComplementary.classList.contains("hidden") ? "" : separationComplementary.classList.add("hidden");
+    separationAnalogous.classList.contains("hidden") ? "" : separationAnalogous.classList.add("hidden");
+    separationTriad.classList.contains("hidden") ? "" : separationTriad.classList.add("hidden");
+  } else {
+    separationComplementary.classList.contains("hidden") ? "" : separationComplementary.classList.add("hidden");
+    separationAnalogous.classList.contains("hidden") ? "" : separationAnalogous.classList.add("hidden");
+    separationTriad.classList.contains("hidden") ? "" : separationTriad.classList.add("hidden");
+    separationSplit.classList.contains("hidden") ? "" : separationSplit.classList.add("hidden");
+  }
+  if (separation) {
+    separation.classList.remove("hidden");
+  }
+}
+
 function drawColorWheels() {
   // Comprobar si los canvas y sus contextos existen
-  if (!wheelSaturationCanvas || !wheelLigthnessCanvas) return;
+  if (!firstWheelCanvas || !secondWheelCanvas) return;
 
-  const saturationContext = wheelSaturationCanvas.getContext("2d", { willReadFrequently: false });
-  const lightnessContext = wheelLigthnessCanvas.getContext("2d", { willReadFrequently: false });
+  const saturationContext = firstWheelCanvas.getContext("2d", { willReadFrequently: false });
+  const lightnessContext = secondWheelCanvas.getContext("2d", { willReadFrequently: false });
   if (!saturationContext || !lightnessContext) return;
 
-  const container = wheelSaturationCanvas.parentElement;
+  const container = firstWheelCanvas.parentElement;
   if (!container) return;
 
   // Configurar tamaño del canvas
   const size = Math.min(container.clientWidth, container.clientHeight);
-  const radius = size / 2;
-  const center = { x: radius, y: radius };
-  const limitedRadius = radius * WHEEL_PROPORTION;
-  wheelSaturationCanvas.width = wheelLigthnessCanvas.width = size;
-  wheelSaturationCanvas.height = wheelLigthnessCanvas.height = size;
+  firstWheelCanvas.width = secondWheelCanvas.width = size;
+  firstWheelCanvas.height = secondWheelCanvas.height = size;
 
   // Limpiar canvas
   saturationContext.clearRect(0, 0, size, size);
   lightnessContext.clearRect(0, 0, size, size);
 
-  // 1. Dibujar canvas
-  drawCanvasWheel(saturationContext, size, center, limitedRadius, LIGHTNESS, true);
-  drawCanvasWheel(lightnessContext, size, center, limitedRadius, SATURATION, false);
-
-  // 2. Dibujar puntos
-  drawAllColorDots();
+  // Comprobar si es una rueda HSL o OKHCL
+  if (!select) return;
+  const representation = select.value as "hsl" | "oklch";
+  
+  if (representation === "hsl") {
+    hslContainers.forEach(container => container.style.display = "flex");
+    oklchContainers.forEach(container => container.style.display = "none");
+    const lightness = document.getElementById("l-1") as HTMLInputElement;
+    const saturation = document.getElementById("s-1") as HTMLInputElement;
+    generateWheelHSL(parseInt(lightness.value), false, firstWheelCanvas);
+    generateWheelHSL(parseInt(saturation.value), true, secondWheelCanvas);
+    
+  } else if (representation === "oklch") {
+    hslContainers.forEach(container => container.style.display = "none");
+    oklchContainers.forEach(container => container.style.display = "flex");
+  }
 }
 
-// Rueda de color
-function drawCanvasWheel(
-  ctx: CanvasRenderingContext2D,
-  size: number,
-  center: { x: number; y: number },
-  radius: number,
-  fixedValue: number,
-  isSaturationWheel: boolean
-) {
-  const step = 3; // Incremento de píxeles
-  for (let y = 0; y < size; y += step) {
-    for (let x = 0; x < size; x += step) {
-      const dx = x - center.x;
-      const dy = y - center.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance > radius) continue;
-      const angle = Math.atan2(dy, dx);
-      const hue = ((angle * 180 / Math.PI) + 360) % 360;
-      // Calcular saturación y luminosidad según el tipo de rueda
-      let saturation, lightness;
-      if (isSaturationWheel) {
-        saturation = (distance / radius) * 100;
-        lightness = fixedValue;
-      } else {
-        saturation = fixedValue;
-        lightness = 100 - ((distance / radius) * 100);
+function generateWheelHSL(
+  value: number,
+  isSaturationWheel: boolean,
+  canvas: HTMLCanvasElement,
+  size: number = 400
+): void {
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) return;
+  canvas.width = size;
+  canvas.height = size;
+
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const radius = size / 2;
+
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+
+  for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+          const dx = x - centerX;
+          const dy = y - centerY;
+          const distance = Math.sqrt(dx * dx + dy * dy) / radius;
+          const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+          const hue = (angle + 360) % 360;
+
+          const index = (y * size + x) * 4;
+
+          if (distance <= 1) {
+              let saturation: number;
+              let lightness: number;
+
+              if (isSaturationWheel) {
+                  saturation = value;
+                  lightness = distance * 100;
+              } else {
+                  saturation = distance * 100;
+                  lightness = value;
+              }
+
+              const [r, g, b] = hslToRgb(hue, saturation, lightness);
+
+              data[index] = r;
+              data[index + 1] = g;
+              data[index + 2] = b;
+              data[index + 3] = 255; // Alpha
+          } else {
+              data[index + 3] = 0; // Transparente fuera del círculo
+          }
       }
-
-      // Dibujar directamente con HSL
-      ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      ctx.fillRect(x, y, step, step);  // Se usa rectángulo porque es más eficiente
-    }
-  }
-  // Borde para suavizar los cortes de la rueda
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
-  ctx.strokeStyle = BACKGROUND_COLOR;
-  ctx.lineWidth = 10;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// Dibujar los puntos de los colores
-function drawAllColorDots() {
-  const points = [];
-
-  // Recolectar datos de todos los puntos
-  for (let i = 1; i <= TOTAL_COLORS; i++) {
-    const h = parseInt((document.getElementById(`hue-${i}`) as HTMLInputElement)?.value || "0");
-    const s = parseInt((document.getElementById(`saturation-${i}`) as HTMLInputElement)?.value || "0");
-    const l = parseInt((document.getElementById(`lightness-${i}`) as HTMLInputElement)?.value || "50");
-    points.push({ h, s, l, id: i });
   }
 
-  // Dibujar todas las líneas primero
-  points.forEach(point => {
-    drawColorLine(wheelSaturationCanvas, point.h, point.s, point.l, point.id);
-  });
-
-  // Dibujar puntos
-  points.forEach(point => {
-    drawColorDot(wheelSaturationCanvas, point.h, point.s, point.l, point.id);
-  });
+  ctx.putImageData(imageData, 0, 0);
 }
 
-function drawColorLine(canvas: HTMLCanvasElement, hue: number, saturation: number, lightness: number, id: number) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const radius = centerX * WHEEL_PROPORTION;
-  const angleRad = (hue * Math.PI) / 180;
-  const distance = radius * (saturation / 100);
-  const x = centerX + Math.cos(angleRad) * distance;
-  const y = centerY + Math.sin(angleRad) * distance;
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.lineTo(x, y);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawColorDot(canvas: HTMLCanvasElement, hue: number, saturation: number, lightness: number, id: number) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const radius = centerX * WHEEL_PROPORTION;
-  const dotRadius = radius * 0.15; // 15% del radio de la rueda
-  const angleRad = (hue * Math.PI) / 180;
-  const distance = radius * (saturation / 100);
-  const x = centerX + Math.cos(angleRad) * distance;
-  const y = centerY + Math.sin(angleRad) * distance;
-  ctx.save();
-
-  // Sombra
-  ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
-  ctx.shadowBlur = 6;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-
-  // Borde blanco
-  ctx.beginPath();
-  ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Relleno del punto
-  ctx.beginPath();
-  ctx.arc(x, y, dotRadius - 2, 0, Math.PI * 2);
-  ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  ctx.fill();
-
-  ctx.restore();
-}
-
-// Refrescar puntos en el canvas
-function refreshDots() {
-  if (!wheelSaturationCanvas) return;
-
-  const ctx = wheelSaturationCanvas.getContext('2d');
-  if (!ctx) return;
-
-  drawColorWheels();
-  drawAllColorDots();
-}
-
-// Actualizar colores desde el panel de edición
-function setupColorUpdate(id: number) {
-  // Obtener elementos
-  const elements = {
-    hue: document.getElementById(`hue-${id}`) as HTMLInputElement,
-    hueValue: document.getElementById(`hue-value-${id}`) as HTMLInputElement,
-    saturation: document.getElementById(`saturation-${id}`) as HTMLInputElement,
-    saturationValue: document.getElementById(`saturation-value-${id}`) as HTMLInputElement,
-    lightness: document.getElementById(`lightness-${id}`) as HTMLInputElement,
-    lightnessValue: document.getElementById(`lightness-value-${id}`) as HTMLInputElement
-  };
-
-  // Validar elementos
-  if (!Object.values(elements).every(el => el !== null)) {
-    console.error(`Elementos para color ${id} no encontrados`);
-    return;
-  }
-
-  // Variables para controlar el rendimiento
-  let lastUpdate = 0;
-  const UPDATE_INTERVAL = 50; // ms
-  let animationFrameId: number | null = null;
-
-  // Función para actualizar el punto
-  const updateDot = () => {
-    const now = Date.now();
-    if (now - lastUpdate < UPDATE_INTERVAL) return;
-    lastUpdate = now;
-
-    const h = parseInt(elements.hue.value);
-    const s = parseInt(elements.saturation.value);
-    const l = parseInt(elements.lightness.value);
-
-    if (isNaN(h) || isNaN(s) || isNaN(l)) return;
-
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-    }
-
-    animationFrameId = requestAnimationFrame(() => {
-      refreshDots();
-      animationFrameId = null;
-    });
-  };
-
-  // Manejador de eventos optimizado
-  const handleInputChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const isValueInput = target.id.includes('-value-');
-    const type = target.id.split('-')[0] as 'hue' | 'saturation' | 'lightness';
-
-    // Sincronizar valores
-    if (isValueInput) {
-      elements[type].value = target.value;
-    } else {
-      elements[`${type}Value`].value = target.value;
-    }
-
-    updateDot();
-  };
-
-  // Asignar eventos
-  const inputs = [
-    elements.hue, elements.hueValue,
-    elements.saturation, elements.saturationValue,
-    elements.lightness, elements.lightnessValue
+// Convertir HSL a RGB para poder utilizar ImageData
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  s /= 100;
+  l /= 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) =>
+      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [
+      Math.round(f(0) * 255),
+      Math.round(f(8) * 255),
+      Math.round(f(4) * 255),
   ];
+}
 
-  inputs.forEach(input => {
-    input.addEventListener('input', handleInputChange);
+function createCircle(container : HTMLElement, id : string, color = "white") {
+  let circle = document.getElementById(id);
+  if (!circle) {
+      circle = document.createElement("div");
+      circle.classList.add("circle"); // Añadir clase para luego eliminar facilmente
+      circle.id = id;
+      circle.style.position = "absolute";
+      circle.style.width = `${CIRCLE_RADIUS}px`;
+      circle.style.height = `${CIRCLE_RADIUS}px`;
+      circle.style.borderRadius = "50%";
+      circle.style.border = `1px solid ${color}`;
+      circle.style.zIndex = "10";
+
+      container.appendChild(circle);
+  }
+  return circle;
+}
+
+function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
+  // Primero actualizar las paletas para luego obtener sus colores
+  updatePalettes();
+  const canvas = wheel.querySelector<HTMLCanvasElement>("canvas");
+  if (!canvas || !colorScheme || !hueSlider || !lightSlider1 || !lightSlider2
+      || !satSlider1 || !satSlider2) return;
+  const baseHue = hueSlider.value; // Obtener el valor del slider de tono
+  const radius = canvas.clientWidth / 2
+  const positionX = wheel.clientWidth / 2;
+  const rectCanvas = canvas.getBoundingClientRect();
+  const rectWheel = wheel.getBoundingClientRect();
+  // Estamos restando el padding que tiene la rueda con el div, ya que si no salen descentrados los puntos
+  // También diferenciamos de las distintas ruedas
+  let positionY = rectCanvas.y - rectWheel.y;
+  let wheelText = "";
+  let slider1;
+  let slider2;
+  if (isSaturationWheel) {
+    wheelText = "lh";
+    positionY += (firstWheelCanvas.clientHeight / 2);
+    slider1 = satSlider1;
+    slider2 = satSlider2;
+  } else {
+    wheelText = "sh";
+    positionY += (secondWheelCanvas.clientHeight / 2); 
+    slider1 = lightSlider1;
+    slider2 = lightSlider2;
+  }
+
+  // Limpiar círculos existentes
+  const existingCircles = wheel.querySelectorAll(".circle");
+  existingCircles.forEach(circle => circle.remove());
+
+  const hues = calculateColors(baseHue, colorScheme.value);
+
+  const colorsWhite = Array.from(palette1.children).map((colorBox, index) => {
+    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const lightness = parseInt(slider1.value) / 100; // Luminosidad normalizada
+    return { color, lightness, index };
   });
-
-  // Inicialización
-  updateDot();
+  colorsWhite.forEach(({ color, lightness, index }) => {
+    const hue = hues[index % hues.length];
+    const radian = (hue * Math.PI) / 180;
+    const circle = createCircle(wheel, `circle-white-${wheelText}-${index}`, "white");
+    const x = positionX - (circle.clientWidth / 2) + lightness * radius * Math.cos(radian); // Coordenada X
+    const y = positionY - (circle.clientWidth / 2) + lightness * radius * Math.sin(radian); // Coordenada Y
+    circle.style.left = `${x}px`;
+    circle.style.top = `${y}px`;
+    circle.style.backgroundColor = color;
+  });
+  // Obtener colores de palette2 (círculos negros)
+  const colorsBlack = Array.from(palette2.children).map((colorBox, index) => {
+    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const lightness = parseInt(slider2.value) / 100; // Luminosidad normalizada
+    return { color, lightness, index };
+  });
+  colorsBlack.forEach(({ color, lightness, index }) => {
+    const hue = hues[index % hues.length];
+    const radian = (hue * Math.PI) / 180;
+    const circle = createCircle(wheel, `circle-black-${wheelText}-${index}`, "black");
+    const x = positionX - (circle.clientWidth / 2) + lightness * radius * Math.cos(radian); // Coordenada X
+    const y = positionY - (circle.clientWidth / 2) + lightness * radius * Math.sin(radian); // Coordenada Y
+    circle.style.left = `${x}px`;
+    circle.style.top = `${y}px`;
+    circle.style.backgroundColor = color;
+  });
 }
 
-// Obtener la luminosidad del color seleccionado
-function getSelectedLightness(): number {
-  const id = selectedColorId ?? 1;
-  const lightnessInput = document.getElementById(`lightness-${id}`) as HTMLInputElement;
-  return parseInt(lightnessInput?.value || '50');
+// Crear las paletas
+let uuid = 0; // Contador para los colores
+function createPalette(container: HTMLElement, hue: string, saturation: string, lightness: string, scheme : string) {
+
+  const colorBoxs = container.querySelectorAll(".color-box");
+  // Primero se comprueba si se los color-box ya están creados o no
+  if (colorBoxs.length > 0) {
+    const hues = calculateColors(hue, scheme); 
+    // Si ya existen, actualizamos los colores de fondo y comprobamos si su checkbox está marcado
+    (colorBoxs as NodeListOf<HTMLDivElement>).forEach((colorBox, index) => {
+      const adjustedHue = hues[index];
+      const hslString = `hsl(${adjustedHue}, ${saturation}%, ${lightness}%)`;
+      colorBox.style.backgroundColor = hslString;
+      colorBox.setAttribute("h", adjustedHue.toString());
+      colorBox.setAttribute("s", saturation);
+      colorBox.setAttribute("l", lightness);
+      const checkbox = colorBox.childNodes[0] as HTMLInputElement;
+      // Si el checkbox está marcado, actualizamos el color en la paleta
+      if (checkbox.checked) {
+        updateColor(colorBox);
+      }
+    });
+  // Si no existen, creamos los nuevos colores
+  } else {
+    const hues = calculateColors(hue, scheme); 
+    hues.forEach(adjustedHue => {
+      // Creamos un nuevo elemento div para cada color
+      const colorBox = document.createElement("div");
+      colorBox.classList.add("color-box");
+      const hslString = `hsl(${adjustedHue}, ${saturation}%, ${lightness}%)`;
+      colorBox.style.backgroundColor = hslString;
+      // Creamos el checkbox
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.classList.add("color-checkbox");
+      
+      // Creamos el texto para el color de marca
+      const text = document.createElement("label");
+      text.classList.add("hidden");
+      text.innerText = `Brand`;
+      text.style.position = "absolute";
+      text.style.alignSelf = "flex-end";
+
+      // Listener para manejar cuando se activa el checkbox
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          colorBox.setAttribute("h", adjustedHue.toString());
+          colorBox.setAttribute("s", saturation);
+          colorBox.setAttribute("l", lightness);
+          addColor(colorBox);
+        } else {
+          removeColor(colorBox);
+        }
+      });
+
+      colorBox.appendChild(checkbox);
+      colorBox.appendChild(text);
+      container.appendChild(colorBox);
+    });
+  }
 }
 
-// Obtener la saturación del color seleccionado
-function getSelectedSaturation(): number {
-  const id = selectedColorId ?? 1;
-  const saturationInput = document.getElementById(`saturation-${id}`) as HTMLInputElement;
-  return parseInt(saturationInput?.value || '50');
-}
+// Función para añadir un color a la paleta
+function addColor(hslColor: HTMLDivElement) {
+  // Leemos todos los colores de la paleta y comprobamos si hay espacio,
+  // si no hay espacio, se desmarca el checkbox y se muestra un mensaje
+  const hue = hslColor.getAttribute("h");
+  const saturation = hslColor.getAttribute("s");
+  const lightness = hslColor.getAttribute("l");
+  for (let i = 1; i <= 5; i++) {
+    const slot = document.getElementById(`color-${i}`);
+    if (slot && slot.style.backgroundColor === "") {
+      // Cambiar fondo
+      slot.style.backgroundColor = hslColor.style.backgroundColor;
+      // Cambiar el color del texto para que sea adecuado dependiendo del color de fondo
+      const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+      (slot as HTMLElement).style.color = textColor;
+      (hslColor as HTMLElement).style.color = textColor;
+      // Que se muestre el padre
+      slot.parentElement?.classList.remove("hidden");
+      hslColor.id = "color-checkbox-" + i;
 
-/// main
-// Dibujar la rueda inicialmente con sus colores
-for (let i = 1; i <= TOTAL_COLORS; i++) {
-  setupColorUpdate(i);
-  const container = document.getElementById(`color-container-${i}`);
+      const editBox = slot.parentElement!.childNodes[3].childNodes;
+      editBox.forEach((child) => {
+        if (child instanceof HTMLElement) {
+          if (child.classList.contains("slider-container")) {
+            child.childNodes.forEach((element) => {
+              if (element instanceof HTMLInputElement) {
+                const type = element.id.split("-")[0];
+                if (type === "hue") {
+                  element.value = hue!;
+                } else if (type === "lightness") {
+                  element.value = lightness!;
+                } else {
+                  element.value = saturation!;
+                }
+              }
+            });
+          }
+        }
+      });
 
-  container?.addEventListener('click', () => {
-    // Quitar clase "selected" de todos
-    for (let j = 1; j <= TOTAL_COLORS; j++) {
-      document.getElementById(`color-container-${j}`)?.classList.remove('selected');
+      // Poner tag de branding al primer
+      if (i === 1) {
+        const text = hslColor.childNodes[1] as HTMLLabelElement;
+        text.classList.remove("hidden");
+      }
+      return;
     }
+  }
+  alert("No puedes agregar más de 5 colores a la paleta.");
 
-    // Añadir al seleccionado
-    container.classList.add('selected');
+  (hslColor.childNodes[0] as HTMLInputElement).checked = false;  
+}
 
-    // Actualizar ID seleccionado si es necesario
-    selectedColorId = i;
+// En el checkbox se guarda el número del color al que pertenece, en base a eso
+// lo eliminamos de la paleta
+function removeColor(hslColor: HTMLDivElement) {
+  
+  const hslColorId = hslColor.id.split("-")[2];
+  const id = parseInt(hslColorId);
+  const slot = document.getElementById(`color-${id}`);
+  if (slot) {
+    if (id !== 1) {
+    hslColor.id = "";
+    slot.style.backgroundColor = "";
+    slot.parentElement?.classList.add("hidden");
+    // Si es el color de branding, se guarda toda la paleta menos el color de branding
+    // Se eliminan los colores de la paleta y se añaden los nuevos
+    } else if (id === 1) {
+      let colors: Array<HTMLDivElement> = [];
+      let isEmpty = true;
+      for (let i = 2; i <= 5; i++) {
+        const colorCheckbox = document.getElementById(`color-checkbox-${i}`) as HTMLDivElement;
+        if (colorCheckbox) {
+          colors.push(colorCheckbox);
+          isEmpty = false;
+        }
+      }
+      const text = hslColor.childNodes[1] as HTMLLabelElement;
+      text.classList.add("hidden");
+      if (isEmpty) {
+        hslColor.id = "";
+        slot.style.backgroundColor = "";
+        slot.parentElement?.classList.add("hidden");
+      } else {
+        RemoveAllColors();
+        for (let i = 0; i < colors.length; i++) {
+          addColor(colors[i]);
+        }
+      }
+    }
+  }
+}
+
+// Eliminar toda la paleta (usado cuando se elimina el color de branding)
+function RemoveAllColors() {
+  const colorBoxs = document.querySelectorAll(".color-box");
+  const colors = document.querySelectorAll(".color");
+  colorBoxs.forEach((colorBox, index) => {
+    colorBox.id = "";
+    if (colors[index]) {
+      (colors[index] as HTMLDivElement).style.backgroundColor = "";
+      (colors[index] as HTMLDivElement).parentElement?.classList.add("hidden");
+    }
   });
 }
+
+// Función para actualizar un color a la paleta
+function updateColor(hslColor: HTMLDivElement) {
+  const color = hslColor.style.backgroundColor;
+  const hslColorId = hslColor.id.split("-")[2];
+  const id = parseInt(hslColorId);
+  const slot = document.getElementById(`color-${id}`);
+  const hue = hslColor.getAttribute("h");
+  const saturation = hslColor.getAttribute("s");
+  const lightness = hslColor.getAttribute("l");
+  // Si el color es el de branding, se actualiza el color de la paleta
+  if (slot) {
+    // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
+    const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+    (slot as HTMLElement).style.color = textColor;
+    (hslColor as HTMLElement).style.color = textColor;
+    slot.style.backgroundColor = color;
+    const editBox = slot.parentElement!.childNodes[3].childNodes;
+    editBox.forEach((child) => {
+      if (child instanceof HTMLElement) {
+        if (child.classList.contains("slider-container")) {
+          if (select!.value === "hsl") {
+            child.childNodes.forEach((element) => {
+              if (element instanceof HTMLInputElement) {
+                const type = element.id.split("-")[0];
+                if (type === "hue") {
+                  element.value = hue!;
+                } else if (type === "lightness") {
+                  element.value = lightness!;
+                } else {
+                  element.value = saturation!;
+                }
+              }
+            });
+          } else if (select!.value === "oklch") {
+
+          }
+          // Aquí puedes hacer lo que quieras con child
+        }
+      }
+    });
+  }
+}
+
+function calculateColors(hue: string, scheme: string) {
+  const colors = [];
+  const hueNumber = parseInt(hue); // Convertir el valor de hue a número
+  switch (scheme) {
+      case "analogous":
+          // Colores análogos (Hue ±30°)
+          const angleAnalogous = Number(analogousSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleAnalogous ) % 360);
+          colors.push((hueNumber - angleAnalogous) % 360);
+          colors.push((hueNumber + angleAnalogous + angleAnalogous) % 360);
+          colors.push((hueNumber - angleAnalogous - angleAnalogous) % 360);
+          break;
+      case "complementary":
+          // Colores complementarios (Hue +180°)
+          const angleComplementary = Number(complementarySlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleComplementary) % 360);
+          break;
+      case "split-complementary":
+          // Split complementarios (Hue ±150°)
+          const angleSplit = Number(splitSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleSplit) % 360);
+          colors.push((hueNumber - angleSplit + 360) % 360);
+          break;
+      case "triad":
+          // Triadas (Hue ±120°)
+          const angleTriad = Number(triadSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleTriad) % 360);
+          colors.push((hueNumber - angleTriad + 360) % 360);
+          break;
+      case "square":
+          // Cuadrado (Hue ±90° y ±180°)
+          colors.push(hueNumber);
+          colors.push((hueNumber + 90) % 360);
+          colors.push((hueNumber + 180) % 360);
+          colors.push((hueNumber - 90 + 360) % 360);
+          break;
+      default:
+          // Si no hay esquema, solo devuelve el tono base
+          colors.push(hueNumber);
+  }
+  return colors;
+}
+
+// Función para calcular el contraste entre dos colores
+function calculateColorContrast(color1: Array<number>, color2: Array<number>): number {
+  // Paso 1
+  let red1 = color1[0] / 255;
+  let green1 = color1[1] / 255;
+  let blue1 = color1[2] / 255;
+
+  let red2 = color2[0] / 255;
+  let green2 = color2[1] / 255;
+  let blue2 = color2[2] / 255;  
+
+  // Paso 2 y 3
+  red1 = red1 <= 0.03928 ? red1 / 12.92 : Math.pow((red1 + 0.055) / 1.055, 2.4);
+  green1 = green1 <= 0.03928 ? green1 / 12.92 : Math.pow((green1 + 0.055) / 1.055, 2.4);
+  blue1 = blue1 <= 0.03928 ? blue1 / 12.92 : Math.pow((blue1 + 0.055) / 1.055, 2.4);
+
+  red2 = red2 <= 0.03928 ? red2 / 12.92 : Math.pow((red2 + 0.055) / 1.055, 2.4);
+  green2 = green2 <= 0.03928 ? green2 / 12.92 : Math.pow((green2 + 0.055) / 1.055, 2.4);
+  blue2 = blue2 <= 0.03928 ? blue2 / 12.92 : Math.pow((blue2 + 0.055) / 1.055, 2.4);
+
+  // Paso 4
+  let l1 = 0.2126 * red1 + 0.7152 * green1 + 0.0722 * blue1;
+  let l2 = 0.2126 * red2 + 0.7152 * green2 + 0.0722 * blue2;
+
+  // Paso 5: El mas grande en el numerador
+  [l1, l2] = [Math.max(l1, l2), Math.min(l1, l2)];
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
+// Función para calcular el color blanco (devuelve el color en hsl)
+function calculateWhite(hue: number) {
+  return [hue, 20, 95];
+}
+
+// Función para calcular el color negro (devuelve el color en hsl)
+function calculateBlack(hue: number) {
+  return [hue, 10, 10];
+}
+
+// Función que elige si el texto es blanco o negro en base al fondo pasado
+function chooseTextColor(background: number[]) {
+  const white = calculateWhite(background[0]);
+  const black = calculateBlack(background[0]);
+  const rgbBackground = hslToRgb(background[0], background[1], background[2]);
+  const rgbWhite = hslToRgb(white[0], white[1], white[2]);
+  const rgbBlack = hslToRgb(black[0], black[1], black[2]);
+  const c1 = calculateColorContrast(rgbBackground, rgbWhite);
+  const c2 = calculateColorContrast(rgbBackground, rgbBlack);
+  return c1 > c2 ? `hsl(${white[0]}, ${white[1]}%, ${white[2]}%)` : `hsl(${black[0]}, ${black[1]}%, ${black[2]}%)`;
+}
+
+function updatePalettes() {
+  if (!colorScheme || !satSlider1 || !lightSlider1
+  || !hueSlider || !satSlider2 || !lightSlider2) return;
+  // Actualizamos las dos paletas con los valores actuales de los sliders y esquema
+  createPalette(palette1, hueSlider.value, satSlider1.value, lightSlider1.value, colorScheme.value);
+  createPalette(palette2, hueSlider.value, satSlider2.value, lightSlider2.value, colorScheme.value);
+  // Actualizamos los círculos con los colores de las paletas
+}
+
+function updateAll() {
+  drawColorWheels();
+  updateCircles(firstWheelCanvas.parentElement!, false);
+  updateCircles(secondWheelCanvas.parentElement!, true);
+}
+// Exportar como si fuera módulo
+(window as any).updateAll = updateAll; 
+window.addEventListener("resize", () => {
+  updateAll();
+});
