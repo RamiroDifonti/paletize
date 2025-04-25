@@ -54,6 +54,7 @@ colorScheme?.addEventListener("change", () => {
     const slot = document.getElementById(`color-${i}`);
     if (slot) {
       slot.style.backgroundColor = "";
+      slot.parentElement?.classList.add("hidden");
     }
   }
   updateAll();
@@ -301,10 +302,13 @@ function createPalette(container: HTMLElement, hue: string, saturation: string, 
       const adjustedHue = hues[index];
       const hslString = `hsl(${adjustedHue}, ${saturation}%, ${lightness}%)`;
       colorBox.style.backgroundColor = hslString;
+      colorBox.setAttribute("h", adjustedHue.toString());
+      colorBox.setAttribute("s", saturation);
+      colorBox.setAttribute("l", lightness);
       const checkbox = colorBox.childNodes[0] as HTMLInputElement;
       // Si el checkbox está marcado, actualizamos el color en la paleta
       if (checkbox.checked) {
-        updateColor(colorBox, adjustedHue.toString(), saturation, lightness);
+        updateColor(colorBox);
       }
     });
   // Si no existen, creamos los nuevos colores
@@ -318,37 +322,51 @@ function createPalette(container: HTMLElement, hue: string, saturation: string, 
       colorBox.style.backgroundColor = hslString;
       // Creamos el checkbox
       const checkbox = document.createElement("input");
-      (checkbox as any).h = adjustedHue;
-      (checkbox as any).s = saturation;
-      (checkbox as any).l = lightness;
       checkbox.type = "checkbox";
       checkbox.classList.add("color-checkbox");
-  
+      
+      // Creamos el texto para el color de marca
+      const text = document.createElement("label");
+      text.classList.add("hidden");
+      text.innerText = `Brand`;
+      text.style.position = "absolute";
+      text.style.alignSelf = "flex-end";
+
       // Listener para manejar cuando se activa el checkbox
-      const originalHandler = function (this: HTMLInputElement) {
-        if (this.checked) {
-          addColor(colorBox, this, adjustedHue.toString(), saturation, lightness);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          colorBox.setAttribute("h", adjustedHue.toString());
+          colorBox.setAttribute("s", saturation);
+          colorBox.setAttribute("l", lightness);
+          addColor(colorBox);
         } else {
-          removeColor(colorBox, this);
+          removeColor(colorBox);
         }
-      };
-      checkbox.addEventListener("change", originalHandler);
+      });
 
       colorBox.appendChild(checkbox);
+      colorBox.appendChild(text);
       container.appendChild(colorBox);
     });
   }
 }
 
 // Función para añadir un color a la paleta
-function addColor(hslColor: HTMLDivElement, checkbox: HTMLInputElement, hue: string, saturation: string, lightness: string) {
+function addColor(hslColor: HTMLDivElement) {
   // Leemos todos los colores de la paleta y comprobamos si hay espacio,
   // si no hay espacio, se desmarca el checkbox y se muestra un mensaje
+  const hue = hslColor.getAttribute("h");
+  const saturation = hslColor.getAttribute("s");
+  const lightness = hslColor.getAttribute("l");
   for (let i = 1; i <= 5; i++) {
     const slot = document.getElementById(`color-${i}`);
     if (slot && slot.style.backgroundColor === "") {
       // Cambiar fondo
       slot.style.backgroundColor = hslColor.style.backgroundColor;
+      // Cambiar el color del texto para que sea adecuado dependiendo del color de fondo
+      const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+      (slot as HTMLElement).style.color = textColor;
+      (hslColor as HTMLElement).style.color = textColor;
       // Que se muestre el padre
       slot.parentElement?.classList.remove("hidden");
       hslColor.id = "color-checkbox-" + i;
@@ -361,11 +379,11 @@ function addColor(hslColor: HTMLDivElement, checkbox: HTMLInputElement, hue: str
               if (element instanceof HTMLInputElement) {
                 const type = element.id.split("-")[0];
                 if (type === "hue") {
-                  element.value = hue;
+                  element.value = hue!;
                 } else if (type === "lightness") {
-                  element.value = lightness;
+                  element.value = lightness!;
                 } else {
-                  element.value = saturation;
+                  element.value = saturation!;
                 }
               }
             });
@@ -373,100 +391,87 @@ function addColor(hslColor: HTMLDivElement, checkbox: HTMLInputElement, hue: str
         }
       });
 
-      // Para tratar el color de branding en un futuro
+      // Poner tag de branding al primer
       if (i === 1) {
-        console.log("Este es el color de branding");
+        const text = hslColor.childNodes[1] as HTMLLabelElement;
+        text.classList.remove("hidden");
       }
       return;
     }
   }
   alert("No puedes agregar más de 5 colores a la paleta.");
-  checkbox.checked = false;  
+
+  (hslColor.childNodes[0] as HTMLInputElement).checked = false;  
 }
 
 // En el checkbox se guarda el número del color al que pertenece, en base a eso
 // lo eliminamos de la paleta
-function removeColor(hslColor: HTMLDivElement, checkbox: HTMLInputElement) {
+function removeColor(hslColor: HTMLDivElement) {
+  
   const hslColorId = hslColor.id.split("-")[2];
   const id = parseInt(hslColorId);
   const slot = document.getElementById(`color-${id}`);
   if (slot) {
+    if (id !== 1) {
     hslColor.id = "";
     slot.style.backgroundColor = "";
-    // Que se oculte el padre
     slot.parentElement?.classList.add("hidden");
-    if (id === 1) {
-      // cambiar color-checkbox-x de palette-y, color-x y color-container-x
+    // Si es el color de branding, se guarda toda la paleta menos el color de branding
+    // Se eliminan los colores de la paleta y se añaden los nuevos
+    } else if (id === 1) {
+      let colors: Array<HTMLDivElement> = [];
+      let isEmpty = true;
       for (let i = 2; i <= 5; i++) {
-        const colorCheckbox = document.getElementById(`color-checkbox-${i}`);
-        const colorContainer = document.getElementById(`color-container-${i}`)!;
+        const colorCheckbox = document.getElementById(`color-checkbox-${i}`) as HTMLDivElement;
         if (colorCheckbox) {
-          hslColor.id = "color-checkbox-1";
-          colorCheckbox.id = "";
-          slot.parentElement?.classList.remove("hidden");
-          slot.style.backgroundColor = colorCheckbox.style.backgroundColor;
-          (colorContainer.childNodes[1] as HTMLDivElement).style.backgroundColor = "";
-          colorContainer.classList.add("hidden");
-          checkbox.checked = true;
-          (colorCheckbox.childNodes[0] as HTMLInputElement).checked = false;
-          let tmp : string[] = ["","",""];
-          // Actualizar colores globables y sus hijos
-          colorContainer.childNodes[3].childNodes.forEach((child) => {
-            if (child instanceof HTMLElement) {
-              if (child.classList.contains("slider-container")) {
-                child.childNodes.forEach((element) => {
-                  if (element instanceof HTMLInputElement) {
-                    const type = element.id.split("-");
-                    if (type[0] === "hue") {
-                      hueSlider!.value = element.value;
-                      hueValue!.value = element.value;
-                      tmp[0] = element.value;
-                    } else if (type[0] === "lightness") {
-                      lightSlider1!.value = element.value;
-                      lightValue1!.value = element.value;
-                      tmp[1] = element.value;
-                    } else {
-                      tmp[2] = element.value;
-                    }
-                  }
-                });
-              }
-            }
-          });
-          slot.parentElement!.childNodes[3].childNodes.forEach((child) => {
-            if (child instanceof HTMLElement) {
-              if (child.classList.contains("slider-container")) {
-                child.childNodes.forEach((element) => {
-                  if (element instanceof HTMLInputElement) {
-                    const type = element.id.split("-");
-                    if (type[0] === "hue") {
-                      element.value = tmp[0];
-                    } else if (type[0] === "lightness") {
-                      element.value = tmp[1];
-                    } else {
-                      element.value = tmp[2]
-                    }
-                  }
-                });
-              }
-            }
-          });
-          updateAll();
-
-          // return;
+          colors.push(colorCheckbox);
+          isEmpty = false;
+        }
+      }
+      const text = hslColor.childNodes[1] as HTMLLabelElement;
+      text.classList.add("hidden");
+      if (isEmpty) {
+        hslColor.id = "";
+        slot.style.backgroundColor = "";
+        slot.parentElement?.classList.add("hidden");
+      } else {
+        RemoveAllColors();
+        for (let i = 0; i < colors.length; i++) {
+          addColor(colors[i]);
         }
       }
     }
   }
 }
 
+// Eliminar toda la paleta (usado cuando se elimina el color de branding)
+function RemoveAllColors() {
+  const colorBoxs = document.querySelectorAll(".color-box");
+  const colors = document.querySelectorAll(".color");
+  colorBoxs.forEach((colorBox, index) => {
+    colorBox.id = "";
+    if (colors[index]) {
+      (colors[index] as HTMLDivElement).style.backgroundColor = "";
+      (colors[index] as HTMLDivElement).parentElement?.classList.add("hidden");
+    }
+  });
+}
+
 // Función para actualizar un color a la paleta
-function updateColor(hslColor: HTMLDivElement, hue: string, saturation: string, lightness: string) {
+function updateColor(hslColor: HTMLDivElement) {
   const color = hslColor.style.backgroundColor;
   const hslColorId = hslColor.id.split("-")[2];
   const id = parseInt(hslColorId);
   const slot = document.getElementById(`color-${id}`);
+  const hue = hslColor.getAttribute("h");
+  const saturation = hslColor.getAttribute("s");
+  const lightness = hslColor.getAttribute("l");
+  // Si el color es el de branding, se actualiza el color de la paleta
   if (slot) {
+    // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
+    const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+    (slot as HTMLElement).style.color = textColor;
+    (hslColor as HTMLElement).style.color = textColor;
     slot.style.backgroundColor = color;
     const editBox = slot.parentElement!.childNodes[3].childNodes;
     editBox.forEach((child) => {
@@ -477,11 +482,11 @@ function updateColor(hslColor: HTMLDivElement, hue: string, saturation: string, 
               if (element instanceof HTMLInputElement) {
                 const type = element.id.split("-")[0];
                 if (type === "hue") {
-                  element.value = hue;
+                  element.value = hue!;
                 } else if (type === "lightness") {
-                  element.value = lightness;
+                  element.value = lightness!;
                 } else {
-                  element.value = saturation;
+                  element.value = saturation!;
                 }
               }
             });
@@ -540,6 +545,57 @@ function calculateColors(hue: string, scheme: string) {
           colors.push(hueNumber);
   }
   return colors;
+}
+
+// Función para calcular el contraste entre dos colores
+function calculateColorContrast(color1: Array<number>, color2: Array<number>): number {
+  // Paso 1
+  let red1 = color1[0] / 255;
+  let green1 = color1[1] / 255;
+  let blue1 = color1[2] / 255;
+
+  let red2 = color2[0] / 255;
+  let green2 = color2[1] / 255;
+  let blue2 = color2[2] / 255;  
+
+  // Paso 2 y 3
+  red1 = red1 <= 0.03928 ? red1 / 12.92 : Math.pow((red1 + 0.055) / 1.055, 2.4);
+  green1 = green1 <= 0.03928 ? green1 / 12.92 : Math.pow((green1 + 0.055) / 1.055, 2.4);
+  blue1 = blue1 <= 0.03928 ? blue1 / 12.92 : Math.pow((blue1 + 0.055) / 1.055, 2.4);
+
+  red2 = red2 <= 0.03928 ? red2 / 12.92 : Math.pow((red2 + 0.055) / 1.055, 2.4);
+  green2 = green2 <= 0.03928 ? green2 / 12.92 : Math.pow((green2 + 0.055) / 1.055, 2.4);
+  blue2 = blue2 <= 0.03928 ? blue2 / 12.92 : Math.pow((blue2 + 0.055) / 1.055, 2.4);
+
+  // Paso 4
+  let l1 = 0.2126 * red1 + 0.7152 * green1 + 0.0722 * blue1;
+  let l2 = 0.2126 * red2 + 0.7152 * green2 + 0.0722 * blue2;
+
+  // Paso 5: El mas grande en el numerador
+  [l1, l2] = [Math.max(l1, l2), Math.min(l1, l2)];
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
+// Función para calcular el color blanco (devuelve el color en hsl)
+function calculateWhite(hue: number) {
+  return [hue, 20, 95];
+}
+
+// Función para calcular el color negro (devuelve el color en hsl)
+function calculateBlack(hue: number) {
+  return [hue, 10, 10];
+}
+
+// Función que elige si el texto es blanco o negro en base al fondo pasado
+function chooseTextColor(background: number[]) {
+  const white = calculateWhite(background[0]);
+  const black = calculateBlack(background[0]);
+  const rgbBackground = hslToRgb(background[0], background[1], background[2]);
+  const rgbWhite = hslToRgb(white[0], white[1], white[2]);
+  const rgbBlack = hslToRgb(black[0], black[1], black[2]);
+  const c1 = calculateColorContrast(rgbBackground, rgbWhite);
+  const c2 = calculateColorContrast(rgbBackground, rgbBlack);
+  return c1 > c2 ? `hsl(${white[0]}, ${white[1]}%, ${white[2]}%)` : `hsl(${black[0]}, ${black[1]}%, ${black[2]}%)`;
 }
 
 function updatePalettes() {

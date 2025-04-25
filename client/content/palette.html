@@ -11,43 +11,45 @@
     <body>
         <main class="container">
             <header class="header">
-                <a href="/" class="logo">
+                <a href="/" class="left">
                     <img src="../images/logo.png" alt="Logo">
                 </a>
-                <div class="center-header">
-                    <input type="text" placeholder="Escribe algo...">
+                <form class="center" action="/create/palette" method="POST">
+                    <input type="text" placeholder="Escriba un nombre" required>
                     <button>Guardar</button>
-                </div>
-                <a href="/profile" class="perfil">
+                </form>
+                <a href="/profile" class="right">
                     <img src="../images/logo.png" alt="Perfil">
                 </a>
             </header>
             <nav class="sidebar">
-                <select name="colorblind">
-                    <option disabled selected>Daltonismos</option>
+                <select class = "colorblind">
                     <option value="ninguno">Ninguno</option>
                     <option value="deuteranopia">Deuteranopía</option>
                     <option value="protanopia">Protanopía</option>
                     <option value="tritanopia">Tritanopía</option>
                 </select>
 
-                <select name="color-type">
-                    <option disabled selected>Tipo de colores</option>
-                    <option value="complementarios">Complementarios</option>
-                    <option value="analogos">Análogos</option>
-                    <option value="triadicos">Triádicos</option>
-                    <option value="monocromaticos">Monocromáticos</option>
+                <select class = "color-type">
+                    <option value="analogous">Análogos</option>
+                    <option value="complementary">Complementarios</option>
+                    <option value="triad">Triádicos</option>
+                    <option value="monochromatic">Monocromáticos</option>
+                    <option value="split-complementary">Separación complementaria</option>
+                    <option value="square">Cuadrado</option>
+                </select>
+                <select class = "representation-wheel">
+                    <option value="hsl">HSL</option>
+                    <option value="oklch">OKLCH</option>
                 </select>
             </nav>
             <div class="content">
 
                 <div class="wheel-container">
-                    
-                    <canvas id="color-wheel-saturation"></canvas>
-                    <div class = "outer-circle"></div>
+                    <canvas id="color-wheel-1"></canvas>
                 </div>
                 <div class="wheel-container">
-                    <canvas id="color-wheel-lightness"></canvas>
+                    <canvas id="color-wheel-2"></canvas>
                 </div>
                 <div class="color-test">
                 </div>
@@ -67,11 +69,19 @@
                               <input type="range" id="hue-1" min="0" max="360" value="14">
                               <input type="number" id="hue-value-1" min="0" max="360" value="14" class="value-input">
                             </div>
-                            <div class="slider-container">
+                            <!-- HSL -->
+                            <div class="slider-container slider-hsl">
                               <label>S:</label>
                               <input type="range" id="saturation-1" min="0" max="100" value="100">
                               <input type="number" id="saturation-value-1" min="0" max="100" value="100" class="value-input">
                             </div>
+                            <!-- OKLCH -->
+                            <div class="slider-container slider-oklch">
+                                <label>C:</label>
+                                <input type="range" id="chroma-1" min="0" max="0.4" step="0.01" value="0.1">
+                                <input type="number" id="chroma-value-1" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                            </div>
+                            
                             <div class="slider-container">
                               <label>L:</label>
                               <input type="range" id="lightness-1" min="0" max="100" value="50">
@@ -92,11 +102,19 @@
                                 <input type="range" id="hue-2" min="0" max="360" value="194">
                                 <input type="number" id="hue-value-2" min="0" max="360" value="194" class="value-input">
                             </div>
-                            <div class="slider-container">
+                            <!-- HSL -->
+                            <div class="slider-container slider-hsl">
                                 <label>S:</label>
                                 <input type="range" id="saturation-2" min="0" max="100" value="100">
                                 <input type="number" id="saturation-value-2" min="0" max="100" value="100" class="value-input">
                             </div>
+                            <!-- OKLCH -->
+                            <div class="slider-container slider-oklch">
+                                <label>C:</label>
+                                <input type="range" id="chroma-2" min="0" max="0.4" step="0.01" value="0.1">
+                                <input type="number" id="chroma-value-2" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                            </div>
+
                             <div class="slider-container">
                                 <label>L:</label>
                                 <input type="range" id="lightness-2" min="0" max="100" value="50">
@@ -117,11 +135,19 @@
                                 <input type="range" id="hue-3" min="0" max="360" value="44">
                                 <input type="number" id="hue-value-3" min="0" max="360" value="44" class="value-input">
                             </div>
-                            <div class="slider-container">
+                            <!-- HSL -->
+                            <div class="slider-container slider-hsl">
                                 <label>S:</label>
                                 <input type="range" id="saturation-3" min="0" max="100" value="100">
                                 <input type="number" id="saturation-value-3" min="0" max="100" value="100" class="value-input">
                             </div>
+                            <!-- OKLCH -->
+                            <div class="slider-container slider-oklch">
+                                <label>C:</label>
+                                <input type="range" id="chroma-3" min="0" max="0.4" step="0.01" value="0.1">
+                                <input type="number" id="chroma-value-3" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                            </div>
+
                             <div class="slider-container">
                                 <label>L:</label>
                                 <input type="range" id="lightness-3" min="0" max="100" value="50">
@@ -142,11 +168,19 @@
                               <input type="range" id="hue-4" min="0" max="360" value="224">
                               <input type="number" id="hue-value-4" min="0" max="360" value="224" class="value-input">
                             </div>
-                            <div class="slider-container">
+                            <!-- HSL -->
+                            <div class="slider-container slider-hsl">
                               <label>S:</label>
                               <input type="range" id="saturation-4" min="0" max="100" value="100">
                               <input type="number" id="saturation-value-4" min="0" max="100" value="100" class="value-input">
                             </div>
+                            <!-- OKLCH -->
+                            <div class="slider-container slider-oklch">
+                                <label>C:</label>
+                                <input type="range" id="chroma-4" min="0" max="0.4" step="0.01" value="0.1">
+                                <input type="number" id="chroma-value-4" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                            </div>
+
                             <div class="slider-container">
                               <label>L:</label>
                               <input type="range" id="lightness-4" min="0" max="100" value="50">
@@ -167,11 +201,19 @@
                               <input type="range" id="hue-5" min="0" max="360" value="104">
                               <input type="number" id="hue-value-5" min="0" max="360" value="104" class="value-input">
                             </div>
-                            <div class="slider-container">
+                            <!-- HSL -->
+                            <div class="slider-container slider-hsl">
                               <label>S:</label>
                               <input type="range" id="saturation-5" min="0" max="100" value="100">
                               <input type="number" id="saturation-value-5" min="0" max="100" value="100" class="value-input">
                             </div>
+                            <!-- OKLCH -->
+                            <div class="slider-container slider-oklch">
+                                <label>C:</label>
+                                <input type="range" id="chroma-5" min="0" max="0.4" step="0.01" value="0.1">
+                                <input type="number" id="chroma-value-5" min="0" max="0.4" step="0.01" value="0.1" class="value-input">
+                            </div>
+
                             <div class="slider-container">
                               <label>L:</label>
                               <input type="range" id="lightness-5" min="0" max="100" value="60">

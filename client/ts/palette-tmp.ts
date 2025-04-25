@@ -30,12 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
     ) => {
       // Slider mueve número
       slider.addEventListener("input", () => {
+        numberInput.setAttribute("previousValue", numberInput.value);
         numberInput.value = slider.value;
         onChange();
       });
   
       // Número mueve slider
+
       numberInput.addEventListener("input", () => {
+        slider.setAttribute("previousValue", slider.value);
+
         let val = Number(numberInput.value);
         if (val < Number(slider.min)) val = Number(slider.min);
         if (val > Number(slider.max)) val = Number(slider.max);
@@ -99,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Función que actualiza el color en CSS
       const updateColor = () => {
-        console.log(colorId);
         const parent = document.getElementById(`color-checkbox-${colorId}`)?.parentElement?.id;
         
         if (!parent) return;
@@ -117,43 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
           lightSlider2.value = l;
           lightValue2.value = l;
         }
-        let hueNumber: number = Number(hueSlider1.value) - Number(hueSlider.value);
-        switch (colorScheme!.value) {
-          case "analogous":
-            // Colores análogos (Hue ±30°)
-            const angleAnalogous = Number(analogousSlider.value);
-            hueNumber = (hueNumber + angleAnalogous) % 360;
-            break;
-          case "complementary":
-              // Colores complementarios (Hue +180°)
-              const angleComplementary = Number(complementarySlider.value);
-              hueNumber = (hueNumber + angleComplementary) % 360;
-              break;
-          case "split-complementary":
-              // Split complementarios (Hue ±150°)
-              const angleSplit = Number(splitSlider.value);
-              hueNumber = (hueNumber + angleSplit) % 360;
-              break;
-          case "triad":
-              // Triadas (Hue ±120°)
-              const angleTriad = Number(triadSlider.value);
-              hueNumber = (hueNumber + angleTriad) % 360;
-              break;
-          case "square":
-              // Cuadrado (Hue ±90° y ±180°)
-              hueNumber = (hueNumber + 90) % 360;
-              break;
-        }
+        let hueNumber: number = Number(h) - Number(hueSlider.getAttribute("previousValue"));
 
-        // Calculos necesarios para actualizar el branding color
-        // ya que desde el branding color se calcula el resto de colores
-        if (colorId !== "1") {
-          hueNumber = (hueNumber * -1 + Number(hueSlider1.value));
-          // Normalizamos
-          hueNumber = (hueNumber % 360 + 360) % 360;
-          hueNumber = Math.max(0, Math.min(hueNumber, 360));
-        } else {
+        // Si se está modificando el branding color, simplemente se asigna este valor a los
+        // sliders de la izquierda, si no, se calcula la diferencia entre el valor actual y el 
+        // anterior y se suma con el slider de la izquierda
+        if (hueSlider1.value === hueSlider.getAttribute("previousValue")) {
           hueNumber = Number(h);
+        } else {
+          hueNumber += Number(hueSlider1.value);
+          hueNumber = hueNumber % 360;
         }
         hueSlider1.value = hueNumber.toString();
         hueValue1.value = hueNumber.toString();
