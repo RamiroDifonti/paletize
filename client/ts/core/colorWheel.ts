@@ -19,7 +19,10 @@ window.addEventListener("DOMContentLoaded", updateSeparation);
 select?.addEventListener("change", createAll);
 wcag?.addEventListener("change", updateAll);
 contrast?.addEventListener("change", updateAll);
-colorblind?.addEventListener("change", updateColorblind);
+colorblind?.addEventListener("change", () => {
+  updateColorblind();
+  updateAll();
+});
 colorScheme?.addEventListener("change", () => {
   // Si el esquema acepta variaciones en la separación de los colores, que se muestre
   updateSeparation();

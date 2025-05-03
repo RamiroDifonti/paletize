@@ -140,11 +140,10 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     }
     return { color, distance, index };
   });
-  colorsWhite.forEach(({ color, index }) => {
+  colorsWhite.forEach(({ color, distance, index }) => {
     const hue = hues[index % hues.length];
     const radian = (hue * Math.PI) / 180;
     const circle =  document.getElementById(`circle-white-${wheelText}-${index}`)! as HTMLDivElement;
-    const distance = Number(circle.getAttribute("distance"));
     const x = positionX - (circle.clientWidth / 2) + distance * radius * Math.cos(radian); // Coordenada X
     const y = positionY - (circle.clientWidth / 2) + distance * radius * Math.sin(radian); // Coordenada Y
     circle.setAttribute("positionX", (positionX - (circle.clientWidth / 2)).toString());
@@ -183,7 +182,6 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     circle.style.backgroundColor = color;
   });
 }
-
 
 export function updateOneCircle(circle: HTMLDivElement, distance: number) {
   const normalizedDistance = distance / 100; // Luminosidad normalizada

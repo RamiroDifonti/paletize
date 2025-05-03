@@ -41,7 +41,6 @@ export function updateColorblind() {
       button.classList.add("show");
     });
   }
-  updateAll();
 }
 
 // Simulate colorblindness for a given HSL color

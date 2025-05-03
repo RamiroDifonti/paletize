@@ -7,9 +7,6 @@ import { hslToRgb } from "./conversor.js";
 
 // Limit sliders with min and max values from WCAG
 export function limitColor(hueBranding: number, hue: number, saturation: number, lightness: number) {
-  if (hue === hueBranding) {
-    return [-1, -1, -1, -1];
-  }
   const wcagValue = wcag?.value == "aa" ? 4.5 : 7;
   const contrastValue = contrast?.value;
 

@@ -252,6 +252,17 @@
   font-size: var(--base-font-size);
   background-color: #ddd;
 }
+
+/* Conversor de colores */
+.export-container {
+  display: none;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5%;
+  background-color: #ddd;
+}
+
 .editor-panel.show {
   display: grid;
 }
@@ -280,5 +291,8 @@ footer{
   }
   .color:hover .export-icon {
     display: inline-block;
+  }
+  .export-container.show {
+    display: flex;
   }
 }

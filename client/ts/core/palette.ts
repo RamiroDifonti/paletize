@@ -2,7 +2,7 @@
 // This file contains the logic for the palette in the HTML file
 
 import { createAll, updateAll } from "./colorWheel.js";
-import { ExportColors } from "../utils/conversor.js";
+import { exportColors, updateExports } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
 import { satSlider1, lightSlider1, hueSlider, satSlider2, lightSlider2, 
          analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
@@ -43,25 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
         onChange();
       });
     };
-    if (!satSlider1 || !lightSlider1 || !hueSlider ||
-        !satSlider2 || !lightSlider2 || !satValue1 || !lightValue1 ||
-        !hueValue || !satValue2 || !lightValue2 || !analogousSlider ||
-        !splitSlider || !triadSlider || !complementarySlider || !analogousValue ||
-        !splitValue || !triadValue || !complementaryValue || !squareSlider ||
-        !squareValue) {
-        return;
-    }
-    connectSliderWithNumber(satSlider1, satValue1, createAll);
-    connectSliderWithNumber(lightSlider1, lightValue1, createAll);
-    connectSliderWithNumber(hueSlider, hueValue, createAll);
-    connectSliderWithNumber(satSlider2, satValue2, createAll);
-    connectSliderWithNumber(lightSlider2, lightValue2, createAll);
+    connectSliderWithNumber(satSlider1, satValue1, updateAll);
+    connectSliderWithNumber(lightSlider1, lightValue1, updateAll);
+    connectSliderWithNumber(hueSlider, hueValue, updateAll);
+    connectSliderWithNumber(satSlider2, satValue2, updateAll);
+    connectSliderWithNumber(lightSlider2, lightValue2, updateAll);
 
-    connectSliderWithNumber(analogousSlider, analogousValue, createAll);
-    connectSliderWithNumber(triadSlider, triadValue, createAll);
-    connectSliderWithNumber(complementarySlider, complementaryValue, createAll);
-    connectSliderWithNumber(splitSlider, splitValue, createAll);
-    connectSliderWithNumber(squareSlider, squareValue, createAll);
+    connectSliderWithNumber(analogousSlider, analogousValue, updateAll);
+    connectSliderWithNumber(triadSlider, triadValue, updateAll);
+    connectSliderWithNumber(complementarySlider, complementaryValue, updateAll);
+    connectSliderWithNumber(splitSlider, splitValue, updateAll);
+    connectSliderWithNumber(squareSlider, squareValue, updateAll);
     
     colorContainers.forEach((container) => {
       const colorDiv = container.querySelector<HTMLElement>(".color");
@@ -94,6 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
       // Mostrar/Ocultar panel al hacer clic
       editButton.addEventListener("click", () => {
+        // Eliminar el panel de conversor si está visible
+        document.querySelectorAll<HTMLElement>(".export-container").forEach((p) => {
+          p.classList.remove("show");
+        });
         // Mostrar u ocultar TODOS los panels
         const shouldShow = !panel.classList.contains("show");
         document.querySelectorAll<HTMLElement>(".editor-panel").forEach((p) => {
@@ -105,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         updateAll();
       });
+      exportColors();
       exportButton.addEventListener("click", () => {
         // Eliminar el panel de edición si está visible
         const shouldShow = !panel.classList.contains("show");
@@ -113,8 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
               p.classList.remove("show");
             }
         });
-        ExportColors();
-        // Mostrar el color en distintos formatos
+        document.querySelectorAll<HTMLElement>(".export-container").forEach((p) => {
+          p.classList.contains("show") ? p.classList.remove("show") : p.classList.add("show");
+        });
+        updateExports();
       });
 
       // Función que actualiza el color en CSS
@@ -135,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
           satValue2.value = satSlider.value;
           lightSlider2.value = lightSlider.value;
           lightValue2.value = lightSlider.value;
-          createAll();
+          updateAll();
           return;
         }
         if (satSlider.value !== satSlider.getAttribute("previousValue") && (satSlider.getAttribute("previousValue") !== null || satNumber.getAttribute("previousValue") !== null)) {

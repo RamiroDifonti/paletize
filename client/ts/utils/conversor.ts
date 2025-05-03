@@ -84,36 +84,41 @@ export function rgbToOklch(red: number, green: number, blue: number): [number, n
   return okLabToOklch(l, a, b);
 }
 
-export function ExportColors() {
+export function exportColors() {
   const containers = document.querySelectorAll('[id^="color-container-"]');
   containers.forEach((container) => {
-    const content = document.createElement("div");
-    content.classList.add("export-container");
-    content.style.display = "flex";
-    content.style.flexDirection = "column";
+    const exportContent = container.querySelector(".export-container");
+    if (!exportContent) {
+      const content = document.createElement("div");
+      content.classList.add("export-container");
+
+      const textHsl = document.createElement("label");
+      const textRgb = document.createElement("label");
+      const textOkLCH = document.createElement("label");
+      textHsl.style.marginLeft = "10%";
+      textRgb.style.marginLeft = "10%";
+      textOkLCH.style.marginLeft = "10%";
+
+      content.appendChild(textHsl);
+      content.appendChild(textRgb);
+      content.appendChild(textOkLCH);
+      container.appendChild(content);
+    }
+  });
+}
+
+export function updateExports() {
+  const containers = document.querySelectorAll('[id^="color-container-"]');
+  containers.forEach((container) => {
+    const exportContent = container.childNodes[5] as HTMLDivElement;
     const bgColor = (container.childNodes[1] as HTMLDivElement).style.backgroundColor;
     const [, r, g, b] = bgColor.match(/rgb\((\d+), (\d+), (\d+)\)/) || [];
     const [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
     let [li, c, hue] = rgbToOklch(Number(r), Number(g), Number(b));
-    const hueString = (hue === undefined) ? "NaN" : hue.toFixed(3) + "";
-    const textHsl = document.createElement("label");
-    textHsl.innerText = `hsl: (${h}, ${s}, ${l})`;
-    textHsl.style.marginTop = "10%";
-    textHsl.style.marginLeft = "5%";
 
-    const textRgb = document.createElement("label");
-    textRgb.innerText = `rgb: (${r}, ${g}, ${b})`;
-    textRgb.style.marginTop = "10%";
-    textRgb.style.marginLeft = "5%";
-
-    const textOkLCH = document.createElement("label");
-    textOkLCH.innerText = `oklch:\n(${li.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
-    textOkLCH.style.marginTop = "10%";
-    textOkLCH.style.marginLeft = "5%";
-
-    content.appendChild(textHsl);
-    content.appendChild(textRgb);
-    content.appendChild(textOkLCH);
-    container.appendChild(content);
+    const hueString = hue === undefined ? "NaN" : hue.toFixed(3);
+    (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${h}, ${s}, ${l})`;
+    (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
+    (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${li.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
   });
 }
