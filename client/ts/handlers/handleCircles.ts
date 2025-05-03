@@ -1,7 +1,7 @@
 // handleCircles.ts
 // This file contains the functions to handle the circles in the color wheels and palettes
 import { colorScheme } from "../constants/selects.js";
-import { hueSlider, lightSlider1, lightSlider2, satSlider1, satSlider2 } from "../constants/sliders.js";
+import { hueSlider } from "../constants/sliders.js";
 import { firstWheelCanvas, secondWheelCanvas } from "../constants/canvas.js";
 import { palette1, palette2 } from "../constants/palette.js";
 
@@ -110,8 +110,7 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
   // Primero actualizar las paletas para luego obtener sus colores
   updatePalettes();
   const canvas = wheel.querySelector<HTMLCanvasElement>("canvas");
-  if (!canvas || !colorScheme || !hueSlider || !lightSlider1 || !lightSlider2
-      || !satSlider1 || !satSlider2) return;
+  if (!canvas) return;
   const baseHue = hueSlider.value; // Obtener el valor del slider de tono
   const radius = canvas.clientWidth / 2
   const positionX = wheel.clientWidth / 2;

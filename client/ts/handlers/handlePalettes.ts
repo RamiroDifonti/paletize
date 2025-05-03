@@ -3,11 +3,12 @@
 import { colorblind, select, colorScheme } from "../constants/selects.js";
 import { simulateColorBlind } from "../utils/colorblind.js";
 import { palette1, palette2 } from "../constants/palette.js";
-import { hueSlider, satSlider1, lightSlider1, satSlider2, lightSlider2 } from "../constants/sliders.js";
+import { hueSlider, satSlider1, lightSlider1 } from "../constants/sliders.js";
 
 import { calculateColors, limitColor, chooseTextColor } from "../utils/utils.js";
 import { updateExports } from "../utils/conversor.js";
 import { hsl } from "culori";
+import { updateAll } from "../core/colorWheel.js";
 
 // Crear las paletas
 export function createPalette(container: HTMLElement, hue: string, saturation: string, lightness: string, scheme : string) {
@@ -22,7 +23,7 @@ export function createPalette(container: HTMLElement, hue: string, saturation: s
 
       let boxSaturation = Number(saturation);
       let boxLightness = Number(lightness);
-      if (colorBox.getAttribute("branding") !== "true" && colorBox.getAttribute("branding") !== "secondary") {
+      if (colorBox.getAttribute("branding") !== "true") {
         if (limits[0] !== -1) {
           boxSaturation = limits[0] === 100 ? limits[2] : limits[0];
           boxLightness = limits[1] === 100 ? limits[3] : limits[1];
@@ -95,8 +96,6 @@ export function createPalette(container: HTMLElement, hue: string, saturation: s
         const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
         colorBox.style.color = textColor;
         colorBox.setAttribute("branding", "true");
-      } else if (index === 0 && container.id === "palette-2") {
-        colorBox.setAttribute("branding", "secondary");
       }
       container.appendChild(colorBox);
     });
@@ -120,7 +119,7 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
   hslColor.setAttribute("s", satValue.toString());
   hslColor.setAttribute("l", lightValue.toString());
 
-  if (hslColor.getAttribute("branding") !== "true" && hslColor.getAttribute("branding") !== "secondary") {
+  if (hslColor.getAttribute("branding") !== "true") {
     maxS = limits[0];
     maxL = limits[1];
     minS = limits[2];
@@ -150,6 +149,7 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
         const limits = limitColor(Number(hue), Number(colors[i].getAttribute("h")), Number(colors[i].getAttribute("s")), Number(colors[i].getAttribute("l")));
         addColor(colors[i], limits);
       }
+      updateAll();
       return;
     } else if (slot && slot.style.backgroundColor === "") {
       // Cambiar fondo
@@ -160,8 +160,22 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
       // Que se muestre el padre
       slot.parentElement?.classList.remove("hidden");
       hslColor.id = "color-checkbox-" + i;
-      const editBox = slot.parentElement!.childNodes[3].childNodes;
-      editBox.forEach((child) => {
+      const editBox = slot.parentElement!.childNodes[3];
+      if (hslColor.getAttribute("branding") === "true") {
+        if ((slot.childNodes[1] as HTMLInputElement).classList.contains("show")) {
+          (slot.childNodes[1] as HTMLInputElement).classList.remove("show");
+        }
+        if ((editBox as HTMLElement).classList.contains("show")) {
+          (editBox as HTMLElement).classList.remove("show");
+        }
+        (editBox as HTMLElement).setAttribute("branding", "true");
+      } else {
+        if (!(slot.childNodes[1] as HTMLInputElement).classList.contains("show")) {
+          (slot.childNodes[1] as HTMLInputElement).classList.add("show");
+        }
+        (editBox as HTMLElement).setAttribute("branding", "false");
+      }
+      editBox.childNodes.forEach((child) => {
         if (child instanceof HTMLElement) {
           if (child.classList.contains("slider-container")) {
             child.childNodes.forEach((element) => {
@@ -232,7 +246,6 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
   const saturation = hslColor.getAttribute("s");
   const lightness = hslColor.getAttribute("l");
 
-
   let maxS = 100;
   let maxL = 100;
   let minS = 0;
@@ -241,7 +254,7 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
   let lightValue = Number(lightness);
   hslColor.setAttribute("s", satValue.toString());
   hslColor.setAttribute("l", lightValue.toString());
-  if (hslColor.getAttribute("branding") !== "true" && hslColor.getAttribute("branding") !== "secondary") {
+  if (hslColor.getAttribute("branding") !== "true") {
     maxS = limits[0];
     maxL = limits[1];
     minS = limits[2];
@@ -260,7 +273,7 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
     slot.style.backgroundColor = color;
     const text = document.getElementById("contrast-text-" + id);
     if (text) {
-      if (hslColor.getAttribute("branding") !== "true" && hslColor.getAttribute("branding") !== "secondary") {
+      if (hslColor.getAttribute("branding") !== "true") {
         if (limits[0] === -1) {
           text.classList.remove("hidden");
         } else {
@@ -304,5 +317,5 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
 export function updatePalettes() {
   // Actualizamos las dos paletas con los valores actuales de los sliders y esquema
   createPalette(palette1, hueSlider.value, satSlider1.value, lightSlider1.value, colorScheme.value);
-  createPalette(palette2, hueSlider.value, satSlider2.value, lightSlider2.value, colorScheme.value);
+  createPalette(palette2, hueSlider.value, satSlider1.value, lightSlider1.value, colorScheme.value);
 }
