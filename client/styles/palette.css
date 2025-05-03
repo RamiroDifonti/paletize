@@ -85,6 +85,7 @@
 .sidebar select {
   width: 50%;
   min-width: 125px;
+  margin-bottom: 10%;
 }
 .separation {
   justify-self: flex-start;
@@ -207,13 +208,13 @@
   display: flex;
   position: relative;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
   font-size: var(--base-font-size);
   height: 15vh;
   aspect-ratio: 1;
 }
 
-.edit-icon {
+.button-icon {
   display: none;
   color: inherit;
   background-color: transparent;
@@ -232,11 +233,11 @@
   position: absolute;
   z-index: 1;
   bottom: 65%;
-  left: 50%;
-  margin-left: -40px;
+  /* left: 50%; */
+  margin-left: -45px;
 }
 
-.edit-icon:hover .tooltip {
+.button-icon:hover .tooltip {
   visibility: visible;
 }
 
@@ -247,12 +248,12 @@
 
   grid-template-rows: auto auto auto;
   padding: 15% 0;
+  gap: 10%;
   font-size: var(--base-font-size);
   background-color: #ddd;
 }
 .editor-panel.show {
   display: grid;
-  gap: 10%;
 }
 .slider-container {
   display: flex;
@@ -274,7 +275,10 @@ footer{
 
 @media (min-width: 678px) {
   /* La función de editar colores solo está disponible para dispositivos grandes */
-  .color:hover .edit-icon {
+  .color:hover .edit-icon.show {
+    display: inline-block;
+  }
+  .color:hover .export-icon {
     display: inline-block;
   }
 }
