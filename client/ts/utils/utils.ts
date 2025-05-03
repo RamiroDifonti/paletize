@@ -1,0 +1,276 @@
+// utils.ts
+// This file contains the utility functions for the color wheel and palette generation
+import { wcag, contrast } from "../constants/selects.js";
+import { analogousSlider, complementarySlider, splitSlider, triadSlider, squareSlider } from "../constants/sliders.js";
+
+import { hslToRgb } from "./conversor.js";
+
+// Limit sliders with min and max values from WCAG
+export function limitColor(hueBranding: number, hue: number, saturation: number, lightness: number) {
+  if (hue === hueBranding) {
+    return [-1, -1, -1, -1];
+  }
+  const wcagValue = wcag?.value == "aa" ? 4.5 : 7;
+  const contrastValue = contrast?.value;
+
+  const brandingRgb = hslToRgb(Number(hueBranding), Number(saturation), Number(lightness));
+  const luminanceBranding = calculateLuminance(brandingRgb);
+  const step = 0.01;
+  let maxS = -1, maxL = -1;
+  let minS = -1, minL = -1;
+  let s = saturation / 100, l = lightness / 100;
+  let changeL = true;
+  switch (contrastValue) {
+    // s2 < s1, l2 < l1 (saturación baja, luminosidad baja)
+    case "depth":
+      changeL = l > s ? false : true;
+      while (l >= -0.01 && s >= -0.01) {
+        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        const luminance2 = calculateLuminance(rgb2);
+        const contrast = calculateContrast(luminanceBranding, luminance2);
+        if (maxS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 0 && Math.round(l*100) === 0))) {
+          if (Math.round(l*100) === 0) {
+            minL = 0;
+          }
+          if (Math.round(s*100) === 0) {
+            minS = 0;
+          }
+          return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+        } else {
+          minS = s * 100;
+          minL = l * 100;
+        }
+        if (maxS === -1 && contrast >= wcagValue) {
+          maxS = s * 100;
+          maxL = l * 100;
+        }
+        if (Math.round(s*100) === 0) {
+          l -= step;
+        } else if (Math.round(l*100) === 0) {
+          s -= step;
+        } else {
+          if (changeL) {
+            l -= step;
+            changeL = false;
+          } else {
+            s -= step;
+            changeL = true;
+          }
+        }
+      }
+      break;
+    // s2 > s1, l2 > l1 (saturación alta, luminosidad alta)
+    case "intensity":
+      changeL = l < s ? false : true;
+      while (l <= 1.01 && s <= 1.01) {
+        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        const luminance2 = calculateLuminance(rgb2);
+        const contrast = calculateContrast(luminanceBranding, luminance2);
+        if (minS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 100 && Math.round(l*100) === 100))) {
+          if (Math.round(s*100) === 100) {
+            maxS = 100;
+          }
+          if (Math.round(l*100) === 100) {
+            maxL = 100;
+          }
+          return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+        } else {
+          maxS = s * 100;
+          maxL = l * 100;
+        }
+        if (minS === -1 && contrast >= wcagValue) {
+          minS = s * 100;
+          minL = l * 100;
+        }
+        if (Math.round(s*100) === 100) {
+          l += step;
+        } else if (Math.round(l*100) === 100) {
+          s += step;
+        } else {
+          if (changeL) {
+            l += step;
+            changeL = false;
+          } else {
+            s += step;
+            changeL = true;
+          }
+        }
+      }
+      break;
+    // s2 < s1, l2 > l1 (saturación alta, luminosidad baja)
+    case "softness":
+      while (l <= 1.01 && s >= -0.01) {
+        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        const luminance2 = calculateLuminance(rgb2);
+        const contrast = calculateContrast(luminanceBranding, luminance2);
+        if (maxS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 0 && Math.round(l*100) === 100))) {
+          if (Math.round(s*100) === 0) {
+            minS = 0;
+          }
+          if (Math.round(l*100) === 100) {
+            maxL = 100;
+          }
+          return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+        } else {
+          minS = s * 100;
+          maxL = l * 100;
+        }
+        if (maxS === -1 && contrast >= wcagValue) {
+          maxS = s * 100;
+          minL = l * 100;
+        }
+        if (Math.round(s*100) === 0) {
+          l += step;
+        } else if (Math.round(l*100) === 100) {
+          s -= step;
+        } else {
+          if (changeL) {
+            l += step;
+            changeL = false;
+          } else {
+            s -= step;
+            changeL = true;
+          }
+        }
+      }
+      break;
+    // s2 > s1, l2 < l1 (saturación baja, luminosidad alta)
+    case "impact":
+      while (l >= -0.01 && s <= 1.01) {
+        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        const luminance2 = calculateLuminance(rgb2);
+        const contrast = calculateContrast(luminanceBranding, luminance2);
+        if (minS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 100 && Math.round(l*0) === 0))) {
+          if (Math.round(s*100) === 100) {
+            maxS = 100;
+          }
+          if (Math.round(l*100) === 0) {
+            minL = 0;
+          }
+          return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+        } else {
+          maxS = s * 100;
+          minL = l * 100;
+        }
+        if (minS === -1 && contrast >= wcagValue) {
+          minS = s * 100;
+          maxL = l * 100;
+        }
+        if (Math.round(s*100) === 100) {
+          l -= step;
+        } else if (Math.round(l*100) === 0) {
+          s += step;
+        } else {
+          if (changeL) {
+            l -= step;
+            changeL = false;
+          } else {
+            s += step;
+            changeL = true;
+          }
+        }
+      }
+      break;
+  }
+  return [-1, -1, -1, -1];
+}
+
+export function calculateColors(hue: string, scheme: string) {
+  const colors = [];
+  const hueNumber = parseInt(hue); // Convertir el valor de hue a número
+  switch (scheme) {
+      case "analogous":
+          // Colores análogos (Hue ±30°)
+          const angleAnalogous = Number(analogousSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleAnalogous ) % 360);
+          colors.push((hueNumber - angleAnalogous + 360) % 360);
+          colors.push((hueNumber + angleAnalogous + angleAnalogous) % 360);
+          colors.push((hueNumber - angleAnalogous - angleAnalogous + 360) % 360);
+          break;
+      case "complementary":  // +30 - 30
+          // Colores complementarios (Hue +180°)
+          const angleComplementary = Number(complementarySlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleComplementary) % 360);
+          break;
+      case "split-complementary": // 0 a 60
+          // Split complementarios (Hue ±150°)
+          const angleSplit = Number(splitSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleSplit) % 360);
+          colors.push((hueNumber - angleSplit + 360) % 360);
+          break;
+      case "triad":  // +30 -30
+          // Triadas (Hue ±120°)
+          const angleTriad = Number(triadSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleTriad) % 360);
+          colors.push((hueNumber - angleTriad + 360) % 360);
+          break;
+      case "square":  // +30 -30
+          // Cuadrado (Hue ±90° y ±180°)
+          const angleSquare = Number(squareSlider.value);
+          colors.push(hueNumber);
+          colors.push((hueNumber + angleSquare) % 360);
+          colors.push((hueNumber + angleSquare + angleSquare) % 360);
+          colors.push((hueNumber - angleSquare + 360) % 360);
+          break;
+      default:
+          // Si no hay esquema, solo devuelve el tono base
+          colors.push(hueNumber);
+  }
+  return colors;
+}
+
+// Función para calcular el valor de la luminosidad de un solo color
+export function calculateLuminance(color: Array<number>): number {
+  // Paso 1
+  let red = color[0] / 255;
+  let green = color[1] / 255;
+  let blue = color[2] / 255;
+
+  // Paso 2 y 3
+  red = red <= 0.03928 ? red / 12.92 : Math.pow((red + 0.055) / 1.055, 2.4);
+  green = green <= 0.03928 ? green / 12.92 : Math.pow((green + 0.055) / 1.055, 2.4);
+  blue = blue <= 0.03928 ? blue / 12.92 : Math.pow((blue + 0.055) / 1.055, 2.4);
+
+  // Paso 4
+  return(0.2126 * red + 0.7152 * green + 0.0722 * blue);
+}
+
+// Función para calcular el contraste entre dos colores según su luminosidad
+export function calculateContrast(l1: number, l2: number): number {
+  return l1 > l2 ? (l1 + 0.05) / (l2 + 0.05) : (l2 + 0.05) / (l1 + 0.05);
+}
+
+// Función para calcular el contraste entre dos colores
+export function calculateColorContrast(color1: Array<number>, color2: Array<number>): number {
+  let l1 = calculateLuminance(color1);
+  let l2 = calculateLuminance(color2);
+  // Paso 5: El mas grande en el numerador
+  [l1, l2] = [Math.max(l1, l2), Math.min(l1, l2)];
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
+// Función para calcular el color blanco (devuelve el color en hsl)
+export function calculateWhite(hue: number) {
+  return [hue, 20, 95];
+}
+
+// Función para calcular el color negro (devuelve el color en hsl)
+export function calculateBlack(hue: number) {
+  return [hue, 10, 10];
+}
+
+// Función que elige si el texto es blanco o negro en base al fondo pasado
+export function chooseTextColor(background: number[]) {
+  const white = calculateWhite(background[0]);
+  const black = calculateBlack(background[0]);
+  const rgbBackground = hslToRgb(background[0], background[1], background[2]);
+  const rgbWhite = hslToRgb(white[0], white[1], white[2]);
+  const rgbBlack = hslToRgb(black[0], black[1], black[2]);
+  const c1 = calculateColorContrast(rgbBackground, rgbWhite);
+  const c2 = calculateColorContrast(rgbBackground, rgbBlack);
+  return c1 > c2 ? `hsl(${white[0]}, ${white[1]}%, ${white[2]}%)` : `hsl(${black[0]}, ${black[1]}%, ${black[2]}%)`;
+}
