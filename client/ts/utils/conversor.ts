@@ -1,3 +1,5 @@
+import { select } from "../constants/selects.js";
+
 // Convertir HSL a RGB
 export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   s /= 100;
@@ -106,19 +108,71 @@ export function exportColors() {
     }
   });
 }
+export function oklchToRgb(l: number, c: number, h: number | undefined): [number, number, number] {
+  // Convertir de OKLCH a OKLab
+  let a = 0, b = 0;
+  if (h !== undefined && c !== 0) {
+    const hRad = h * (Math.PI / 180);
+    a = c * Math.cos(hRad);
+    b = c * Math.sin(hRad);
+  }
+
+  // Convertir de OKLab a RGB lineal
+  const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = l - 0.0894841775 * a - 1.2914855480 * b;
+
+  // Elevar al cubo para invertir la raíz cúbica
+  const l_3 = l_ * l_ * l_;
+  const m_3 = m_ * m_ * m_;
+  const s_3 = s_ * s_ * s_;
+
+  // Convertir a RGB lineal
+  const r = 4.0767416621 * l_3 - 3.3077115913 * m_3 + 0.2309699292 * s_3;
+  const g = -1.2684380046 * l_3 + 2.6097574011 * m_3 - 0.3413193965 * s_3;
+  const b_linear = -0.0041960863 * l_3 - 0.7034186147 * m_3 + 1.7076147010 * s_3;
+
+  // Convertir de RGB lineal a sRGB
+  const toSRGB = (value: number): number => {
+    if (value <= 0) return 0;
+    if (value >= 1) return 255;
+   
+    const normalized = value <= 0.0031308
+      ? value * 12.92
+      : 1.055 * Math.pow(value, 1/2.4) - 0.055;
+   
+    return Math.round(normalized * 255);
+  };
+
+  return [toSRGB(r), toSRGB(g), toSRGB(b_linear)];
+}
+
 
 export function updateExports() {
   const containers = document.querySelectorAll('[id^="color-container-"]');
   containers.forEach((container) => {
     const exportContent = container.childNodes[5] as HTMLDivElement;
-    const bgColor = (container.childNodes[1] as HTMLDivElement).style.backgroundColor;
-    const [, r, g, b] = bgColor.match(/rgb\((\d+), (\d+), (\d+)\)/) || [];
-    const [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
-    let [li, c, hue] = rgbToOklch(Number(r), Number(g), Number(b));
+    const slot = container.childNodes[1] as HTMLDivElement;
+    const hue = slot.getAttribute("h") || "0";
+    const saturation = slot.getAttribute("s") || "0";
+    const lightness = slot.getAttribute("l") || "0";
+    let [r, g, b] = [0, 0, 0];
+    if (select.value === "oklch") {
+      [r, g, b] = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+      let [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
+      // const hueString = h === undefined ? "NaN" : h.toFixed(3);
+      (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${h}, ${s}, ${l})`;
+      (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
+      (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${lightness}, ${saturation}, ${hue})`;
+    } else {
+      [r, g, b] = hslToRgb(Number(hue), Number(saturation), Number(lightness));
+      let [l, c, h] = rgbToOklch(Number(r), Number(g), Number(b));
+      const hueString = h === undefined ? "NaN" : h.toFixed(3);
+      (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${hue}, ${saturation}, ${lightness})`;
+      (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
+      (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${l.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
+    }
 
-    const hueString = hue === undefined ? "NaN" : hue.toFixed(3);
-    (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${h}, ${s}, ${l})`;
-    (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
-    (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${li.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
+
   });
 }

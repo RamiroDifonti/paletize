@@ -1,30 +1,51 @@
 // utils.ts
 // This file contains the utility functions for the color wheel and palette generation
-import { wcag, contrast } from "../constants/selects.js";
+import { wcag, contrast, select } from "../constants/selects.js";
 import { analogousSlider, complementarySlider, splitSlider, triadSlider, squareSlider } from "../constants/sliders.js";
 
-import { hslToRgb } from "./conversor.js";
+import { hslToRgb, oklchToRgb } from "./conversor.js";
 
 // Limit sliders with min and max values from WCAG
 export function limitColor(hueBranding: number, hue: number, saturation: number, lightness: number) {
   const wcagValue = wcag?.value == "aa" ? 4.5 : 7;
   const contrastValue = contrast?.value;
-
-  const brandingRgb = hslToRgb(Number(hueBranding), Number(saturation), Number(lightness));
+  let brandingRgb = hslToRgb(Number(hueBranding), Number(saturation), Number(lightness));
   const luminanceBranding = calculateLuminance(brandingRgb);
   const step = 0.01;
   let maxS = -1, maxL = -1;
   let minS = -1, minL = -1;
-  let s = saturation / 100, l = lightness / 100;
+  let s = saturation, l = lightness / 100;
+  if (select?.value === "oklch") {
+    brandingRgb = oklchToRgb(Number(lightness), Number(saturation), Number(hueBranding));
+    s /= 0.4;
+  } else {
+    s /= 100;
+  }
   let changeL = true;
   switch (contrastValue) {
     // s2 < s1, l2 < l1 (saturación baja, luminosidad baja)
     case "depth":
       while (l >= -0.01 && s >= -0.01) {
-        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        let rgb2 = hslToRgb(hue, s * 100, l * 100);
+        if (select?.value === "oklch") {
+          rgb2 = oklchToRgb(l, Math.round((s*0.4) * 100) / 100, hue);
+        }
         const luminance2 = calculateLuminance(rgb2);
         const contrast = calculateContrast(luminanceBranding, luminance2);
         if (maxS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 0 && Math.round(l*100) === 0))) {
+          if (Math.round(s*100) === 0 && Math.round(l*100) === 0) {
+            if (Math.round(s*100) === 0) {
+              minS = 0;
+            }
+            if (Math.round(l*100) === 0) {
+              minL = 0;
+            }
+            if (select?.value === "oklch") {
+              return [maxS, Math.round(maxL), minS, Math.round(minL)];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+            }
+          }
           if ((Math.round(maxS) - Math.round(minS) < 2)  || (Math.round(maxL) - Math.round(minL) < 2)) {
             if (Math.round(s*100) !== minS) {
               s += step;
@@ -45,7 +66,11 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               if (Math.round(l*100) === 0) {
                 minL = 0;
               }
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              if (select?.value === "oklch") {
+                return [maxS, Math.round(maxL), minS, Math.round(minL)];
+              } else {
+                return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              }
             }
           } else {
             if (Math.round(s*100) === 0) {
@@ -54,15 +79,27 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
             if (Math.round(l*100) === 0) {
               minL = 0;
             }
-            return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+            if (select?.value === "oklch") {
+              return [maxS, Math.round(maxL), minS, Math.round(minL)];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+            }
           }
         } else {
-          minS = s * 100;
           minL = l * 100;
+          if (select?.value === "oklch") {
+            minS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            minS = s * 100;
+          }
         }
         if (maxS === -1 && contrast >= wcagValue) {
-          maxS = s * 100;
           maxL = l * 100;
+          if (select?.value === "oklch") {
+            maxS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            maxS = s * 100;
+          }
         }
         if (Math.round(s*100) > Math.round(l*100)) {
           s -= step;
@@ -267,7 +304,10 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
       }
       break;
   }
-  return [-1, -1, -1, -1];
+  const rgb2 = hslToRgb(hue, s * 100, l * 100);
+  const luminance2 = calculateLuminance(rgb2);
+  const contrastNumber = calculateContrast(luminanceBranding, luminance2);
+  return [-1, -1, -1, contrastNumber];
 }
 
 export function calculateColors(hue: string, scheme: string) {

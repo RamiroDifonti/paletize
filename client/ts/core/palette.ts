@@ -4,8 +4,9 @@
 import { createAll, updateAll } from "./colorWheel.js";
 import { exportColors, updateExports } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
-import { satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
-import { satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
+import { chromaSlider1, satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
+import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
+import { select } from "../constants/selects.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Contenedores de colores
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     connectSliderWithNumber(satSlider1, satValue1, createAll);
     connectSliderWithNumber(lightSlider1, lightValue1, createAll);
+    connectSliderWithNumber(chromaSlider1, chromaValue1, createAll);
     connectSliderWithNumber(hueSlider, hueValue, createAll);
 
     connectSliderWithNumber(analogousSlider, analogousValue, updateAll);
@@ -59,27 +61,23 @@ document.addEventListener("DOMContentLoaded", () => {
   
       let colorId = colorDiv.id.split("-")[1]; // "1", "2", etc.
   
-      const panel = container.querySelector<HTMLElement>(`#panel-${colorId}`);
-      const satSlider = container.querySelector<HTMLInputElement>(`#saturation-${colorId}`);
-      const lightSlider = container.querySelector<HTMLInputElement>(`#lightness-${colorId}`);
-  
-      const satNumber = container.querySelector<HTMLInputElement>(`#saturation-value-${colorId}`);
-      const lightNumber = container.querySelector<HTMLInputElement>(`#lightness-value-${colorId}`);
-      
+      const panel = container.querySelector<HTMLElement>(`#panel-${colorId}`)!;
+      const satSlider = container.querySelector<HTMLInputElement>(`#saturation-${colorId}`)!;
+      const lightSlider = container.querySelector<HTMLInputElement>(`#lightness-${colorId}`)!;
+      const chromaSlider = container.querySelector<HTMLInputElement>(`#chroma-${colorId}`)!;
+
+      const satNumber = container.querySelector<HTMLInputElement>(`#saturation-value-${colorId}`)!;
+      const lightNumber = container.querySelector<HTMLInputElement>(`#lightness-value-${colorId}`)!;
+      const chromaNumber = container.querySelector<HTMLInputElement>(`#chroma-value-${colorId}`)!;
+
       // Poner un texto si no cumple con el contraste
       const text = document.createElement("label");
-      if (colorId !== "1") {
-        text.id = "contrast-text-" + colorId;
-        text.innerText = `No cumple con ningún contraste`;
-        text.style.wordBreak = "break-word";
-        text.style.textAlign = "center";
-        (container.childNodes[3] as HTMLElement).appendChild(text);
-      }
+      text.id = "contrast-text-" + colorId;
+      text.innerText = `Contraste no accesible`;
+      text.style.wordBreak = "break-word";
+      text.style.textAlign = "center";
+      (container.childNodes[3] as HTMLElement).appendChild(text);
       
-      if (
-        !panel || !satSlider || !lightSlider || !satNumber || !lightNumber
-      ) return;
-  
       // Mostrar/Ocultar panel al hacer clic
       editButton.addEventListener("click", () => {
         // Eliminar el panel de conversor si está visible
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Mostrar u ocultar TODOS los panels
         const shouldShow = !panel.classList.contains("show");
         document.querySelectorAll<HTMLElement>(".editor-panel").forEach((p) => {
-          if (shouldShow && p.getAttribute("branding") !== "true") {
+          if (shouldShow && p.getAttribute("palette") !== "1") {
             p.classList.add("show");
           } else {
             p.classList.remove("show");
@@ -121,30 +119,23 @@ document.addEventListener("DOMContentLoaded", () => {
         if (satSlider.value !== satSlider.getAttribute("previousValue") && (satSlider.getAttribute("previousValue") !== null || satNumber.getAttribute("previousValue") !== null)) {
           satSlider.setAttribute("previousValue", satSlider.value);
           satNumber.setAttribute("previousValue", satSlider.value);
-          let color
-          let wheelText;
-          if (parent?.id === "palette-1") {
-            wheelText = "lh";
-            color = "white";
-          } else {
-            wheelText = "sh";
-            color = "black";
-          }
-          const circleString = `circle-${color}-${wheelText}`;
-          const elements = document.querySelectorAll(`[id^="${circleString}"]`);
+          let color = "black";
+          const movingCircle = `circle-${color}-lh`;
+          const stationaryCircle = `circle-${color}-sh`;
+
+          const elements = document.querySelectorAll(`[id^="${movingCircle}"]`);
           const colorDiv = document.getElementById(`color-${colorId}`) as HTMLDivElement;
           elements.forEach((element, index) => {
             const circle = element as HTMLDivElement;
+            const circleLH = document.getElementById(`${stationaryCircle}-${index}`) as HTMLDivElement;
             if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
               const colorPalette = parent.childNodes[index] as HTMLDivElement;
               const hue = colorPalette.getAttribute("h");
               colorPalette.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
               colorDiv.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
               circle.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
-              // Solo se deberia mover si el color circulo es de la paleta derecha
-              if (parent?.id === "palette-1" && color === "white") {
-                updateOneCircle(circle, satSlider.valueAsNumber);
-              }
+              circleLH.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
+              updateOneCircle(circle, satSlider.valueAsNumber);
               return;
             }
           });
@@ -152,31 +143,51 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (lightSlider.value !== lightSlider.getAttribute("previousValue") && (lightSlider.getAttribute("previousValue") !== null || lightNumber.getAttribute("previousValue") !== null)) {
           lightSlider.setAttribute("previousValue", lightSlider.value);
           lightNumber.setAttribute("previousValue", lightSlider.value);
-          let color
-          let wheelText;
-          if (parent?.id === "palette-1") {
-            wheelText = "lh";
-            color = "white";
-          } else {
-            wheelText = "sh";
-            color = "black";
-          }
+          let color = "black";
+          const movingCircle = `circle-${color}-sh`;
+          const stationaryCircle = `circle-${color}-lh`;
 
-          const circleString = `circle-${color}-${wheelText}`;
-          const elements = document.querySelectorAll(`[id^="${circleString}"]`);
+          const elements = document.querySelectorAll(`[id^="${movingCircle}"]`);
           const colorDiv = document.getElementById(`color-${colorId}`) as HTMLDivElement;
           elements.forEach((element, index) => {
             const circle = element as HTMLDivElement;
+            const circleLH = document.getElementById(`${stationaryCircle}-${index}`) as HTMLDivElement;
             if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
               const colorPalette = parent.childNodes[index] as HTMLDivElement;
               const hue = colorPalette.getAttribute("h");
-              colorPalette.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
-              colorDiv.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
-              circle.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
-              // Solo se deberia mover si el color circulo es de la paleta izquierda
-              if (parent?.id === "palette-2" && color === "black") {
-                updateOneCircle(circle, lightSlider.valueAsNumber);
+              let bgString = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
+              if (select.value === "oklch") {
+                bgString = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
               }
+              colorPalette.style.backgroundColor = bgString;
+              colorDiv.style.backgroundColor = bgString;
+              circle.style.backgroundColor = bgString;
+              circleLH.style.backgroundColor = bgString;
+              updateOneCircle(circle, lightSlider.valueAsNumber);
+              return;
+            }
+          });
+          return;
+        } else if (chromaSlider.value !== chromaSlider.getAttribute("previousValue") && (chromaSlider.getAttribute("previousValue") !== null || chromaNumber.getAttribute("previousValue") !== null)) {
+          chromaSlider.setAttribute("previousValue", chromaSlider.value);
+          chromaSlider.setAttribute("previousValue", chromaSlider.value);
+          let color = "black";
+          const stationaryCircle = `circle-${color}-sh`;
+          const movingCircle = `circle-${color}-lh`;
+
+          const elements = document.querySelectorAll(`[id^="${movingCircle}"]`);
+          const colorDiv = document.getElementById(`color-${colorId}`) as HTMLDivElement;
+          elements.forEach((element, index) => {
+            const circle = element as HTMLDivElement;
+            const circleLH = document.getElementById(`${stationaryCircle}-${index}`) as HTMLDivElement;
+            if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
+              const colorPalette = parent.childNodes[index] as HTMLDivElement;
+              const hue = colorPalette.getAttribute("h");
+              colorPalette.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+              colorDiv.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+              circle.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+              circleLH.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+              updateOneCircle(circle, chromaSlider.valueAsNumber);
               return;
             }
           });
@@ -187,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Sincronizar sliders y números
       connectSliderWithNumber(satSlider, satNumber, updateColor);
       connectSliderWithNumber(lightSlider, lightNumber, updateColor);
-  
+      connectSliderWithNumber(chromaSlider, chromaNumber, updateColor);
       // Inicializa el color
       createAll();
     });

@@ -1,6 +1,6 @@
 // handleCircles.ts
 // This file contains the functions to handle the circles in the color wheels and palettes
-import { colorScheme } from "../constants/selects.js";
+import { colorScheme, select } from "../constants/selects.js";
 import { hueSlider } from "../constants/sliders.js";
 import { firstWheelCanvas, secondWheelCanvas } from "../constants/canvas.js";
 import { palette1, palette2 } from "../constants/palette.js";
@@ -56,7 +56,11 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     const color = window.getComputedStyle(colorBox).backgroundColor;
     let distance;
     if (isSaturationWheel) {
-      distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      }
     } else {
       distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
     }
@@ -82,7 +86,11 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     const color = window.getComputedStyle(colorBox).backgroundColor;
     let distance;
     if (isSaturationWheel) {
-      distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      }
     } else {
       distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
     }
@@ -133,7 +141,11 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     const color = window.getComputedStyle(colorBox).backgroundColor;
     let distance;
     if (isSaturationWheel) {
-      distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      }
     } else {
       distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
     }
@@ -159,7 +171,11 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
     const color = window.getComputedStyle(colorBox).backgroundColor;
     let distance;
     if (isSaturationWheel) {
-      distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+      }
     } else {
       distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
     }
@@ -183,7 +199,12 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
 }
 
 export function updateOneCircle(circle: HTMLDivElement, distance: number) {
-  const normalizedDistance = distance / 100; // Luminosidad normalizada
+  let normalizedDistance;
+  if (distance < 1 && distance >= 0) {
+    normalizedDistance = distance / 0.4; // Luminosidad normalizada
+  } else {
+    normalizedDistance = distance / 100; // Luminosidad normalizada
+  }
   const posX = circle.getAttribute("positionX");
   const posY = circle.getAttribute("positionY");
   const radius = circle.getAttribute("radius");

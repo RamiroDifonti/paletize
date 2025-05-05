@@ -3,9 +3,10 @@ import { select, wcag, contrast, colorScheme, colorblind} from "../constants/sel
 import { firstWheelCanvas, secondWheelCanvas } from "../constants/canvas.js";
 import { hslContainers, oklchContainers } from "../constants/containers.js";
 import { palette1, palette2 } from "../constants/palette.js";
+import { chromaSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
 
 // functions
-import { hslToRgb } from "../utils/conversor.js";
+import { hslToRgb, oklchToRgb, updateExports } from "../utils/conversor.js";
 import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
@@ -66,14 +67,18 @@ function drawColorWheels() {
   if (representation === "hsl") {
     hslContainers.forEach(container => container.style.display = "flex");
     oklchContainers.forEach(container => container.style.display = "none");
-    const lightness = document.getElementById("l-1") as HTMLInputElement;
-    const saturation = document.getElementById("s-1") as HTMLInputElement;
+    const lightness = lightSlider1;
+    const saturation = satSlider1;
     generateWheelHSL(parseInt(lightness.value), false, firstWheelCanvas);
     generateWheelHSL(parseInt(saturation.value), true, secondWheelCanvas);
     
   } else if (representation === "oklch") {
     hslContainers.forEach(container => container.style.display = "none");
     oklchContainers.forEach(container => container.style.display = "flex");
+    const lightness = lightSlider1;
+    const chroma = chromaSlider1;
+    generateWheelOKLCH(parseInt(lightness.value), false, firstWheelCanvas);
+    generateWheelOKLCH(chroma.valueAsNumber, true, secondWheelCanvas);
   }
 }
 
@@ -133,16 +138,74 @@ function generateWheelHSL(
   ctx.putImageData(imageData, 0, 0);
 }
 
+function generateWheelOKLCH(
+  value: number,
+  isChromaWheel: boolean,
+  canvas: HTMLCanvasElement,
+  size: number = 400
+): void {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  canvas.width = size;
+  canvas.height = size;
+
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const radius = size / 2;
+
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy) / radius;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      const hue = (angle + 360) % 360;
+
+      const index = (y * size + x) * 4;
+
+      if (distance <= 1) {
+        let chroma: number;
+        let lightness: number;
+        if (isChromaWheel) {
+          chroma = 0.4 * value;
+          lightness = distance;
+        } else {
+          chroma = distance * 0.4;
+          lightness = value / 100;
+          
+        }
+        // Convertimos OKLCH a sRGB
+        const [r, g, b] = oklchToRgb(lightness, chroma, hue);
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
+        data[index + 3] = 255; // Alpha
+      } else {
+        data[index] = 255;
+        data[index + 1] = 255;
+        data[index + 2] = 255;
+        data[index + 3] = 0; // transparente fuera del círculo
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
 
 
 export function createAll() {
   drawColorWheels();
   createCircles(firstWheelCanvas.parentElement!, false);
   createCircles(secondWheelCanvas.parentElement!, true);
+  updateExports();
 }
 export function updateAll() {
   updateCircles(firstWheelCanvas.parentElement!, false);
   updateCircles(secondWheelCanvas.parentElement!, true);
+  updateExports();
 }
 
 // Exportar como si fuera módulo

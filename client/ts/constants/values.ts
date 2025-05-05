@@ -3,6 +3,7 @@
 export const satValue1 = document.querySelector<HTMLInputElement>("#s-1-value")!;
 export const lightValue1 = document.querySelector<HTMLInputElement>("#l-1-value")!;
 export const hueValue = document.querySelector<HTMLInputElement>("#h-value")!;
+export const chromaValue1 = document.querySelector<HTMLInputElement>("#c-1-value")!;
 
 export const analogousValue = document.querySelector<HTMLInputElement>("#analogous-value")!;
 export const splitValue = document.querySelector<HTMLInputElement>("#split-value")!;
