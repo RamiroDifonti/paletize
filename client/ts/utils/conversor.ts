@@ -116,7 +116,10 @@ export function oklchToRgb(l: number, c: number, h: number | undefined): [number
     a = c * Math.cos(hRad);
     b = c * Math.sin(hRad);
   }
-
+  // if (h === 0) {
+  //   console.log(l, a, b);
+  //   // console.log();
+  // }
   // Convertir de OKLab a RGB lineal
   const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
   const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
@@ -131,7 +134,10 @@ export function oklchToRgb(l: number, c: number, h: number | undefined): [number
   const r = 4.0767416621 * l_3 - 3.3077115913 * m_3 + 0.2309699292 * s_3;
   const g = -1.2684380046 * l_3 + 2.6097574011 * m_3 - 0.3413193965 * s_3;
   const b_linear = -0.0041960863 * l_3 - 0.7034186147 * m_3 + 1.7076147010 * s_3;
-
+  // if (h === 0) {
+  //   console.log(r, g, b_linear);
+  //   console.log();
+  // }
   // Convertir de RGB lineal a sRGB
   const toSRGB = (value: number): number => {
     if (value <= 0) return 0;

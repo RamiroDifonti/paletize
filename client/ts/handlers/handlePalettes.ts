@@ -37,11 +37,15 @@ export function createPalette(container: HTMLElement, scheme : string) {
           boxLightness = limits[1] === 100 ? limits[3] : limits[1];
         }
       }
-
       if (container.classList.contains("colorblind")) {
         const colorblindType = colorblind?.value as "protanopia" | "deuteranopia" | "tritanopia";
-        [adjustedHue, boxSaturation, boxLightness] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+        if (select?.value === "oklch") {
+          [boxLightness, boxSaturation, adjustedHue] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+        } else {
+          [adjustedHue, boxSaturation, boxLightness] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+        }
       }
+
       let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
       if (select?.value === "oklch") {
         bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
@@ -81,6 +85,7 @@ export function createPalette(container: HTMLElement, scheme : string) {
           }
           const lightness = lightSlider1.value;
           const newHue = hueSlider.value;
+          adjustedHue = calculateColors(hueSlider.value, scheme)[index];
           const limits = limitColor(Number(newHue), Number(adjustedHue), Number(saturation), Number(lightness));
           let boxSaturation = Number(saturation);
           let boxLightness = Number(lightness);
@@ -90,7 +95,11 @@ export function createPalette(container: HTMLElement, scheme : string) {
           }
           if (container.classList.contains("colorblind")) {
             const colorblindType = colorblind?.value as "protanopia" | "deuteranopia" | "tritanopia";
-            [adjustedHue, boxSaturation, boxLightness] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+            if (select?.value === "oklch") {
+              [boxLightness, boxSaturation, adjustedHue] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+            } else {
+              [adjustedHue, boxSaturation, boxLightness] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+            }
           }
           let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
           if (select?.value === "oklch") {

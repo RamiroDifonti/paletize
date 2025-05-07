@@ -1,8 +1,8 @@
 // colorblind.ts
 // This file contains the code for the colorblindness functionality
-import { updateAll } from "../core/colorWheel.js";
 import { palette1, palette2 } from "../constants/palette.js";
-import { hslToRgb, rgbToHsl } from "./conversor.js";
+import { select } from "../constants/selects.js";
+import { hslToRgb, oklchToRgb, rgbToHsl, rgbToOklch } from "./conversor.js";
 
 const colorblind = document.querySelector<HTMLInputElement>(".colorblind");
 // Colorblindness matrices for different types of colorblindness
@@ -50,7 +50,10 @@ export function simulateColorBlind (
   l: number,
   type: "protanopia" | "deuteranopia" | "tritanopia"
 ): [number, number, number] {
-  const rgb = hslToRgb(h, s, l);
+  let rgb = hslToRgb(h, s, l);
+  if (select.value === "oklch") {
+    rgb = oklchToRgb(l / 100, s, h);
+  }
   const matrix = colorBlindMatrices[type];
 
   const [r, g, b] = rgb.map(v => v / 255);
@@ -63,5 +66,15 @@ export function simulateColorBlind (
     Math.round(Math.min(1, gBlind) * 255),
     Math.round(Math.min(1, bBlind) * 255)
   ];
-  return rgbToHsl(rgbSim[0], rgbSim[1], rgbSim[2]);
+  if (select.value === "oklch") {
+    let [l, c, h] = rgbToOklch(rgbSim[0], rgbSim[1], rgbSim[2]);
+    if (h === undefined) {
+      h = 0;
+    }
+    c = Math.round(c * 100) / 100;
+    return [Math.round(l * 100), c, Math.round(h)];
+  } else {
+    return rgbToHsl(rgbSim[0], rgbSim[1], rgbSim[2]);
+  }
+
 }
