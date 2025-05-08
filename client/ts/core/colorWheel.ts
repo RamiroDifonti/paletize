@@ -1,5 +1,5 @@
 // constants
-import { select, wcag, contrast, colorScheme, colorblind} from "../constants/selects.js";
+import { select, wcag, contrastS, contrastC, contrastL, colorScheme, colorblind} from "../constants/selects.js";
 import { firstWheelCanvas, secondWheelCanvas } from "../constants/canvas.js";
 import { hslContainers, oklchContainers } from "../constants/containers.js";
 import { palette1, palette2 } from "../constants/palette.js";
@@ -11,15 +11,13 @@ import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
 
-const BACKGROUND_COLOR = "#444"; // Color de fondo
-
-
-
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", updateSeparation);
 select?.addEventListener("change", createAll);
 wcag?.addEventListener("change", updateAll);
-contrast?.addEventListener("change", updateAll);
+contrastL?.addEventListener("change", updateAll);
+contrastS?.addEventListener("change", updateAll);
+contrastC?.addEventListener("change", updateAll);
 colorblind?.addEventListener("change", () => {
   updateColorblind();
   updateAll();

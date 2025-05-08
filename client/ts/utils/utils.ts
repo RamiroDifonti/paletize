@@ -1,6 +1,6 @@
 // utils.ts
 // This file contains the utility functions for the color wheel and palette generation
-import { wcag, contrast, select } from "../constants/selects.js";
+import { wcag, contrastS, contrastC, contrastL, select } from "../constants/selects.js";
 import { analogousSlider, complementarySlider, splitSlider, triadSlider, squareSlider } from "../constants/sliders.js";
 
 import { hslToRgb, oklchToRgb } from "./conversor.js";
@@ -8,7 +8,8 @@ import { hslToRgb, oklchToRgb } from "./conversor.js";
 // Limit sliders with min and max values from WCAG
 export function limitColor(hueBranding: number, hue: number, saturation: number, lightness: number) {
   const wcagValue = wcag?.value == "aa" ? 4.5 : 7;
-  const contrastValue = contrast?.value;
+  let contrastValueFirst = contrastS.value;
+  const contrastValueSecond = contrastL.value;
   let brandingRgb = hslToRgb(Number(hueBranding), Number(saturation), Number(lightness));
   const luminanceBranding = calculateLuminance(brandingRgb);
   const step = 0.01;
@@ -16,12 +17,29 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
   let minS = -1, minL = -1;
   let s = saturation, l = lightness / 100;
   if (select?.value === "oklch") {
+    contrastValueFirst = contrastC.value;
     brandingRgb = oklchToRgb(Number(lightness), Number(saturation), Number(hueBranding));
     s /= 0.4;
   } else {
     s /= 100;
   }
   let changeL = true;
+
+  let contrastValue;
+  if (contrastValueFirst === "decrease") {
+    if (contrastValueSecond === "decrease") {
+      contrastValue = "depth";
+    } else {
+      contrastValue = "softness";
+    }
+  } else {
+    if (contrastValueSecond === "decrease") {
+      contrastValue = "impact";
+    } else {
+      contrastValue = "intensity";
+    }
+  }
+
   switch (contrastValue) {
     // s2 < s1, l2 < l1 (saturación baja, luminosidad baja)
     case "depth":
