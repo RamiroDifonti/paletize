@@ -13,8 +13,8 @@
                 <a href="/" class="left">
                     <img src="../images/logo.png" alt="Logo">
                 </a>
-                <form class="center" action="/create/palette" method="POST">
-                    <input type="text" placeholder="Introduzca un nombre a la paleta" required>
+                <form class="center" action="/api/palette/create" method="POST">
+                    <input name = "name" type="text" placeholder="Introduzca un nombre a la paleta" required>
                     <button>Guardar</button>
                 </form>
                 <a href="/profile" class="right">
@@ -47,12 +47,22 @@
                         <option value="oklch">OKLCH</option>
                     </select>
 
-                    <label> Contraste: </label>
-                    <select class = "contrast-selection">
-                        <option value="depth">Profundidad</option>
-                        <option value="intensity">Intensidad</option>
-                        <option value="softness">Suavidad</option>
-                        <option value="impact">Impacto</option>
+                    <label class = "slider-hsl"> Contraste S: </label>
+                    <select class = "contrast-selection-s slider-hsl">
+                        <option value="increase">Incrementa S</option>
+                        <option value="decrease">Disminuye S</option>
+                    </select>
+
+                    <label class = "slider-oklch"> Contraste C: </label>
+                    <select class = "contrast-selection-c slider-oklch">
+                        <option value="increase">Incrementa C</option>
+                        <option value="decrease">Disminuye C</option>
+                    </select>
+
+                    <label> Contraste L: </label>
+                    <select class = "contrast-selection-l">
+                        <option value="increase">Incrementa L</option>
+                        <option value="decrease">Disminuye L</option>
                     </select>
 
                     <label> WCAG: </label>
@@ -287,5 +297,6 @@
         </footer>   
         <script type = "module" src="../js/core/palette.js"></script>
         <script type = "module" src="../js/core/colorWheel.js"></script>
+        <script type = "module" src="../js/forms/savePalette.js"></script>
     </body>
 </html>
