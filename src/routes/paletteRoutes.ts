@@ -1,9 +1,10 @@
 import express from 'express';
+import { authMiddleware } from '../middlewares/authMiddleware';
 import { createPalette,  publicPalettes, userPalettes, likePalette} from '../controllers/paletteControllers';
 
 export default (router: express.Router) => {
-    router.post("palette/create", createPalette);
-    router.get("palette/public", publicPalettes);
-    router.get("palette/user", userPalettes);
-    router.post("palette/like/:paletteId", likePalette);
+    router.post("/api/palette/create", authMiddleware, createPalette);
+    router.get("/api/palette/public", authMiddleware, publicPalettes);
+    router.get("/api/palette/user", authMiddleware, userPalettes);
+    router.post("/api/palette/like/:paletteId", authMiddleware, likePalette);
 };
