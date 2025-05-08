@@ -1,0 +1,21 @@
+- back-end:
+    - guardar paleta ---
+    - pagina que muestre todas las paletas creadas
+    - que la pagina tenga un filtro si quiere mostrar todas las paletas o las del Usuario
+    - que no sea necesario iniciar sesion para cargar todas las paletas
+    - cuando se le de click a una paleta que se cargue toda la paleta y:
+        - se ponga el id de la paleta en la url
+        - si se le da al boton de guardar que se actualice si el usuario ya tiene esa id guardada
+        - si se quiere guardar una paleta obligue al usuario a iniciar sesion
+    - que sea la pagina main
+
+
+    - Nombre colores.
+        https://www.color-blindness.com/color-name-hue/
+
+    - Añadir mas matrices de daltonismo.
+    - Separar funcionamiento hsl y oklch (mucho if en el programa)
+    - optimizar rueda HSL donde se calcule 1/4 y el resto se haga por inversos
+    - maximo contraste
+    - Contraste de colores
+    - Agregar una opción para poner paletas privadas
