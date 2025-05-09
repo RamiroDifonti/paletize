@@ -1,0 +1,71 @@
+:root {
+  --background-color: #444;
+  --base-font-size: 16px; /* Tamaño de fuente por defecto */
+  --responsive-font-size: calc(1rem + 2vw); /* Fórmula para calcular tamaño de fuente responsivo */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main */
+.container {
+  width: calc(100vw - var(--scrollbar-width));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  min-height: 10vh;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--responsive-font-size);
+  color:white;
+  background-color: blueviolet;
+}
+
+.header .left, .header .right {
+  display: flex;
+  justify-self: center;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  width: 10vh;
+  min-width: 50px;
+}
+
+.left img, .right img {
+  aspect-ratio: 1 / 1;
+  height: 80%;
+  border-radius: 8%;
+}
+
+.header .center{
+  display: flex;
+  flex: 2 1 auto;
+  align-items: center;
+  width: 10vw;
+  min-width: 200px;
+  gap: 1%;
+  justify-content: center;
+  flex-wrap: wrap;
+} 
+
+.center * {
+  max-width: 80%;
+}
+
+.center input {
+  min-width: 20%;
+}
+
+/* Footer */
+footer{
+  background-color: lightslategrey;
+  height: 10vh;
+  min-height: 50px;
+}

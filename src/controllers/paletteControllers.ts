@@ -60,7 +60,7 @@ export const publicPalettes = async (_req: express.Request, res: express.Respons
 
 export const userPalettes = async (req: express.Request, res: express.Response): Promise<void> => {
     try {
-        const userId = req.user._id;
+        const userId = req.user.id;
         const palettes = await Palette.find({ creator: userId });
         res.json(palettes);
         return;
