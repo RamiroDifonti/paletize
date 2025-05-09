@@ -63,13 +63,7 @@ export const login = async (req: express.Request, res: express.Response): Promis
                 sameSite: 'strict',
                 maxAge: 60 * 60 * 1000
             })
-            .send({
-            _id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            username: user.username,
-            email: user.email
-            });
+            .redirect('/');
         return;
     } catch (e) {
         console.log(e);

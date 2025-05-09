@@ -3,14 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <link rel="stylesheet" href="../styles/index.css">
+    <link rel="stylesheet" href="../styles/common.css">
+    <title>Paletize</title>
 </head>
 <body>
-    <div>
-        <h1>Bienvenido a la Página de Inicio</h1>
-        <button id="logoutBtn">Cerrar Sesión</button>
-    </div>
-
-    <script src="/js/index.js"></script> <!-- Archivo JavaScript -->
+    <main class="container">
+        <header class="header">
+            <a href="/" class="left">
+                <img src="../images/logo.png" alt="Logo">
+            </a>
+            <div class="selection">
+                <button id = "user">Tus paletas</button>
+                <button id = "community" class="active">Comunidad</button>
+            </div>
+            <form class="center" action="/api/palette/create" method="POST">
+                <input name = "name" type="text" placeholder="Busque una paleta" required>
+                <button>Buscar</button>
+            </form>
+            <a href="/profile" class="right">
+                <img src="../images/logo.png" alt="Perfil">
+            </a>
+        </header>
+        <section class="content">
+            <div class="search-items">
+            </div>
+        </section>
+    </main>
+    <footer>
+        TFG: Ramiro Difonti
+    </footer>   
+    <script type = "module" src="../js/core/index.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@ import { createPalette,  publicPalettes, userPalettes, likePalette} from '../con
 
 export default (router: express.Router) => {
     router.post("/api/palette/create", authMiddleware, createPalette);
-    router.get("/api/palette/public", authMiddleware, publicPalettes);
+    router.get("/api/palette/public", publicPalettes);
     router.get("/api/palette/user", authMiddleware, userPalettes);
     router.post("/api/palette/like/:paletteId", authMiddleware, likePalette);
 };

@@ -26,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+    if (colors.length === 0) {
+      alert('Añada colores a la paleta.');
+      return;
+    }
     let brandS = (document.getElementById(`s-1`) as HTMLInputElement)?.value;
     const brandL = (document.getElementById(`l-1`) as HTMLInputElement)?.value;
     const brandH = (document.getElementById(`h`) as HTMLInputElement)?.value;

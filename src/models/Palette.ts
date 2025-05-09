@@ -24,14 +24,9 @@ const PaletteSchema = new mongoose.Schema(
       required: true,
     },
     colors: {
-      type: [
-        {
-          hsl: { type: String },
-          oklch: { type: String },
-        },
-      ],
+      type: [String],
       validate: [
-        (val: { hsl: String, oklch: String }[]) => val.length <= 5,
+        (val: string[]) => val.length <= 5,
         "Debe contener como máximo 5 colores",
       ],
       required: true,

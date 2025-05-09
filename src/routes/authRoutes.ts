@@ -13,7 +13,7 @@ export default (router: express.Router) => {
     router.post("/api/account/email", authMiddleware, changeEmail);
     router.post("/api/account/password", authMiddleware, changePassword);
     // Rutas para el cliente
-    router.get("/", authMiddleware, getIndex);
+    router.get("/", getIndex);
     router.get("/profile", authMiddleware, getProfile);
     router.get("/login", getLogin);
     router.get("/account", authMiddleware, getAccount);
