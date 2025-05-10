@@ -57,13 +57,15 @@ export const login = async (req: express.Request, res: express.Response): Promis
 
         await user.save();
         // Devolver el json sin el bloque de autenticación
+        const redirectTo = req.cookies.redirectAfterLogin || '/';
         res
+            .clearCookie('redirectAfterLogin')
             .cookie('sessionToken', token, {
                 httpOnly: true,
                 sameSite: 'strict',
                 maxAge: 60 * 60 * 1000
             })
-            .redirect('/');
+            .redirect(redirectTo);
         return;
     } catch (e) {
         console.log(e);

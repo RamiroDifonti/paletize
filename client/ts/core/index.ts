@@ -1,11 +1,16 @@
 const buttons = document.querySelectorAll('.selection button');
-
+const createButton = document.getElementById('create') as HTMLButtonElement;
 buttons.forEach(button => {
   button.addEventListener('click', () => {
     buttons.forEach(btn => btn.classList.remove('active')); // quitar selección previa
     button.classList.add('active'); // marcar el clicado
     loadItems(); // cargar los items
   });
+});
+
+createButton.addEventListener('click', () => {
+  window.location.href = `/palette`;
+  return;
 });
 
 
@@ -44,11 +49,14 @@ async function loadItems () {
   if (isUserPalettes) {
     fetchString = "/api/palette/user"
   }
-
   try {
-    const res = await fetch(fetchString);
+    let res = await fetch(fetchString);
+    if (res.redirected) {
+      window.location.href = `/login`;
+      return;
+    }
     const palettes = await res.json();
-    
+
     palettes.forEach((palette: Palette) => {
       const item = document.createElement("div");
       item.classList.add("item");
@@ -77,7 +85,6 @@ async function loadItems () {
       const creatorLabel = document.createElement("p");
       creatorLabel.innerText = palette.creator.username;
       info.appendChild(creatorLabel);
-
       const likesLabel = document.createElement("p");
       likesLabel.innerText = `${palette.likes.length} ♡`;
       info.appendChild(likesLabel);
@@ -85,18 +92,10 @@ async function loadItems () {
       item.append(colors);
       item.appendChild(info);
       item.addEventListener("click", () => {
-        window.location.href = `/palette`;
-        // window.location.href = `/palette/${palette._id}`;
+        window.location.href = `/palette/${palette._id}`;
       });
       container.appendChild(item);
     });
-    // palettes.forEach((palette) => {
-    //   const item = document.createElement("div");
-    //   item.className = "shop-item";
-    //   item.style.background = palette.colors?.[0]?.hsl || "#ccc";
-    //   item.innerHTML = `<p style="padding: 0.5rem; color: white;">${palette.name}</p>`;
-    //   container.appendChild(item);
-    // });
   } catch (e) {
     console.error("Error al cargar paletas:", e);
   }

@@ -9,12 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const buttons = document.querySelectorAll('.selection button');
+const createButton = document.getElementById('create');
 buttons.forEach(button => {
     button.addEventListener('click', () => {
         buttons.forEach(btn => btn.classList.remove('active')); // quitar selección previa
         button.classList.add('active'); // marcar el clicado
         loadItems(); // cargar los items
     });
+});
+createButton.addEventListener('click', () => {
+    window.location.href = `/palette`;
+    return;
 });
 document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, void 0, function* () {
     loadItems(); // cargar los items al cargar la página
@@ -32,7 +37,11 @@ function loadItems() {
             fetchString = "/api/palette/user";
         }
         try {
-            const res = yield fetch(fetchString);
+            let res = yield fetch(fetchString);
+            if (res.redirected) {
+                window.location.href = `/login`;
+                return;
+            }
             const palettes = yield res.json();
             palettes.forEach((palette) => {
                 const item = document.createElement("div");
@@ -66,18 +75,10 @@ function loadItems() {
                 item.append(colors);
                 item.appendChild(info);
                 item.addEventListener("click", () => {
-                    window.location.href = `/palette`;
-                    // window.location.href = `/palette/${palette._id}`;
+                    window.location.href = `/palette/${palette._id}`;
                 });
                 container.appendChild(item);
             });
-            // palettes.forEach((palette) => {
-            //   const item = document.createElement("div");
-            //   item.className = "shop-item";
-            //   item.style.background = palette.colors?.[0]?.hsl || "#ccc";
-            //   item.innerHTML = `<p style="padding: 0.5rem; color: white;">${palette.name}</p>`;
-            //   container.appendChild(item);
-            // });
         }
         catch (e) {
             console.error("Error al cargar paletas:", e);

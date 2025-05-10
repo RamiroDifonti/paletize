@@ -18,6 +18,7 @@ export default (router: express.Router) => {
     router.get("/login", getLogin);
     router.get("/account", authMiddleware, getAccount);
     router.get("/palette", authMiddleware, getPalette);
+    router.get("/palette/:id", authMiddleware, getPalette);
 };
 
 

@@ -16,6 +16,17 @@
   border : none;
   cursor: pointer;
 }
+#create {
+  align-self: center;
+  height: 2.5rem;
+  /* max-height: 80%; */
+  width: 5vw;
+  min-width: 100px;
+  white-space: nowrap;
+  border : none;
+  cursor: pointer;
+}
+
 .selection button.active {
   background-color: #333;
   color: white;
@@ -62,7 +73,8 @@
     justify-content: center;
   }
   .header .center,
-  .header .selection {
+  .header .selection,
+  #create {
     padding: 5% 0;
   }
 }

@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     // Crear un objeto FormData para extraer los valores del formulario
     const form = e.target as HTMLFormElement;
+    const path = window.location.pathname;
+    const id = path.split('/')[2]; // Obtener el ID de la URL (en este caso sería "12345")
+
     // Primero obtenemos el modelo de color seleccionado
     const name = form.querySelector('[name="name"]') as HTMLInputElement;
     const colorModel = (document.querySelector('.representation-wheel') as HTMLSelectElement)?.value as 'hsl' | 'oklch';
@@ -73,6 +76,37 @@ document.addEventListener('DOMContentLoaded', () => {
       colorSeparation,
     };
     // Enviar los datos a la API usando fetch
+    if (id !== undefined) {
+      const res = await fetch(`/api/palette/user`);
+      if (res.redirected) {
+        window.location.href = `/login`;
+        return;
+      }
+      const palettes = await res.json();
+      const palette = palettes.find((palette: { _id: string }) => palette._id === id);
+      if (palette) {
+        try {
+          const response = await fetch(`/api/palette/update/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data), // Convertimos el objeto a JSON
+          });
+          const result = await response.json();
+          if (response.ok) {
+            console.log('Paleta actualizada:', result);
+            // Puedes redirigir a otra página o mostrar un mensaje de éxito
+          } else {
+            console.error('Error al actualizar paleta:', result);
+            // Mostrar mensaje de error en la UI
+          }
+          return;
+        } catch (error) {
+          console.error('Error en la solicitud:', error);
+        }
+      }
+    }
     try {
       const response = await fetch('/api/palette/create', {
         method: 'POST',

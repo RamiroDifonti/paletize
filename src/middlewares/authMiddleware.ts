@@ -5,6 +5,11 @@ export const authMiddleware = async (req: express.Request, res: express.Response
     const token = req.cookies.sessionToken;
     req.user = null;
     if (!token) {
+        res.cookie("redirectAfterLogin", req.originalUrl, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 5 * 60 * 1000, // 5 minutos
+        });
         res.redirect("/login");
         return;
     }
