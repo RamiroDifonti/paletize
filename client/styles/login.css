@@ -1,0 +1,87 @@
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 400px;
+    height: 90vh;
+    background-color: #F0F0F0;
+}
+
+.loginui {
+    background-color: #fff;
+    border: 3px solid gray;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 400px;
+    justify-self: center;
+}
+
+h3 {
+    text-align: center;
+    font-family: monospace;
+    align-self: center;
+    justify-self: flex-start;
+}
+
+.data {
+    border: none;
+    min-height: 300px;
+    padding: 20px;
+}
+
+.data-button {
+    align-self: center;
+    margin-bottom: 2%;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    background: #6E6D70;
+    color: #DFDEDF;
+}
+
+.button-holder {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.menu-button {
+    border: none;
+    height: 5vh;
+    flex: 1;
+    background-color: #ccd2db;
+    font-family: monospace;
+}
+
+.register-button {
+    background-color: #b8babe;
+}
+
+.button-holder .menu-button:hover {
+    background-color: #8e9197;
+}
+.form.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.form {
+    display: none;
+}
+
+label {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    width: 100%;
+    height: 10%;
+    margin: 5px;
+}
+label input {
+    width: 100%;
+}
+
+.header {
+    justify-content: center;
+}

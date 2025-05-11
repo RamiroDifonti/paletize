@@ -1,0 +1,106 @@
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 400px;
+    height: 90vh;
+    background-color: #F0F0F0;
+}
+
+.profileui {
+    background-color: #fff;
+    border: 3px solid gray;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 400px;
+    justify-self: center;
+    /* font-size: var(--responsive-font-size); */
+}
+
+h3 {
+    text-align: center;
+    font-family: monospace;
+    align-self: center;
+}
+
+.data {
+    border: none;
+    min-height: 300px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.data-button {
+    align-self: center;
+    margin-bottom: 2%;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    background: #6E6D70;
+    color: #DFDEDF;
+}
+.data-button:active {
+    background: #8e9197;
+}
+
+.button-holder {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.menu-button {
+    border: none;
+    height: 5vh;
+    flex: 1;
+    background-color: #ccd2db;
+    font-family: monospace;
+}
+
+.account-button {
+    background-color: #b8babe;
+}
+
+.button-holder .menu-button:hover {
+    background-color: #8e9197;
+}
+.form.active {
+    display: flex;
+    flex-direction: column;
+}
+#logoutBtn {
+    border: none;
+    border-radius: 6px;
+    font-family: monospace;
+    width: 50%;
+    height: 50px;
+    margin-top: 2%;
+    align-self: center;
+}
+#changePasswordForm {
+    margin-top: -40%;
+}
+.form {
+    display: none;
+    padding-bottom: 5%;
+}
+.form div {
+    align-self: center;
+    justify-self: center;
+}
+.data input {
+    width: 50%;
+    margin: 1%;
+}
+.data button {
+    width: 50%;
+}
+@media (max-width: 250px) {
+  .header {
+    justify-content: center;
+  }
+}
