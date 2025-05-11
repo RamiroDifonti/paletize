@@ -67,6 +67,10 @@
 
 /* Footer */
 footer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
   background-color: lightslategrey;
   height: 10vh;
   min-height: 50px;
