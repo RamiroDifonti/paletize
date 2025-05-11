@@ -46,7 +46,7 @@ export const login = async (req: express.Request, res: express.Response): Promis
             },
             JWT_SECRET,
             {
-                expiresIn: '1h'
+                expiresIn: '30d'
             });
 
         const isValidPassword = await bcrypt.compare(password, user.authentication.password);
@@ -63,7 +63,7 @@ export const login = async (req: express.Request, res: express.Response): Promis
             .cookie('sessionToken', token, {
                 httpOnly: true,
                 sameSite: 'strict',
-                maxAge: 60 * 60 * 1000
+                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 días
             })
             .redirect(redirectTo);
         return;
@@ -92,7 +92,7 @@ export const register = async (req: express.Request, res: express.Response): Pro
         const salt = await bcrypt.genSalt(SALT_ROUNDS);
         const hashedPassword = await bcrypt.hash(password, salt);
         // Crear el usuario
-        const newUser = createUser({
+        const newUser = await createUser({
             firstName,
             lastName,
             username,
@@ -102,9 +102,30 @@ export const register = async (req: express.Request, res: express.Response): Pro
                 salt
             }
         });
-        newUser.then((user) => {
-            res.status(201).json(user);
-        });
+        // Generar token JWT
+        const token = jwt.sign(
+            {
+                id: newUser._id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                username: newUser.username,
+                email: newUser.email,
+                savedPalettes: newUser.savedPalettes
+            },
+            process.env.JWT_SECRET!,
+            { expiresIn: '30d' }
+        );
+
+        // Establecer cookie y redirigir
+        const redirectTo = req.cookies.redirectAfterLogin || '/';
+        res
+            .clearCookie('redirectAfterLogin')
+            .cookie('sessionToken', token, {
+                httpOnly: true,
+                sameSite: 'strict',
+                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 días
+            })
+            .redirect(redirectTo);
         return;
     } catch (e) {
         console.log(e);
@@ -130,12 +151,51 @@ export const logout = async (_req: express.Request, res: express.Response): Prom
 }
 
 export const apiProfile = async (req: express.Request, res: express.Response): Promise <void> => {
-    res.json({
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        username: req.user.username,
-        // fotoPerfil: req.user.fotoPerfil, // URL de la imagen
-    });
+    try {
+        const user = await User.findById(req.user.id); // Consultar desde la BD
+        if (!user) {
+            res.status(404).json({ message: "Usuario no encontrado" });
+            return;
+        }
+
+        res.json({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+            id: user._id,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el perfil" });
+    }
+    return;
+}
+
+export const updateProfile = async (req: express.Request, res: express.Response): Promise <void> => {
+    const { firstName, lastName, username } = req.body;
+    if (firstName || lastName || username) {
+        try {
+            // Actualizar solo los campos que se envían
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user.id, // ID del usuario a actualizar
+                { firstName, lastName, username }, // Campos a actualizar
+                { new: true } // Devuelve el documento actualizado
+            );
+            if (!updatedUser) {
+                throw new Error('Usuario no encontrado');
+            }
+            updatedUser.save();
+            res.json({
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                username: updatedUser.username,
+            });
+            return;
+        } catch (error) {
+            res.status(500).json({ message: "Error al actualizar el perfil" });
+            return;
+        }
+    }
+    res.status(400).json({ message: "Los campos son obligatorios" });
     return;
 }
 
@@ -226,10 +286,5 @@ export const getIndex = async (_req: express.Request, res: express.Response): Pr
 
 export const getAccount = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.sendFile(path.join(__dirname, "../../client/content/account.html"));
-    return;
-}
-
-export const getPalette = async (_req: express.Request, res: express.Response): Promise <void> => {
-    res.sendFile(path.join(__dirname, "../../client/content/palette.html"));
     return;
 }

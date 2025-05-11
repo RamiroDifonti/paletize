@@ -207,7 +207,6 @@ export function updateAll() {
 }
 
 // Exportar como si fuera módulo
-// (window as any).updateAll = updateAll; 
 window.addEventListener("resize", () => {
   updateAll();
 });

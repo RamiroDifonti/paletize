@@ -128,6 +128,54 @@ export function createPalette(container, scheme) {
         });
     }
 }
+// Cargar las paletas
+// Crear las paletas
+export function loadPalette(container, scheme) {
+    const colorBoxs = container.querySelectorAll(".color-box");
+    // Primero se comprueba si se los color-box ya están creados o no
+    const hue = hueSlider.value;
+    let saturation = satSlider1.value;
+    if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+        saturation = chromaSlider1.value;
+    }
+    const lightness = lightSlider1.value;
+    const hues = calculateColors(hue, scheme);
+    // Si ya existen, actualizamos los colores de fondo y comprobamos si su checkbox está marcado
+    colorBoxs.forEach((colorBox, index) => {
+        let adjustedHue = hues[index];
+        const limits = limitColor(Number(hue), Number(adjustedHue), Number(saturation), Number(lightness));
+        let boxSaturation = Number(saturation);
+        let boxLightness = Number(lightness);
+        if (container.id !== "palette-1") {
+            if (limits[0] !== -1) {
+                boxSaturation = limits[0] === 100 ? limits[2] : limits[0];
+                boxLightness = limits[1] === 100 ? limits[3] : limits[1];
+            }
+        }
+        if (container.classList.contains("colorblind")) {
+            const colorblindType = colorblind === null || colorblind === void 0 ? void 0 : colorblind.value;
+            if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+                [boxLightness, boxSaturation, adjustedHue] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+            }
+            else {
+                [adjustedHue, boxSaturation, boxLightness] = simulateColorBlind(adjustedHue, boxSaturation, boxLightness, colorblindType);
+            }
+        }
+        let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
+        if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+            bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
+        }
+        colorBox.style.backgroundColor = bgString;
+        colorBox.setAttribute("h", adjustedHue.toString());
+        colorBox.setAttribute("s", boxSaturation.toString());
+        colorBox.setAttribute("l", boxLightness.toString());
+        const checkbox = colorBox.childNodes[0];
+        // Si el checkbox está marcado, actualizamos el color en la paleta
+        if (checkbox.checked) {
+            addColor(colorBox, limits);
+        }
+    });
+}
 // Función para añadir un color a la paleta
 function addColor(hslColor, limits) {
     var _a;

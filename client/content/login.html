@@ -1,55 +1,97 @@
 <!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Login</title>
-    <!-- Asegúrate de enlazar correctamente el archivo CSS -->
-    <link rel="stylesheet" href="../styles/styles.css">
-  </head>
-  <body class="align">
-    <div class="grid">
-        <form action="/api/login" method="POST" class="form login">
-            <div class="form__field">
-              <label for="login__email">
-                <svg class="icon">
-                  <use xlink:href="#icon-user"></use>
-                </svg><span class="hidden">Email</span>
-              </label>
-              <input autocomplete="email" id="login__email" type="text" name="email" class="form__input" placeholder="Email" required>
-            </div>
-          
-            <div class="form__field">
-              <label for="login__password">
-                <svg class="icon">
-                  <use xlink:href="#icon-lock"></use>
-                </svg><span class="hidden">Password</span>
-              </label>
-              <input id="login__password" type="password" name="password" class="form__input" placeholder="Password" required>
-            </div>
-          
-            <div class="form__field">
-              <input type="submit" value="Sign In">
-            </div>
-          </form>          
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="../styles/common.css">
+        <link rel="stylesheet" href="../styles/login.css">
+        <title>Inicio de sesión</title>
+    </head>
+    <body>
+        <main class="container">
+            <header class="header">
+                <a href="/" class="left">
+                    <img src="../images/logo.svg" alt="Logo">
+                </a>
+                <h3>Paletize</h3>
+            </header>
+            <section class ="content">
+                <section class="loginui">
+                    <section class="button-holder">
+                        <button id= "button1" class="menu-button" onclick="showForm('1')">Inicio</button>
+                        <button id= "button2" class="menu-button register-button" onclick="showForm('2')">Registro</button>
+                    </section>
+                    <form id="form1" class="form active" method="POST" action="/api/login">
+                        <fieldset class="data">
+                            <h2>Iniciar sesión</h2>
+                            <label>Email:
+                                <input type="text" name="email" placeholder="Tu email" required>
+                            </label>
+                            <label>Contraseña: 
+                                <input type="password" name="password" placeholder="Tu contraseña" required>
+                            </label>
+                        </fieldset>
+                        <button class="data-button">Enviar</button>
+                    </form>
+                    <form id="form2" class="form" method="POST" action="/api/register">
+                        <fieldset class="data">
+                            <h2>Registrarse</h2>
+                            <label>Nombre:
+                                <input type="text" name="firstName" placeholder="Tu nombre" required>
+                            </label>
+                            <label>Apellidos:
+                                <input type="text" name="lastName" placeholder="Tus apellidos" required>
+                            </label>
+                            <label>Usuario:
+                                <input type="text" name="username" placeholder="Tu usuario" required>
+                            </label>
+                            <label>Correo:
+                                <input type="email" name="email" placeholder="Tu correo" required>
+                            </label> 
+                            <label>Repetir correo:
+                                <input type="email" name="emailcheck" placeholder="Repite tu correo" required>
+                            </label>
+                            <label>Contraseña:
+                                <input type="password" name="password" placeholder="Tu contraseña" required>
+                            </label>
+                            <label>Repetir contraseña:
+                                <input type="password" name="passwordcheck" placeholder="Repite tu contraseña" required>
+                            </label>
+                        </fieldset>
+                        <button class="data-button">crear cuenta</button>
+                    </form>
+                </section>
+            </section>
+        </main>
+        <footer class="footer">
+            <p>Ramiro Difonti</p>
+        </footer>
+        <script>
+            document.getElementById('form2')?.addEventListener('submit', (e) => {
+                const form = e.target;
+                const email = form.email.value;
+                const emailCheck = form.emailcheck.value;
+                const password = form.password.value;
+                const passwordCheck = form.passwordcheck.value;
+                if (email !== emailCheck) {
+                    e.preventDefault();
+                    alert('Los correos no coinciden.');
+                    return;
+                }
+                if (password !== passwordCheck) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden.');
+                    return;
+                }
+            });
+            function showForm(id) {
+                const forms = document.querySelectorAll('.form');
+                forms.forEach(form => form.classList.remove('active'));
+                document.getElementById(`form${id}`).classList.add('active');
+                const buttons = document.querySelectorAll('.menu-button');
+                buttons.forEach(button => button.classList.remove('register-button'));
+                document.getElementById(`button${id}`).classList.add('register-button');
+            }
+        </script>
+    </body>
 
-      <p class="text--center">Not a member? <a href="#">Sign up now</a> 
-        <svg class="icon">
-          <use xlink:href="#icon-arrow-right"></use>
-        </svg>
-      </p>
-    </div>
-
-    <svg xmlns="http://www.w3.org/2000/svg" class="icons">
-      <symbol id="icon-arrow-right" viewBox="0 0 1792 1792">
-        <path d="M1600 960q0 54-37 91l-651 651q-39 37-91 37-51 0-90-37l-75-75q-38-38-38-91t38-91l293-293H245q-52 0-84.5-37.5T128 1024V896q0-53 32.5-90.5T245 768h704L656 474q-38-36-38-90t38-90l75-75q38-38 90-38 53 0 91 38l651 651q37 35 37 90z" />
-      </symbol>
-      <symbol id="icon-lock" viewBox="0 0 1792 1792">
-        <path d="M640 768h512V576q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28H416q-40 0-68-28t-28-68V864q0-40 28-68t68-28h32V576q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z" />
-      </symbol>
-      <symbol id="icon-user" viewBox="0 0 1792 1792">
-        <path d="M1600 1405q0 120-73 189.5t-194 69.5H459q-121 0-194-69.5T192 1405q0-53 3.5-103.5t14-109T236 1084t43-97.5 62-81 85.5-53.5T538 832q9 0 42 21.5t74.5 48 108 48T896 971t133.5-21.5 108-48 74.5-48 42-21.5q61 0 111.5 20t85.5 53.5 62 81 43 97.5 26.5 108.5 14 109 3.5 103.5zm-320-893q0 159-112.5 271.5T896 896 624.5 783.5 512 512t112.5-271.5T896 128t271.5 112.5T1280 512z" />
-      </symbol>
-    </svg>
-  </body>
 </html>

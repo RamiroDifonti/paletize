@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles/index.css">
     <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../styles/index.css">
     <title>Paletize</title>
 </head>
 <body>
     <main class="container">
         <header class="header">
             <a href="/" class="left">
-                <img src="../images/logo.png" alt="Logo">
+                <img src="../images/logo.svg" alt="Logo">
             </a>
             <div class="selection">
                 <button id = "user">Tus paletas</button>
                 <button id = "community" class="active">Comunidad</button>
             </div>
             <button id = "create">Crear paleta</button>
-            <form class="center" action="/api/palette/create" method="POST">
+            <form id = "searchForm" class="center" action="/api/palette/search" method="POST">
                 <input name = "name" type="text" placeholder="Busque una paleta" required>
                 <button>Buscar</button>
             </form>
             <a href="/profile" class="right">
-                <img src="../images/logo.png" alt="Perfil">
+                <img src="../images/perfil.svg" alt="Perfil">
             </a>
         </header>
         <section class="content">

@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { Palette } from "../models/Palette";
+import path from 'path';
 
 export const createPalette = async (req: express.Request, res: express.Response): Promise<void> => {
     try {
@@ -130,19 +131,58 @@ export const likePalette = async (req: express.Request, res: express.Response): 
             res.status(404).json({ message: "Paleta no encontrada" });
             return;
         }
+
         if (palette.likes.includes(req.user.id)) {
-            res.status(400).json({ message: "Ya diste like a esta paleta" });
+            // Quitar el like del usuario
+            palette.likes = palette.likes.filter((like: any) => !like.equals(req.user.id));
+            await palette.save();
             return;
-        }
-        palette.likes.push(req.user._id);
+        } 
+        palette.likes.push(req.user.id);
         await palette.save();
-        const numberLikes = palette.likes.length;
-        res.json({ likes: numberLikes });
         return;
     } catch (error) {
         res.status(500).json({ message: "Error al dar like" });
         return;
     }
 };
-  
-  
+
+export const getPalette = async (_req: express.Request, res: express.Response): Promise <void> => {
+    res.sendFile(path.join(__dirname, "../../client/content/palette.html"));
+    return;
+}
+
+export const loadPalette = async (req: express.Request, res: express.Response): Promise <void> => {
+    try {
+        const { id } = req.params;
+        const palette = await Palette.findById(id).populate('creator', 'username');
+        if (!palette) {
+            res.status(404).json({ message: 'Paleta no encontrada' });
+            return;
+        }
+        res.json(palette);
+        return;
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+        return;
+    }
+};
+export const searchPalette = async (req: express.Request, res: express.Response): Promise<void> => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      res.status(400).json({ message: "El nombre es requerido" });
+      return;
+    }
+
+    const palettes = await Palette.find({
+      name: { $regex: new RegExp(name, 'i') }
+    }).populate('creator', 'username');
+
+    res.json(palettes);
+  } catch (error) {
+    console.error("Error en búsqueda:", error);
+    res.status(500).json({ message: "Error al buscar la paleta" });
+  }
+};  

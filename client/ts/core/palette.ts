@@ -6,12 +6,13 @@ import { exportColors, updateExports } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
 import { chromaSlider1, satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
 import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
-import { select } from "../constants/selects.js";
+import { colorScheme, select, contrastC, contrastS, contrastL, wcag } from "../constants/selects.js";
+import { loadPalette } from "../handlers/handlePalettes.js";
+import { palette1, palette2 } from "../constants/palette.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     // Contenedores de colores
     const colorContainers = document.querySelectorAll<HTMLElement>(".color-container");
-
     // Función para sincronizar slider y número
     const connectSliderWithNumber = (
       slider: HTMLInputElement,
@@ -202,4 +203,136 @@ document.addEventListener("DOMContentLoaded", () => {
       // Inicializa el color
       createAll();
     });
+    
+    const id = window.location.href.split("/").pop();
+    if (!id || id === "palette") {
+      document.querySelector(".selection")?.classList.add("hidden");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/palette/${id}`);
+      const palette = await res.json();
+      (document.querySelector('[name="name"]') as HTMLInputElement).value = palette.name;
+      select.value = palette.colorModel;
+
+      const checkboxes = document.querySelectorAll<HTMLInputElement>(".color-checkbox");
+      if (palette.colorModel === "hsl") {
+        const hBrand = palette.brandColor.split(",")[0].split("(")[1].trim();
+        const sBrand = palette.brandColor.split(",")[1].split("%")[0].trim();
+        const lBrand = palette.brandColor.split(",")[2].split(")")[0].split("%")[0].trim();
+        
+        satSlider1.value = sBrand;
+        satValue1.value = sBrand;
+        lightSlider1.value = lBrand;
+        lightValue1.value = lBrand;
+        hueSlider.value = hBrand;
+        hueValue.value = hBrand;
+
+        contrastS.value = palette.firstContrast;
+        const palettes = palette.colors;
+        updateAll();
+        palettes.forEach((color: string) => {
+          const h = color.split(",")[0].split("(")[1].trim();
+          const s = color.split(",")[1].split("%")[0].trim();
+          const l = color.split(",")[2].split(")")[0].split("%")[0].trim();
+          for (const checkbox of checkboxes) {
+            const colorBox = checkbox.parentElement as HTMLDivElement;
+            if (
+              colorBox.getAttribute("h") === h &&
+              colorBox.getAttribute("s") === s &&
+              colorBox.getAttribute("l") === l
+            ) {
+
+              checkbox.checked = true;
+              break;
+            }
+          }
+        });
+      } else {
+        const hBrand = palette.brandColor.split(" ")[2].trim().split(")")[0];
+        const sBrand = palette.brandColor.split(" ")[1].trim();
+        const lBrand = palette.brandColor.split(" ")[0].trim().split("%")[0].split("(")[1];
+
+        chromaSlider1.value = sBrand;
+        chromaValue1.value = sBrand;
+        lightSlider1.value = lBrand;
+        lightValue1.value = lBrand;
+        hueSlider.value = hBrand;
+        hueValue.value = hBrand;
+
+        contrastC.value = palette.firstContrast;
+        const palettes = palette.colors;
+        updateAll();
+        palettes.forEach((color: string) => {
+          const h = color.split(" ")[2].trim().split(")")[0];
+          const c = color.split(" ")[1].trim();
+          const l = color.split(" ")[0].trim().split("%")[0].split("(")[1];
+          for (const checkbox of checkboxes) {
+            const colorBox = checkbox.parentElement as HTMLDivElement;
+            if (
+              colorBox.getAttribute("h") === h &&
+              colorBox.getAttribute("s") === c &&
+              colorBox.getAttribute("l") === l
+            ) {
+              checkbox.checked = true;
+              break;
+            }
+          }
+        });
+      }
+
+      contrastL.value = palette.secondContrast;
+
+      colorScheme.value = palette.colorScheme;
+      wcag.value = palette.wcagLevel;
+      switch (palette.colorScheme) {
+        case 'analogous':
+          (document.getElementById(`analogous`) as HTMLInputElement).value = palette.colorSeparation;
+          break;
+        case 'complementary':
+          (document.getElementById(`complementary`) as HTMLInputElement).value = palette.colorSeparation;
+          break;
+        case 'triad':
+          (document.getElementById(`triad`) as HTMLInputElement).value = palette.colorSeparation;
+          break;
+        case 'split-complementary':
+          (document.getElementById(`split`) as HTMLInputElement).value = palette.colorSeparation;
+          break;
+        case 'square':
+          (document.getElementById(`square`) as HTMLInputElement).value = palette.colorSeparation;
+          break;
+      }
+      const response = await fetch("/api/profile", { credentials: "include" });
+      if (!response.ok) {
+          throw new Error("No autorizado");
+      }
+      const user = await response.json();
+      const like = document.getElementById("like") as HTMLInputElement;
+      like.addEventListener("click", async () => {
+        if (like.children[0].classList.contains("bi-heart-fill")) {
+          like.children[0].classList.add("bi-heart");
+          like.children[0].classList.remove("bi-heart-fill");
+        } else {
+          like.children[0].classList.remove("bi-heart");
+          like.children[0].classList.add("bi-heart-fill");
+        }
+        await fetch(`/api/palette/like/${palette._id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+      });
+      if(palette.likes.includes(user.id)) {
+        like.children[0].classList.remove("bi-heart");
+        like.children[0].classList.add("bi-heart-fill");
+      }
+
+      loadPalette(palette1, palette.colorScheme);
+      loadPalette(palette2, palette.colorScheme);
+      updateAll();
+    } catch (error) {
+    console.error("Error al cargar paleta:", error);
+  }
 });

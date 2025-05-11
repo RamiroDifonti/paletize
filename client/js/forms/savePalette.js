@@ -104,19 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify(data), // Convertimos el objeto a JSON
                     });
-                    const result = yield response.json();
-                    if (response.ok) {
-                        console.log('Paleta actualizada:', result);
-                        // Puedes redirigir a otra página o mostrar un mensaje de éxito
-                    }
-                    else {
-                        console.error('Error al actualizar paleta:', result);
+                    if (!response.ok) {
+                        console.error('Error al actualizar paleta');
                         // Mostrar mensaje de error en la UI
                     }
                     return;
                 }
                 catch (error) {
-                    console.error('Error en la solicitud:', error);
+                    console.error('Error al actualizar paleta');
                 }
             }
         }
@@ -129,17 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(data), // Convertimos el objeto a JSON
             });
             const result = yield response.json();
-            if (response.ok) {
-                console.log('Paleta creada:', result);
-                // Puedes redirigir a otra página o mostrar un mensaje de éxito
-            }
-            else {
-                console.error('Error al crear paleta:', result);
+            if (!response.ok) {
+                console.error('Error al crear paleta');
                 // Mostrar mensaje de error en la UI
             }
         }
         catch (error) {
-            console.error('Error en la solicitud:', error);
+            console.error('Error al crear solicitud');
         }
     }));
 });

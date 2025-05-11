@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         document.getElementById("nombre").textContent = user.firstName;
         document.getElementById("apellido").textContent = user.lastName;
         document.getElementById("usuario").textContent = user.username;
-        document.getElementById("fotoPerfil").src = user.fotoPerfil;
+        //   (document.getElementById("fotoPerfil") as HTMLImageElement).src = user.fotoPerfil;
     }
     catch (error) {
         console.error("Error cargando perfil:", error);

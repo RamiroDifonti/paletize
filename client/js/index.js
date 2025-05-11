@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,7 +17,7 @@ if (logoutBtn) {
                 credentials: "include", // Para enviar cookies de sesión si están activadas
             });
             if (response.ok) {
-                window.location.href = "/login"; // Redirigir al login después de cerrar sesión
+                window.location.href = "/"; // Redirigir al login después de cerrar sesión
             }
             else {
                 console.error("No se pudo cerrar sesión");
@@ -29,4 +30,3 @@ if (logoutBtn) {
         }
     }));
 }
-export {};

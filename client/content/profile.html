@@ -1,19 +1,112 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario</title>
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-</head>
-<body>
-    <div class="profile-container">
-        <h2>Perfil de Usuario</h2>
-        <img id="fotoPerfil" src="" alt="Foto de perfil">
-        <p><strong>Nombre:</strong> <span id="nombre"></span></p>
-        <p><strong>Apellido:</strong> <span id="apellido"></span></p>
-        <p><strong>Usuario:</strong> <span id="usuario"></span></p>
-    </div>
-    <script src="/js/profile.js"></script>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="../styles/common.css">
+        <link rel="stylesheet" href="../styles/profile.css">
+        <title>Perfil</title>
+    </head>
+    <body>
+        <main class="container">
+            <header class="header">
+                <a href="/" class="left">
+                    <img src="../images/logo.svg" alt="Logo">
+                </a>
+                <h3>Paletize</h3>
+                <a href="/profile" class="left">
+                    <img src="../images/perfil.svg" alt="Logo">
+                </a>
+            </header>
+            <section class ="content">
+                <section class="profileui">
+                    <section class="button-holder">
+                        <button id= "button1" class="menu-button" onclick="showForm('1')">Perfil</button>
+                        <button id= "button2" class="menu-button account-button" onclick="showForm('2')">Cuenta</button>
+                    </section>
+                    <button id="logoutBtn">Cerrar sesión</button>
+
+                    <form id="form1" class="form active">
+                        <fieldset class="data">
+                            <label id="nombre"> Nombre: </label>
+                            <input type="text" name="firstName" placeholder="Nuevo nombre" required>
+                            <label id="apellido"> Apellido: </label>
+                            <input type="text" name="lastName" placeholder="Nuevo apellido" required>
+                            <label id="usuario"> Usuario: </label>
+                            <input type="text" name="username" placeholder="Nuevo usuario" required>
+                        </fieldset>
+                        <button class="data-button">Actualizar</button>
+                    </form>
+                    <section id="form2" class="form">
+                        <form id="changeEmailForm">
+                            <fieldset class="data">
+                                <label> Cambiar correo: </label>
+                                <input type="email" id="newEmail" name="newEmail" placeholder="Nuevo correo" required>
+                                <button type="submit" class = "data-button">Cambiar Correo Electrónico</button>
+                            </fieldset>
+                        </form>
+                        <form id="changePasswordForm">
+                            <fieldset class="data">
+                                <label> Contraseña actual: </label>
+                                <input type="password" id="currentPassword" name="currentPassword" placeholder="contraseña actual" required>
+                                <label for="newPassword">Nueva Contraseña:</label>
+                                <input type="password" id="newPassword" name="newPassword" placeholder="nueva contraseña" required>
+                                <label for="confirmPassword">Confirmar Nueva Contraseña:</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="repite contraseña" required>
+                                <button type="submit" class = "data-button">Cambiar Contraseña</button>
+                            </fieldset>
+                        </form>
+
+                        <div id="errorMessage" style="color: red; display: none;">
+                            <p>Las contraseñas no coinciden. Por favor, inténtelo de nuevo.</p>
+                        </div>
+
+                        <div id="successMessage" style="color: green; display: none;">
+                            <p>Los cambios se han guardado correctamente.</p>
+                        </div>
+                    </section>
+                    <!-- <form id="form2" class="form" method="POST" action="/api/register">
+                        <fieldset class="data">
+                            <h2>Registrarse</h2>
+                            <label>Nombre:
+                                <input type="text" name="firstName" placeholder="Tu nombre" required>
+                            </label>
+                            <label>Apellidos:
+                                <input type="text" name="lastName" placeholder="Tus apellidos" required>
+                            </label>
+                            <label>Usuario:
+                                <input type="text" name="username" placeholder="Tu usuario" required>
+                            </label>
+                            <label>Correo:
+                                <input type="email" name="email" placeholder="Tu correo" required>
+                            </label> 
+                            <label>Repetir correo:
+                                <input type="email" name="emailcheck" placeholder="Repite tu correo" required>
+                            </label>
+                            <label>Contraseña:
+                                <input type="password" name="password" placeholder="Tu contraseña" required>
+                            </label>
+                            <label>Repetir contraseña:
+                                <input type="password" name="passwordcheck" placeholder="Repite tu contraseña" required>
+                            </label>
+                        </fieldset>
+                        <button class="data-button">crear cuenta</button>
+                    </form> -->
+                </section>
+            </section>
+        </main>
+        <footer class="footer">
+            <p>Ramiro Difonti</p>
+        </footer>
+        <script type = "module" src="../js/core/profile.js"></script>
+        <script>
+            function showForm(id) {
+                const forms = document.querySelectorAll('.form');
+                forms.forEach(form => form.classList.remove('active'));
+                document.getElementById(`form${id}`).classList.add('active');
+                const buttons = document.querySelectorAll('.menu-button');
+                buttons.forEach(button => button.classList.remove('register-button'));
+                document.getElementById(`button${id}`).classList.add('register-button');
+            }
+        </script>
+    </body>
 </html>

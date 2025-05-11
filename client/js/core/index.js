@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var _a;
 const buttons = document.querySelectorAll('.selection button');
 const createButton = document.getElementById('create');
 buttons.forEach(button => {
@@ -85,3 +86,65 @@ function loadItems() {
         }
     });
 }
+// Cargar los elementos encontrados
+(_a = document.getElementById("searchForm")) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", (e) => __awaiter(void 0, void 0, void 0, function* () {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const name = formData.get("name");
+    try {
+        const response = yield fetch("/api/palette/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+        });
+        if (!response.ok)
+            throw new Error("Error en la búsqueda");
+        const palettes = yield response.json();
+        console.log(palettes);
+        const container = document.querySelector(".search-items");
+        if (!container)
+            return;
+        container.innerHTML = ""; // Limpiar resultados anteriores
+        palettes.forEach((palette) => {
+            const item = document.createElement("div");
+            item.classList.add("item");
+            item.style.background = "#ccc";
+            item.style.display = "flex";
+            item.style.flexDirection = "column";
+            item.style.cursor = "pointer";
+            const colors = document.createElement("div");
+            colors.style.display = "flex";
+            palette.colors.map((color) => {
+                const colorDiv = document.createElement("div");
+                // colorDiv.style.width = "20%";
+                colorDiv.className = "color";
+                colorDiv.style.background = color;
+                colorDiv.style.width = "20%"; // Tamaño de cada color
+                colorDiv.style.height = "150px"; // Tamaño de cada color
+                colors.appendChild(colorDiv);
+            });
+            const info = document.createElement("section");
+            info.className = "info";
+            const nameLabel = document.createElement("p");
+            nameLabel.innerText = palette.name;
+            info.appendChild(nameLabel);
+            const creatorLabel = document.createElement("p");
+            creatorLabel.innerText = palette.creator.username;
+            info.appendChild(creatorLabel);
+            const likesLabel = document.createElement("p");
+            likesLabel.innerText = `${palette.likes.length} ♡`;
+            info.appendChild(likesLabel);
+            item.append(colors);
+            item.appendChild(info);
+            item.addEventListener("click", () => {
+                window.location.href = `/palette/${palette._id}`;
+            });
+            container.appendChild(item);
+        });
+    }
+    catch (error) {
+        console.error(error);
+        alert("No se pudieron cargar las paletas");
+    }
+}));

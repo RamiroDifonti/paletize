@@ -1,3 +1,26 @@
+.selection {
+  display: flex;
+
+  flex: 1 1 auto;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.selection button {
+  display: flex;
+  flex-direction: column;
+  min-width: 50px;
+  white-space: nowrap;
+  border : none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+#like i {
+  font-size: 3em;
+  color: #ff0000;
+}
 /* Main content */
 .content{
   flex: 1;
@@ -26,6 +49,7 @@
 .separation {
   justify-self: flex-start;
   background-color: aqua;
+  margin-top: -10%;
 }
 
 .color-section {
@@ -176,6 +200,11 @@
 .button-icon:hover .tooltip {
   visibility: visible;
 }
+#like:hover .tooltip {
+  margin: 0;
+  position: relative;
+  visibility: visible;
+}
 
 /* Editor de colores */
 .editor-panel {
@@ -230,5 +259,11 @@ footer{
   }
   .export-container.show {
     display: flex;
+  }
+}
+
+@media (max-width: 330px) {
+  .header {
+    justify-content: center;
   }
 }

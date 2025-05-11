@@ -1,12 +1,24 @@
 // palette.ts
 // This file contains the logic for the palette in the HTML file
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { createAll, updateAll } from "./colorWheel.js";
 import { exportColors, updateExports } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
 import { chromaSlider1, satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
 import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
-import { select } from "../constants/selects.js";
-document.addEventListener("DOMContentLoaded", () => {
+import { colorScheme, select, contrastC, contrastS, contrastL, wcag } from "../constants/selects.js";
+import { loadPalette } from "../handlers/handlePalettes.js";
+import { palette1, palette2 } from "../constants/palette.js";
+document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     // Contenedores de colores
     const colorContainers = document.querySelectorAll(".color-container");
     // Función para sincronizar slider y número
@@ -187,4 +199,125 @@ document.addEventListener("DOMContentLoaded", () => {
         // Inicializa el color
         createAll();
     });
-});
+    const id = window.location.href.split("/").pop();
+    if (!id || id === "palette") {
+        (_a = document.querySelector(".selection")) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
+        return;
+    }
+    try {
+        const res = yield fetch(`/api/palette/${id}`);
+        const palette = yield res.json();
+        document.querySelector('[name="name"]').value = palette.name;
+        select.value = palette.colorModel;
+        const checkboxes = document.querySelectorAll(".color-checkbox");
+        if (palette.colorModel === "hsl") {
+            const hBrand = palette.brandColor.split(",")[0].split("(")[1].trim();
+            const sBrand = palette.brandColor.split(",")[1].split("%")[0].trim();
+            const lBrand = palette.brandColor.split(",")[2].split(")")[0].split("%")[0].trim();
+            satSlider1.value = sBrand;
+            satValue1.value = sBrand;
+            lightSlider1.value = lBrand;
+            lightValue1.value = lBrand;
+            hueSlider.value = hBrand;
+            hueValue.value = hBrand;
+            contrastS.value = palette.firstContrast;
+            const palettes = palette.colors;
+            updateAll();
+            palettes.forEach((color) => {
+                const h = color.split(",")[0].split("(")[1].trim();
+                const s = color.split(",")[1].split("%")[0].trim();
+                const l = color.split(",")[2].split(")")[0].split("%")[0].trim();
+                for (const checkbox of checkboxes) {
+                    const colorBox = checkbox.parentElement;
+                    if (colorBox.getAttribute("h") === h &&
+                        colorBox.getAttribute("s") === s &&
+                        colorBox.getAttribute("l") === l) {
+                        checkbox.checked = true;
+                        break;
+                    }
+                }
+            });
+        }
+        else {
+            const hBrand = palette.brandColor.split(" ")[2].trim().split(")")[0];
+            const sBrand = palette.brandColor.split(" ")[1].trim();
+            const lBrand = palette.brandColor.split(" ")[0].trim().split("%")[0].split("(")[1];
+            chromaSlider1.value = sBrand;
+            chromaValue1.value = sBrand;
+            lightSlider1.value = lBrand;
+            lightValue1.value = lBrand;
+            hueSlider.value = hBrand;
+            hueValue.value = hBrand;
+            contrastC.value = palette.firstContrast;
+            const palettes = palette.colors;
+            updateAll();
+            palettes.forEach((color) => {
+                const h = color.split(" ")[2].trim().split(")")[0];
+                const c = color.split(" ")[1].trim();
+                const l = color.split(" ")[0].trim().split("%")[0].split("(")[1];
+                for (const checkbox of checkboxes) {
+                    const colorBox = checkbox.parentElement;
+                    if (colorBox.getAttribute("h") === h &&
+                        colorBox.getAttribute("s") === c &&
+                        colorBox.getAttribute("l") === l) {
+                        checkbox.checked = true;
+                        break;
+                    }
+                }
+            });
+        }
+        contrastL.value = palette.secondContrast;
+        colorScheme.value = palette.colorScheme;
+        wcag.value = palette.wcagLevel;
+        switch (palette.colorScheme) {
+            case 'analogous':
+                document.getElementById(`analogous`).value = palette.colorSeparation;
+                break;
+            case 'complementary':
+                document.getElementById(`complementary`).value = palette.colorSeparation;
+                break;
+            case 'triad':
+                document.getElementById(`triad`).value = palette.colorSeparation;
+                break;
+            case 'split-complementary':
+                document.getElementById(`split`).value = palette.colorSeparation;
+                break;
+            case 'square':
+                document.getElementById(`square`).value = palette.colorSeparation;
+                break;
+        }
+        const response = yield fetch("/api/profile", { credentials: "include" });
+        if (!response.ok) {
+            throw new Error("No autorizado");
+        }
+        const user = yield response.json();
+        const like = document.getElementById("like");
+        like.addEventListener("click", () => __awaiter(void 0, void 0, void 0, function* () {
+            if (like.children[0].classList.contains("bi-heart-fill")) {
+                like.children[0].classList.add("bi-heart");
+                like.children[0].classList.remove("bi-heart-fill");
+            }
+            else {
+                like.children[0].classList.remove("bi-heart");
+                like.children[0].classList.add("bi-heart-fill");
+            }
+            yield fetch(`/api/palette/like/${palette._id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+        }));
+        if (palette.likes.includes(user.id)) {
+            like.children[0].classList.remove("bi-heart");
+            like.children[0].classList.add("bi-heart-fill");
+        }
+        loadPalette(palette1, palette.colorScheme);
+        loadPalette(palette2, palette.colorScheme);
+        updateAll();
+    }
+    catch (error) {
+        console.error("Error al cargar paleta:", error);
+    }
+}));
