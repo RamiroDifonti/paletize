@@ -1,6 +1,6 @@
 // handlePalettes.ts
 // This file contains the functions to handle the palettes in the HTML file
-import { colorblind, select, colorScheme } from "../constants/selects.js";
+import { colorblind, select, colorScheme, wcag } from "../constants/selects.js";
 import { simulateColorBlind } from "../utils/colorblind.js";
 import { palette1, palette2 } from "../constants/palette.js";
 import { hueSlider, satSlider1, lightSlider1, chromaSlider1 } from "../constants/sliders.js";
@@ -20,16 +20,24 @@ export function createPalette(container: HTMLElement, scheme : string) {
       saturation = chromaSlider1.value;
     }
     const lightness = lightSlider1.value;
-
+    
     const hues = calculateColors(hue, scheme); 
     // Si ya existen, actualizamos los colores de fondo y comprobamos si su checkbox está marcado
     (colorBoxs as NodeListOf<HTMLDivElement>).forEach((colorBox, index) => {
       let adjustedHue = hues[index];
+
       const limits = limitColor(Number(hue), Number(adjustedHue), Number(saturation), Number(lightness));
 
+      // Actualizar el rango WCAG
+      const label = (colorBox.childNodes[0] as HTMLDivElement).childNodes[0] as HTMLLabelElement;
+      if (limits[0] !== -1) {
+        label.innerText = wcag.value === "aa" ? "AA" : "AAA";
+      } else {
+        label.innerText = "N/A";
+      }
+      colorBox.setAttribute("contrast", limits[4].toFixed(3));
       let boxSaturation = Number(saturation);
       let boxLightness = Number(lightness);
-
       if (container.id !== "palette-1") {
         if (limits[0] !== -1) {
           boxSaturation = limits[0] === 100 ? limits[2] : limits[0];
@@ -53,7 +61,7 @@ export function createPalette(container: HTMLElement, scheme : string) {
       colorBox.setAttribute("h", adjustedHue.toString());
       colorBox.setAttribute("s", boxSaturation.toString());
       colorBox.setAttribute("l", boxLightness.toString());
-      const checkbox = colorBox.childNodes[0] as HTMLInputElement;
+      const checkbox = colorBox.childNodes[2] as HTMLInputElement;
       // Si el checkbox está marcado, actualizamos el color en la paleta
       if (checkbox.checked) {
         updateColor(colorBox, limits);
@@ -65,16 +73,24 @@ export function createPalette(container: HTMLElement, scheme : string) {
     const hues = calculateColors(hue, scheme); 
     hues.forEach((adjustedHue, index) => {
       // Creamos un nuevo elemento div para cada color
-      
       const colorBox = document.createElement("div");
       colorBox.classList.add("color-box");
 
-
+      // Texto si es AA, AAA o N/A
+      const colorText = document.createElement("div");
+      colorText.classList.add("color-text");
+      // Preview del color
+      const colorPreview = document.createElement("div");
+      colorPreview.classList.add("color-preview");
+    
       // Creamos el checkbox
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
+
       checkbox.classList.add("color-checkbox");
-    
+      colorBox.appendChild(colorText);
+      colorBox.appendChild(colorPreview);
+      colorBox.appendChild(checkbox);
       // Listener para manejar cuando se activa el checkbox
       checkbox.addEventListener("change", () => {
         if (checkbox.checked) {
@@ -116,21 +132,28 @@ export function createPalette(container: HTMLElement, scheme : string) {
         }
       });
 
-      colorBox.appendChild(checkbox);
       // Creamos el texto para el color de marca
       if (index === 0 && container.id === "palette-1") {
-        const saturation = satSlider1.value;
-        const lightness = lightSlider1.value;
         const text = document.createElement("label");
         text.innerText = `Brand`;
         text.style.position = "absolute";
         text.style.alignSelf = "flex-end";
-        colorBox.appendChild(text);
         // Cambiar el color del texto para que sea adecuado dependiendo del color de fondo
-        const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
-        colorBox.style.color = textColor;
+        colorPreview.appendChild(text);
         colorBox.setAttribute("branding", "true");
       }
+      const saturation = satSlider1.value;
+      const lightness = lightSlider1.value;
+      const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+      const limits = limitColor(Number(hue), Number(adjustedHue), Number(saturation), Number(lightness));
+      const label = document.createElement("label");
+      if (limits[0] !== -1) {
+        label.innerText = wcag.value === "aa" ? "AA" : "AAA";
+      } else {
+        label.innerText = "N/A";
+      }
+      colorText.appendChild(label);
+      colorPreview.style.color = textColor;
       container.appendChild(colorBox);
     });
   }
@@ -196,6 +219,9 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
   const lightness = hslColor.getAttribute("l");
   const isBranding = hslColor.getAttribute("branding") === "true" ? true : false;
   let maxS = 100;
+  if (select?.value === "oklch") {
+    maxS = 0.4;
+  }
   let maxL = 100;
   let minS = 0;
   let minL = 0;
@@ -210,6 +236,9 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
     minS = limits[2];
     minL = limits[0] === -1 ? -1 : limits[3];
     satValue = limits[0] === 100 ? limits[2] : limits[0];
+    if (select?.value === "oklch") {
+      satValue = limits[0] === 0.4 ? limits[2] : limits[0];
+    }
     lightValue = limits[1] === 100 ? limits[3] : limits[1];
     if (limits[0] !== -1) hslColor.setAttribute("s", maxS.toString());
     if (limits[0] !== -1) hslColor.setAttribute("l", maxL.toString());
@@ -238,9 +267,10 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
       return;
     } else if (slot && slot.style.backgroundColor === "") {
       // Cambiar fondo
-      slot?.setAttribute("h", hue!);
-      slot?.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
-      slot?.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
+      slot.setAttribute("h", hue!);
+      slot.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
+      slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
+      slot.setAttribute("contrast", limits[4].toFixed(3));
       slot.style.backgroundColor = hslColor.style.backgroundColor;
 
       const textColor = chooseTextColor([Number(hue), Number(satValue), Number(lightValue)]);
@@ -251,7 +281,7 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
           
           if (limits[0] === -1) {
             text.classList.remove("hidden");
-            text.innerText = `Contraste no accesible\n${limits[3].toFixed(3)}`;
+            text.innerText = `Contraste no accesible\n${limits[4].toFixed(3)}`;
           } else {
             text.classList.add("hidden");
           } 
@@ -344,11 +374,15 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
   const id = parseInt(hslColorId);
   const slot = document.getElementById(`color-${id}`);
 
+  // Modificar si cambia el limite
+
   const hue = hslColor.getAttribute("h");
   const saturation = hslColor.getAttribute("s");
   const lightness = hslColor.getAttribute("l");
-
   let maxS = 100;
+  if (select?.value === "oklch") {
+    maxS = 0.4;
+  }
   let maxL = 100;
   let minS = 0;
   let minL = 0;
@@ -362,6 +396,9 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
     minS = limits[2];
     minL = limits[0] === -1 ? -1 : limits[3];
     satValue = limits[0] === 100 ? limits[2] : limits[0];
+    if (select?.value === "oklch") {
+      satValue = limits[0] === 0.4 ? limits[2] : limits[0];
+    }
     lightValue = limits[1] === 100 ? limits[3] : limits[1];
     if (maxS !== -1) hslColor.setAttribute("s", maxS.toString());
     if (maxS !== -1) hslColor.setAttribute("l", maxL.toString());
@@ -369,12 +406,13 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
   slot?.setAttribute("h", hue!);
   slot?.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
   slot?.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
+  slot?.setAttribute("contrast", limits[4].toFixed(3));
 
   if (slot) {
     // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
     const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
     (slot as HTMLElement).style.color = textColor;
-    (hslColor as HTMLElement).style.color = textColor;
+    (hslColor.childNodes[1] as HTMLDivElement).style.color = textColor;
     slot.style.backgroundColor = color;
     const text = document.getElementById("contrast-text-" + id);
     if (text) {
