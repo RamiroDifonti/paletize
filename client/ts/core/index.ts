@@ -119,7 +119,6 @@ document.getElementById("searchForm")?.addEventListener("submit", async (e) => {
     if (!response.ok) throw new Error("Error en la búsqueda");
 
     const palettes = await response.json();
-    console.log(palettes);
     const container = document.querySelector(".search-items") as HTMLDivElement;
     if (!container) return;
     container!.innerHTML = ""; // Limpiar resultados anteriores
@@ -164,7 +163,8 @@ document.getElementById("searchForm")?.addEventListener("submit", async (e) => {
       container.appendChild(item);
     });
   } catch (error) {
-    console.error(error);
+    // No mostrar error en producción
+    // console.error(error);
     alert("No se pudieron cargar las paletas");
   }
 });

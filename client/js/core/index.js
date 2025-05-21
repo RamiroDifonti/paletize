@@ -101,7 +101,6 @@ function loadItems() {
         if (!response.ok)
             throw new Error("Error en la búsqueda");
         const palettes = yield response.json();
-        console.log(palettes);
         const container = document.querySelector(".search-items");
         if (!container)
             return;
@@ -144,7 +143,8 @@ function loadItems() {
         });
     }
     catch (error) {
-        console.error(error);
+        // No mostrar error en producción
+        // console.error(error);
         alert("No se pudieron cargar las paletas");
     }
 }));
