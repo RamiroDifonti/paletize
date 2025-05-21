@@ -1,21 +1,53 @@
 - back-end:
     - guardar paleta ---
-    - pagina que muestre todas las paletas creadas
-    - que la pagina tenga un filtro si quiere mostrar todas las paletas o las del Usuario
-    - que no sea necesario iniciar sesion para cargar todas las paletas
+    - pagina que muestre todas las paletas creadas ---
+        - que no sea necesario iniciar sesion para cargar todas las paletas ---
+    - que sea la pagina main ---
+
+    - que la pagina tenga un filtro si quiere mostrar todas las paletas o las del Usuario:
+        - Falta que se muestre correctamente las paletas del usuario ---
     - cuando se le de click a una paleta que se cargue toda la paleta y:
-        - se ponga el id de la paleta en la url
-        - si se le da al boton de guardar que se actualice si el usuario ya tiene esa id guardada
-        - si se quiere guardar una paleta obligue al usuario a iniciar sesion
-    - que sea la pagina main
+        - se ponga el id de la paleta en la url ---
+        - si se le da al boton de guardar que se actualice si el usuario ya tiene esa id guardada ---
+        - si se quiere guardar una paleta obligue al usuario a iniciar sesion ---
+    - cuando el middleware te lleve a iniciar sesion, que te redirija a la pagina a la que estabas no siempre a / ---
+    QUE CUANDO LE DE CLICK A LA PALETA SE CARGUE CORRECTAMENTE ---
+    que el sistema de likes funcione ---
+    que las cookies de inicio de sesion se guarden durante 1 mes ---
+    que el sistema de busqueda funcione ---
 
 
+
+/// TODO
     - Nombre colores.
         https://www.color-blindness.com/color-name-hue/
-
+    - Añadir apartado para probar los colores en una página web para ver como quedarían (color-test)
     - Añadir mas matrices de daltonismo.
     - Separar funcionamiento hsl y oklch (mucho if en el programa)
     - optimizar rueda HSL donde se calcule 1/4 y el resto se haga por inversos
     - maximo contraste
     - Contraste de colores
     - Agregar una opción para poner paletas privadas
+    - Añadir mas robustez a la hora de inicio de sesion (filtrar correos temporales)
+    - Añadir verificacion de correo
+    - Añadir metodo para recuperacion de contraseña
+    - Boton guardar imagen con colores
+
+
+///
+
+    - actualizar font-family
+    - hacer manual de uso
+
+    - cambiar color aunque el contraste sea inválido ¿? Capaz no porque como es inválido que valor le pongo?
+    - compatible en todos los navegadores: Por ahora firefox y chrome !--
+
+
+    - Revisar contraste si es > 100, no funciona aunque lo cumpla ---
+    - agregar texto con el número del contraste ---
+    - Cambiar fondo  ---
+    - root backgroundcolor  ---
+    - Cambiar contraste ---
+    - Agregar contraste encima del color AA, AAA, N/A  ---
+    - Cambiar boton de añadir color ---
+    - Agregar nombre a las ruedas Rueda de color Matiz-Luminosidad, Rueda de color Matiz-Saturacion ---
