@@ -1,5 +1,6 @@
 // utils.ts
 // This file contains the utility functions for the color wheel and palette generation
+import { rgb } from "culori";
 import { wcag, contrastS, contrastC, contrastL, select } from "../constants/selects.js";
 import { analogousSlider, complementarySlider, splitSlider, triadSlider, squareSlider } from "../constants/sliders.js";
 
@@ -46,22 +47,18 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
       while (l >= -0.01 && s >= -0.01) {
         let rgb2 = hslToRgb(hue, s * 100, l * 100);
         if (select?.value === "oklch") {
-          rgb2 = oklchToRgb(l, Math.round((s*0.4) * 100) / 100, hue);
+          rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
         }
         const luminance2 = calculateLuminance(rgb2);
         const contrast = calculateContrast(luminanceBranding, luminance2);
         if (maxS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 0 && Math.round(l*100) === 0))) {
           if (Math.round(s*100) === 0 && Math.round(l*100) === 0) {
-            if (Math.round(s*100) === 0) {
-              minS = 0;
-            }
-            if (Math.round(l*100) === 0) {
-              minL = 0;
-            }
+            minS = 0;
+            minL = 0;
             if (select?.value === "oklch") {
-              return [maxS, Math.round(maxL), minS, Math.round(minL)];
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
             } else {
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
             }
           }
           if ((Math.round(maxS) - Math.round(minS) < 2)  || (Math.round(maxL) - Math.round(minL) < 2)) {
@@ -72,7 +69,10 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               s -= step;
               l += step;
             }
-            const rgb2 = hslToRgb(hue, s * 100, l * 100);
+            let rgb2 = hslToRgb(hue, Math.round(s*100), Math.round(l*100));
+            if (select?.value === "oklch") {
+              rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+            }
             const luminance2 = calculateLuminance(rgb2);
             const contrast = calculateContrast(luminanceBranding, luminance2);
             if (contrast >= wcagValue) {
@@ -85,9 +85,9 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
                 minL = 0;
               }
               if (select?.value === "oklch") {
-                return [maxS, Math.round(maxL), minS, Math.round(minL)];
+                return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
               } else {
-                return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+                return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
               }
             }
           } else {
@@ -98,12 +98,12 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               minL = 0;
             }
             if (select?.value === "oklch") {
-              return [maxS, Math.round(maxL), minS, Math.round(minL)];
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
             } else {
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
             }
           }
-        } else {
+        } else if (maxS !== -1) {
           minL = l * 100;
           if (select?.value === "oklch") {
             minS = Math.round((s*0.4) * 100) / 100;
@@ -137,10 +137,23 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
     // s2 > s1, l2 > l1 (saturación alta, luminosidad alta)
     case "intensity":
       while (l <= 1.01 && s <= 1.01) {
-        const rgb2 = hslToRgb(hue, Math.round(s*100), Math.round(l*100));
+        let rgb2 = hslToRgb(hue, Math.round(s*100), Math.round(l*100));
+        if (select?.value === "oklch") {
+          rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+        }
         const luminance2 = calculateLuminance(rgb2);
         const contrast = calculateContrast(luminanceBranding, luminance2);
         if (minS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 100 && Math.round(l*100) === 100))) {
+          if (Math.round(s*100) === 100 && Math.round(l*100) === 100) {
+            maxS = 100;
+            maxL = 100;
+            if (select?.value === "oklch") {
+              maxS = 0.4;
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+            }
+          }
           if ((Math.round(maxS) - Math.round(minS) < 2)  || (Math.round(maxL) - Math.round(minL) < 2)) {
             if (Math.round(s*100) !== minS) {
               s -= step;
@@ -149,36 +162,40 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               s += step;
               l -= step;
             }
-            const rgb2 = hslToRgb(hue, s * 100, l * 100);
+            let rgb2 = hslToRgb(hue, Math.round(s*100), Math.round(l*100));
+            if (select?.value === "oklch") {
+              rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+            }
             const luminance2 = calculateLuminance(rgb2);
             const contrast = calculateContrast(luminanceBranding, luminance2);
             if (contrast >= wcagValue) {
               changeL = !changeL;
-            } else {
-              if (Math.round(s*100) === 100) {
-                maxS = 100;
-              }
-              if (Math.round(l*100) === 100) {
-                maxL = 100;
-              }
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
-            }
-          } else {
-            if (Math.round(s*100) === 100) {
-              maxS = 100;
-            }
-            if (Math.round(l*100) === 100) {
-              maxL = 100;
-            }
-            return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
-          }
-        } else {
-          maxS = s * 100;
+            } 
+          } 
+        } else if (minS !== -1) {
           maxL = l * 100;
+          if (select?.value === "oklch") {
+            maxS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            maxS = s * 100;
+          }
         }
         if (minS === -1 && contrast >= wcagValue) {
-          minS = s * 100;
           minL = l * 100;
+          if (select?.value === "oklch") {
+            minS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            minS = s * 100;
+          }
+          if (Math.round(s*100) >= 100 && Math.round(l*100) >= 100) {
+            maxS = 100;
+            maxL = 100;
+            if (select?.value === "oklch") {
+              maxS = 0.4;
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            }
+            return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+          }
         }
         if (Math.round(s*100) < Math.round(l*100)) {
           s += step;
@@ -198,10 +215,22 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
     // s2 < s1, l2 > l1 (saturación alta, luminosidad baja)
     case "softness":
       while (l <= 1.01 && s >= -0.01) {
-        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        let rgb2 = hslToRgb(hue, s * 100, l * 100);
+        if (select?.value === "oklch") {
+          rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+        }
         const luminance2 = calculateLuminance(rgb2);
         const contrast = calculateContrast(luminanceBranding, luminance2);
         if (maxS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 0 && Math.round(l*100) === 100))) {
+          if (Math.round(s*100) === 0 && Math.round(l*100) === 100) {
+            minS = 0;
+            maxL = 100;
+            if (select?.value === "oklch") {
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+            }
+          }
           if ((Math.round(maxS) - Math.round(minS) < 2)  || (Math.round(maxL) - Math.round(minL) < 2)) {
             if (Math.round(s*100) !== minS) {
               s += step;
@@ -210,7 +239,10 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               s -= step;
               l -= step;
             }
-            const rgb2 = hslToRgb(hue, s * 100, l * 100);
+            let rgb2 = hslToRgb(hue, s * 100, l * 100);
+            if (select?.value === "oklch") {
+              rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+            }
             const luminance2 = calculateLuminance(rgb2);
             const contrast = calculateContrast(luminanceBranding, luminance2);
             if (contrast >= wcagValue) {
@@ -222,7 +254,11 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               if (Math.round(l*100) === 0) {
                 minL = 0;
               }
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              if (select?.value === "oklch") {
+                return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+              } else {
+                return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+              }
             }
           } else {
             if (Math.round(s*100) === 100) {
@@ -231,15 +267,27 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
             if (Math.round(l*100) === 0) {
               minL = 0;
             }
-            return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+            if (select?.value === "oklch") {
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+            }
           }
-        } else {
-          minS = s * 100;
+        } else if (maxS !== -1) {
           maxL = l * 100;
+          if (select?.value === "oklch") {
+            minS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            minS = s * 100;
+          }
         }
         if (maxS === -1 && contrast >= wcagValue) {
-          maxS = s * 100;
           minL = l * 100;
+          if (select?.value === "oklch") {
+            maxS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            maxS = s * 100;
+          }
         }
         const centerS = 100 - (100 - Math.round(s*100));
         const centerL = 100 - Math.round(l*100);
@@ -261,10 +309,23 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
     // s2 > s1, l2 < l1 (saturación baja, luminosidad alta)
     case "impact":
       while (l >= -0.01 && s <= 1.01) {
-        const rgb2 = hslToRgb(hue, s * 100, l * 100);
+        let rgb2 = hslToRgb(hue, s * 100, l * 100);
+        if (select?.value === "oklch") {
+          rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+        }
         const luminance2 = calculateLuminance(rgb2);
         const contrast = calculateContrast(luminanceBranding, luminance2);
         if (minS !== -1 && (contrast < wcagValue || (Math.round(s*100) === 100 && Math.round(l*0) === 0))) {
+          if (Math.round(s*100) === 100 && Math.round(l*100) === 0) {
+            maxS = 100;
+            minL = 0;
+            if (select?.value === "oklch") {
+              maxS = 0.4;
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+            }
+          }
           if ((Math.round(maxS) - Math.round(minS) < 2)  || (Math.round(maxL) - Math.round(minL) < 2)) {
             if (Math.round(s*100) !== minS) {
               s -= step;
@@ -273,7 +334,10 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               s += step;
               l += step;
             }
-            const rgb2 = hslToRgb(hue, s * 100, l * 100);
+            let rgb2 = hslToRgb(hue, s * 100, l * 100);
+            if (select?.value === "oklch") {
+              rgb2 = oklchToRgb(Math.round(l*100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+            }
             const luminance2 = calculateLuminance(rgb2);
             const contrast = calculateContrast(luminanceBranding, luminance2);
             if (contrast >= wcagValue) {
@@ -285,7 +349,11 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
               if (Math.round(l*100) === 100) {
                 maxL = 100;
               }
-              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+              if (select?.value === "oklch") {
+                return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+              } else {
+                return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+              }
             }
           } else {
             if (Math.round(s*100) === 0) {
@@ -294,15 +362,27 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
             if (Math.round(l*100) === 100) {
               maxL = 100;
             }
-            return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL)];
+            if (select?.value === "oklch") {
+              return [maxS, Math.round(maxL), minS, Math.round(minL), contrast];
+            } else {
+              return [Math.round(maxS), Math.round(maxL), Math.round(minS), Math.round(minL), contrast];
+            }
           }
-        } else {
-          maxS = s * 100;
+        } else if (minS !== -1) {
           minL = l * 100;
+          if (select?.value === "oklch") {
+            maxS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            maxS = s * 100;
+          }
         }
         if (minS === -1 && contrast >= wcagValue) {
-          minS = s * 100;
           maxL = l * 100;
+          if (select?.value === "oklch") {
+            minS = Math.round((s*0.4) * 100) / 100;
+          } else {
+            minS = s * 100;
+          }
         }
         const centerL = 100 - (100 - Math.round(l*100));
         const centerS = 100 - Math.round(s*100);
@@ -322,10 +402,21 @@ export function limitColor(hueBranding: number, hue: number, saturation: number,
       }
       break;
   }
-  const rgb2 = hslToRgb(hue, s * 100, l * 100);
+  let rgb2 = hslToRgb(hue, s * 100, l * 100);
+  if (select?.value === "oklch") {
+    rgb2 = oklchToRgb(Math.round(l * 100) / 100, Math.round((s*0.4) * 100) / 100, hue);
+  }
+
   const luminance2 = calculateLuminance(rgb2);
   const contrastNumber = calculateContrast(luminanceBranding, luminance2);
-  return [-1, -1, -1, contrastNumber];
+  if (contrastNumber >= wcagValue) {
+    if (select?.value === "oklch") {
+      return [0.4, 100, 0.4, 100, contrastNumber];
+    } else {
+      return [100, 100, 100, 100, contrastNumber];
+    }
+  }
+  return [-1, -1, -1, -1, contrastNumber];
 }
 
 export function calculateColors(hue: string, scheme: string) {
