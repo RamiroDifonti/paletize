@@ -25,7 +25,7 @@
                     </section>
                     <button id="logoutBtn">Cerrar sesión</button>
 
-                    <form id="form1" class="form active">
+                    <form id="form1" class="form">
                         <fieldset class="data">
                             <label id="nombre"> Nombre: </label>
                             <input type="text" name="firstName" placeholder="Nuevo nombre" required>
@@ -36,7 +36,7 @@
                         </fieldset>
                         <button class="data-button">Actualizar</button>
                     </form>
-                    <section id="form2" class="form">
+                    <section id="form2" class="form active">
                         <form id="changeEmailForm">
                             <fieldset class="data">
                                 <label> Cambiar correo: </label>
@@ -64,33 +64,6 @@
                             <p>Los cambios se han guardado correctamente.</p>
                         </div>
                     </section>
-                    <!-- <form id="form2" class="form" method="POST" action="/api/register">
-                        <fieldset class="data">
-                            <h2>Registrarse</h2>
-                            <label>Nombre:
-                                <input type="text" name="firstName" placeholder="Tu nombre" required>
-                            </label>
-                            <label>Apellidos:
-                                <input type="text" name="lastName" placeholder="Tus apellidos" required>
-                            </label>
-                            <label>Usuario:
-                                <input type="text" name="username" placeholder="Tu usuario" required>
-                            </label>
-                            <label>Correo:
-                                <input type="email" name="email" placeholder="Tu correo" required>
-                            </label> 
-                            <label>Repetir correo:
-                                <input type="email" name="emailcheck" placeholder="Repite tu correo" required>
-                            </label>
-                            <label>Contraseña:
-                                <input type="password" name="password" placeholder="Tu contraseña" required>
-                            </label>
-                            <label>Repetir contraseña:
-                                <input type="password" name="passwordcheck" placeholder="Repite tu contraseña" required>
-                            </label>
-                        </fieldset>
-                        <button class="data-button">crear cuenta</button>
-                    </form> -->
                 </section>
             </section>
         </main>
@@ -104,8 +77,8 @@
                 forms.forEach(form => form.classList.remove('active'));
                 document.getElementById(`form${id}`).classList.add('active');
                 const buttons = document.querySelectorAll('.menu-button');
-                buttons.forEach(button => button.classList.remove('register-button'));
-                document.getElementById(`button${id}`).classList.add('register-button');
+                buttons.forEach(button => button.classList.remove('account-button'));
+                document.getElementById(`button${id}`).classList.add('account-button');
             }
         </script>
     </body>

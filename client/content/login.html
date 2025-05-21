@@ -20,7 +20,7 @@
                         <button id= "button1" class="menu-button" onclick="showForm('1')">Inicio</button>
                         <button id= "button2" class="menu-button register-button" onclick="showForm('2')">Registro</button>
                     </section>
-                    <form id="form1" class="form active" method="POST" action="/api/login">
+                    <form id="form1" class="form" method="POST" action="/api/login">
                         <fieldset class="data">
                             <h2>Iniciar sesión</h2>
                             <label>Email:
@@ -32,7 +32,7 @@
                         </fieldset>
                         <button class="data-button">Enviar</button>
                     </form>
-                    <form id="form2" class="form" method="POST" action="/api/register">
+                    <form id="form2" class="form active" method="POST" action="/api/register">
                         <fieldset class="data">
                             <h2>Registrarse</h2>
                             <label>Nombre:
@@ -65,6 +65,43 @@
         <footer class="footer">
             Ramiro Difonti
         </footer>
+        <!-- Enviar alert si hay error en el inicio de sesión -->
+        <script>
+            document.getElementById('form1').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const contentType = response.headers.get('content-type') || '';
+
+                    if (contentType.includes('application/json')) {
+                        const result = await response.json();
+                        if (!response.ok) {
+                            alert(result.message || 'Error en el inicio de sesión');
+                        }
+                    } else {
+                        // por defecto volver a index
+                        window.location.href = '/';
+                    }
+
+                } catch (error) {
+                    alert('Ocurrió un error de red al intentar iniciar sesión');
+                    // No se debería mostrar el error en producción
+                    // console.error(error);
+                }
+            });
+        </script>
         <script>
             document.getElementById('form2')?.addEventListener('submit', (e) => {
                 const form = e.target;
