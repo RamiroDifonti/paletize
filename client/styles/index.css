@@ -45,7 +45,6 @@
 }
 
 .item {
-  /* background-color: #c2c2ff; */
   height: 200px;
   min-width: 200px;
   flex-shrink: 1;
@@ -57,8 +56,6 @@
   flex-direction: column;
   width: auto;
   width: 20%;
-  /* height: 30vh; */
-  /* background-color: lightblue; */
 }
 .info {
   display: flex;

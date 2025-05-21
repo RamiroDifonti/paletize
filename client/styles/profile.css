@@ -5,23 +5,21 @@
     width: 100%;
     min-height: 400px;
     height: 90vh;
-    background-color: #F0F0F0;
+    background-color: var(--background-color);
 }
 
 .profileui {
-    background-color: #fff;
+    background-color: #ffd;
     border: 3px solid gray;
     display: flex;
     flex-direction: column;
     width: 80%;
     max-width: 400px;
     justify-self: center;
-    /* font-size: var(--responsive-font-size); */
 }
 
 h3 {
     text-align: center;
-    font-family: monospace;
     align-self: center;
 }
 
@@ -58,7 +56,6 @@ h3 {
     height: 5vh;
     flex: 1;
     background-color: #ccd2db;
-    font-family: monospace;
 }
 
 .account-button {
@@ -75,7 +72,6 @@ h3 {
 #logoutBtn {
     border: none;
     border-radius: 6px;
-    font-family: monospace;
     width: 50%;
     height: 50px;
     margin-top: 2%;

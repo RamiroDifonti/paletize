@@ -24,11 +24,10 @@
 /* Main content */
 .content{
   flex: 1;
-
   display: flex;
   flex-wrap: wrap;
   font-size: var(--base-font-size);
-  background-color: lightcyan;
+  background-color: var(--background-color);
 }
 .sidebar {
   flex: 1 0 10%;
@@ -39,7 +38,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: lightcoral;
+  background-color: var(--background-color);
 }
 .sidebar select {
   width: 50%;
@@ -60,7 +59,7 @@
   justify-content: space-around;
   width: 100%;
   height: 30vh;
-  background-color: blanchedalmond;
+  background-color: var(--background-color);
 }
 
 .selector {
@@ -91,9 +90,13 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  background-color: lightpink;
+  background-color: var(--background-color);
 }
 
+.wheel-text {
+  font-size: var(--base-font-size);
+  padding-bottom: 2%;
+}
 #color-wheel-1, #color-wheel-2  {
   height: 75%;
   max-width: 350px;
@@ -112,24 +115,54 @@
 
 .color-box {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 50px;
-  height: 50px;
+  height: 125px;
   margin: 5px;
 }
 
-.color-checkbox {
-  display: none;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  accent-color: green;
-  background-color: transparent;
-}
-.color-box:hover .color-checkbox{
+.color-text {
   display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  font-size: var(--base-font-size);
+  background-color: #b8babe;
+}
+
+.color-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+
+.color-checkbox {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid #ddd;
+  cursor: pointer;
+
+  background-color: hsl(0, 100%, 99%);
+}
+
+.color-checkbox::before {
+  content: "Añadir";
+}
+.color-checkbox:checked {
+  appearance: textfield;
+  accent-color: green;
 }
 
 .color-test{
@@ -144,6 +177,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   flex: 0 0 30vh;
+  align-content: flex-start; /* 🔑 esto evita superposición vertical */
   height: 30vh;
 }
 .color-container {
@@ -152,7 +186,7 @@
   width: auto;
   width: 20%;
   height: 30vh;
-  background-color: lightblue;
+  background-color: var(--background-color);
 }
 
 .hidden {
@@ -199,11 +233,6 @@
 .button-icon:hover .tooltip {
   visibility: visible;
 }
-#like:hover .tooltip {
-  margin: 0;
-  position: relative;
-  visibility: visible;
-}
 
 /* Editor de colores */
 .editor-panel {
@@ -239,13 +268,6 @@
 /* Que los sliders ocupen el 40% */
 input[type="range"] {
   width: 40%; 
-}
-
-/* Footer */
-footer{
-  background-color: lightslategrey;
-  height: 10vh;
-  min-height: 50px;
 }
 
 @media (min-width: 678px) {
