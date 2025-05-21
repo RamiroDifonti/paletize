@@ -84,8 +84,12 @@ function generateWheelHSL(
   value: number,
   isSaturationWheel: boolean,
   canvas: HTMLCanvasElement,
-  size: number = 400
+  size: number = 300
 ): void {
+  const text = canvas.parentElement?.childNodes[1] as HTMLLabelElement;
+  if (isSaturationWheel) {
+    text.innerText =  "Rueda de color Matiz-Saturación";
+  }
   const ctx = canvas.getContext("2d");
 
   if (!ctx) return;
@@ -140,8 +144,12 @@ function generateWheelOKLCH(
   value: number,
   isChromaWheel: boolean,
   canvas: HTMLCanvasElement,
-  size: number = 400
+  size: number = 300
 ): void {
+  const text = canvas.parentElement?.childNodes[1] as HTMLLabelElement;
+  if (isChromaWheel) {
+    text.innerText =  "Rueda de color Matiz-Croma";
+  }
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   canvas.width = size;

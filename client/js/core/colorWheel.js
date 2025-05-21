@@ -75,7 +75,12 @@ function drawColorWheels() {
         generateWheelOKLCH(chroma.valueAsNumber, true, secondWheelCanvas);
     }
 }
-function generateWheelHSL(value, isSaturationWheel, canvas, size = 400) {
+function generateWheelHSL(value, isSaturationWheel, canvas, size = 300) {
+    var _a;
+    const text = (_a = canvas.parentElement) === null || _a === void 0 ? void 0 : _a.childNodes[1];
+    if (isSaturationWheel) {
+        text.innerText = "Rueda de color Matiz-Saturación";
+    }
     const ctx = canvas.getContext("2d");
     if (!ctx)
         return;
@@ -118,7 +123,12 @@ function generateWheelHSL(value, isSaturationWheel, canvas, size = 400) {
     }
     ctx.putImageData(imageData, 0, 0);
 }
-function generateWheelOKLCH(value, isChromaWheel, canvas, size = 400) {
+function generateWheelOKLCH(value, isChromaWheel, canvas, size = 300) {
+    var _a;
+    const text = (_a = canvas.parentElement) === null || _a === void 0 ? void 0 : _a.childNodes[1];
+    if (isChromaWheel) {
+        text.innerText = "Rueda de color Matiz-Croma";
+    }
     const ctx = canvas.getContext("2d");
     if (!ctx)
         return;

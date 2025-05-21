@@ -91,12 +91,15 @@ export function exportColors() {
             const textHsl = document.createElement("label");
             const textRgb = document.createElement("label");
             const textOkLCH = document.createElement("label");
+            const textContrast = document.createElement("label");
             textHsl.style.marginLeft = "10%";
             textRgb.style.marginLeft = "10%";
             textOkLCH.style.marginLeft = "10%";
+            textContrast.style.marginLeft = "10%";
             content.appendChild(textHsl);
             content.appendChild(textRgb);
             content.appendChild(textOkLCH);
+            content.appendChild(textContrast);
             container.appendChild(content);
         }
     });
@@ -139,17 +142,19 @@ export function updateExports() {
     containers.forEach((container) => {
         const exportContent = container.childNodes[5];
         const slot = container.childNodes[1];
+        console.log(slot);
         const hue = slot.getAttribute("h") || "0";
         const saturation = slot.getAttribute("s") || "0";
         const lightness = slot.getAttribute("l") || "0";
+        console.log(slot);
         let [r, g, b] = [0, 0, 0];
         if (select.value === "oklch") {
             [r, g, b] = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
             let [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
-            // const hueString = h === undefined ? "NaN" : h.toFixed(3);
             exportContent.childNodes[0].innerText = `hsl: (${h}, ${s}, ${l})`;
             exportContent.childNodes[1].innerText = `rgb: (${r}, ${g}, ${b})`;
             exportContent.childNodes[2].innerText = `oklch:\n(${lightness}, ${saturation}, ${hue})`;
+            exportContent.childNodes[3].innerText = `contraste: ${slot.getAttribute("contrast")}`;
         }
         else {
             [r, g, b] = hslToRgb(Number(hue), Number(saturation), Number(lightness));
@@ -158,6 +163,7 @@ export function updateExports() {
             exportContent.childNodes[0].innerText = `hsl: (${hue}, ${saturation}, ${lightness})`;
             exportContent.childNodes[1].innerText = `rgb: (${r}, ${g}, ${b})`;
             exportContent.childNodes[2].innerText = `oklch:\n(${l.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
+            exportContent.childNodes[3].innerText = `contraste: ${slot.getAttribute("contrast")}`;
         }
     });
 }
