@@ -156,11 +156,9 @@ export function updateExports() {
   containers.forEach((container) => {
     const exportContent = container.childNodes[5] as HTMLDivElement;
     const slot = container.childNodes[1] as HTMLDivElement;
-    console.log(slot);
     const hue = slot.getAttribute("h") || "0";
     const saturation = slot.getAttribute("s") || "0";
     const lightness = slot.getAttribute("l") || "0";
-    console.log(slot);
     let [r, g, b] = [0, 0, 0];
     if (select.value === "oklch") {
       [r, g, b] = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
