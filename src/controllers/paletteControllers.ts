@@ -18,7 +18,8 @@ export const createPalette = async (req: express.Request, res: express.Response)
             colorSeparation, // Separación de colores
         } = req.body;
         // Verificación de campos obligatorios
-        if (!name || !colors || !colorModel || !wcagLevel || colorSeparation === undefined || !brandColor || !colorScheme) {
+        if (!name || !colors || !colorModel || !wcagLevel 
+            || colorSeparation === undefined || !brandColor || !colorScheme) {
             res.status(400).json({ message: "Faltan campos obligatorios" });
             return;
         }

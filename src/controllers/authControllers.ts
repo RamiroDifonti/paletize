@@ -29,6 +29,11 @@ export const login = async (req: express.Request, res: express.Response): Promis
             res.status(404).json({ message: 'Email no encontrado' });
             return;
         }
+        const isValidPassword = await bcrypt.compare(password, user.authentication.password);
+        if (!isValidPassword) {
+            res.status(401).json({ message: 'Contraseña o email incorrecta' });
+            return;
+        }
         // Comprobar que la palabra secreta de JWT este definida
         if (!JWT_SECRET) {
             res.status(500).json({ message: 'JWT_SECRET is not defined' });
@@ -49,11 +54,7 @@ export const login = async (req: express.Request, res: express.Response): Promis
                 expiresIn: '30d'
             });
 
-        const isValidPassword = await bcrypt.compare(password, user.authentication.password);
-        if (!isValidPassword) {
-            res.status(401).json({ message: 'Contraseña o email incorrecta' });
-            return;
-        }
+ 
 
         await user.save();
         // Devolver el json sin el bloque de autenticación
@@ -85,7 +86,7 @@ export const register = async (req: express.Request, res: express.Response): Pro
         }
         const userByUsername = await getUsersByUsername(username);
         if (userByUsername) {
-            res.status(400).json({message: 'El nombre de usuario ya está en uso'});
+            res.status(400).json({message: 'El usuario ya está en uso'});
             return;
         }
         // Generar un salt y hash
