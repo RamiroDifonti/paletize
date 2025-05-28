@@ -5,8 +5,8 @@ import { simulateColorBlind } from "../utils/colorblind.js";
 import { palette1, palette2 } from "../constants/palette.js";
 import { hueSlider, satSlider1, lightSlider1, chromaSlider1 } from "../constants/sliders.js";
 
-import { calculateColors, limitColor, chooseTextColor } from "../utils/utils.js";
-import { updateExports } from "../utils/conversor.js";
+import { calculateColors, limitColor, chooseTextColor, calculateLuminance, calculateContrast } from "../utils/utils.js";
+import { updateExports, hslToRgb, oklchToRgb } from "../utils/conversor.js";
 import { updateAll } from "../core/colorWheel.js";
 
 // Crear las paletas
@@ -35,9 +35,9 @@ export function createPalette(container: HTMLElement, scheme : string) {
       } else {
         label.innerText = "N/A";
       }
-      colorBox.setAttribute("contrast", limits[4].toFixed(3));
       let boxSaturation = Number(saturation);
       let boxLightness = Number(lightness);
+      colorBox.setAttribute("contrast", limits[4].toFixed(3));
       if (container.id !== "palette-1") {
         if (limits[0] !== -1) {
           boxSaturation = limits[0] === 100 ? limits[2] : limits[0];
@@ -203,7 +203,7 @@ export function loadPalette(container: HTMLElement, scheme : string) {
     colorBox.setAttribute("h", adjustedHue.toString());
     colorBox.setAttribute("s", boxSaturation.toString());
     colorBox.setAttribute("l", boxLightness.toString());
-    const checkbox = colorBox.childNodes[0] as HTMLInputElement;
+    const checkbox = colorBox.childNodes[2] as HTMLInputElement;
     // Si el checkbox está marcado, actualizamos el color en la paleta
     if (checkbox.checked) {
       addColor(colorBox, limits);
@@ -270,7 +270,6 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
       slot.setAttribute("h", hue!);
       slot.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
       slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
-      slot.setAttribute("contrast", limits[4].toFixed(3));
       slot.style.backgroundColor = hslColor.style.backgroundColor;
 
       const textColor = chooseTextColor([Number(hue), Number(satValue), Number(lightValue)]);
@@ -278,15 +277,37 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
       const text = document.getElementById("contrast-text-" + i);
       if (text) {
         if ((hslColor.parentElement as HTMLDivElement).id !== "palette-1") {
-          
+          slot.setAttribute("contrast", limits[4].toFixed(3));
           if (limits[0] === -1) {
             text.classList.remove("hidden");
-            text.innerText = `Contraste no accesible\n${limits[4].toFixed(3)}`;
+            text.innerText = `Contraste no accesible: ${limits[4].toFixed(3)}`;
+            (text.parentElement as HTMLDivElement).style.paddingBottom = "5%";
+            (text.parentElement as HTMLDivElement).style.paddingTop = "5%";
           } else {
             text.classList.add("hidden");
+            (text.parentElement as HTMLDivElement).style.paddingBottom = "15%";
+            (text.parentElement as HTMLDivElement).style.paddingTop = "15%";
           } 
         } else {
           text.classList.contains("hidden") ? "" : text.classList.add("hidden");
+
+          if (select?.value === "oklch") {
+            const hueValue = hueSlider.value;
+            const rgbBranding = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hueValue));
+            const rgb = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+            const l1 = calculateLuminance(rgbBranding);
+            const l2 = calculateLuminance(rgb);
+            const contrast = calculateContrast(l1, l2);
+            slot.setAttribute("contrast", contrast.toFixed(3));
+          } else {
+            const hueValue = hueSlider.value;
+            const rgbBranding = hslToRgb(Number(hueValue), Number(saturation), Number(lightness));
+            const rgb = hslToRgb(Number(hue), Number(saturation), Number(lightness));
+            const l1 = calculateLuminance(rgbBranding);
+            const l2 = calculateLuminance(rgb);
+            const contrast = calculateContrast(l1, l2);
+            slot.setAttribute("contrast", contrast.toFixed(3));
+          }
         }
       }
       // Que se muestre el padre
@@ -333,8 +354,7 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
     }
   }
   alert("No puedes agregar más de 5 colores a la paleta.");
-
-  (hslColor.childNodes[0] as HTMLInputElement).checked = false;  
+  (hslColor.childNodes[2] as HTMLInputElement).checked = false;  
 }
 
 // En el checkbox se guarda el número del color al que pertenece, en base a eso
@@ -402,11 +422,29 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
     lightValue = limits[1] === 100 ? limits[3] : limits[1];
     if (maxS !== -1) hslColor.setAttribute("s", maxS.toString());
     if (maxS !== -1) hslColor.setAttribute("l", maxL.toString());
+    slot?.setAttribute("contrast", limits[4].toFixed(3));
+  } else {
+    if (select?.value === "oklch") {
+      const hueValue = hueSlider.value;
+      const rgbBranding = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hueValue));
+      const rgb = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+      const l1 = calculateLuminance(rgbBranding);
+      const l2 = calculateLuminance(rgb);
+      const contrast = calculateContrast(l1, l2);
+      slot?.setAttribute("contrast", contrast.toFixed(3));
+    } else {
+      const hueValue = hueSlider.value;
+      const rgbBranding = hslToRgb(Number(hueValue), Number(saturation), Number(lightness));
+      const rgb = hslToRgb(Number(hue), Number(saturation), Number(lightness));
+      const l1 = calculateLuminance(rgbBranding);
+      const l2 = calculateLuminance(rgb);
+      const contrast = calculateContrast(l1, l2);
+      slot?.setAttribute("contrast", contrast.toFixed(3));
+    }
   }
   slot?.setAttribute("h", hue!);
   slot?.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
   slot?.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
-  slot?.setAttribute("contrast", limits[4].toFixed(3));
 
   if (slot) {
     // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
@@ -419,9 +457,13 @@ function updateColor(hslColor: HTMLDivElement, limits: number[]) {
       if ((hslColor.parentElement as HTMLDivElement).id !== "palette-1") {
         if (limits[0] === -1) {
           text.classList.remove("hidden");
-          text.innerText = `Contraste no accesible\n${limits[3].toFixed(3)}`;
+          text.innerText = `Contraste no accesible: ${limits[4].toFixed(3)}`;
+          (text.parentElement as HTMLDivElement).style.paddingBottom = "5%";
+          (text.parentElement as HTMLDivElement).style.paddingTop = "5%";
         } else {
           text.classList.add("hidden");
+          (text.parentElement as HTMLDivElement).style.paddingBottom = "15%";
+          (text.parentElement as HTMLDivElement).style.paddingTop = "15%";
         } 
       } else {
         text.classList.contains("hidden") ? "" : text.classList.add("hidden");

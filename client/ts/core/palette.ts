@@ -2,7 +2,7 @@
 // This file contains the logic for the palette in the HTML file
 
 import { createAll, updateAll } from "./colorWheel.js";
-import { exportColors, updateExports } from "../utils/conversor.js";
+import { exportColors } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
 import { chromaSlider1, satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
 import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
@@ -57,8 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     colorContainers.forEach((container) => {
       const colorDiv = container.querySelector<HTMLElement>(".color");
       const editButton = container.querySelector<HTMLButtonElement>(".edit-icon");
-      const exportButton = container.querySelector<HTMLButtonElement>(".export-icon");
-      if (!colorDiv || !editButton || !exportButton) return;
+      if (!colorDiv || !editButton) return;
   
       let colorId = colorDiv.id.split("-")[1]; // "1", "2", etc.
   
@@ -75,41 +74,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       const text = document.createElement("label");
       text.id = "contrast-text-" + colorId;
       text.innerText = `Contraste no accesible`;
-      text.style.wordBreak = "break-word";
       text.style.textAlign = "center";
       (container.childNodes[3] as HTMLElement).appendChild(text);
       
       // Mostrar/Ocultar panel al hacer clic
       editButton.addEventListener("click", () => {
         // Eliminar el panel de conversor si está visible
-        document.querySelectorAll<HTMLElement>(".export-container").forEach((p) => {
-          p.classList.remove("show");
-        });
+        const expContainer = document.querySelectorAll<HTMLElement>(".export-container");
         // Mostrar u ocultar TODOS los panels
         const shouldShow = !panel.classList.contains("show");
-        document.querySelectorAll<HTMLElement>(".editor-panel").forEach((p) => {
+        document.querySelectorAll<HTMLElement>(".editor-panel").forEach((p, index) => {
           if (shouldShow && p.getAttribute("palette") !== "1") {
             p.classList.add("show");
+            expContainer[index].classList.remove("show");
           } else {
             p.classList.remove("show");
+            expContainer[index].classList.add("show");
           }
         });
         updateAll();
       });
       exportColors();
-      exportButton.addEventListener("click", () => {
-        // Eliminar el panel de edición si está visible
-        document.querySelectorAll<HTMLElement>(".editor-panel").forEach((p) => {
-          const shouldShow = p.classList.contains("show");
-            if (shouldShow) {
-              p.classList.remove("show");
-            }
-        });
-        document.querySelectorAll<HTMLElement>(".export-container").forEach((p) => {
-          p.classList.contains("show") ? p.classList.remove("show") : p.classList.add("show");
-        });
-        updateExports();
-      });
 
       // Función que actualiza el color en CSS
       const updateColor = () => {

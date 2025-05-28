@@ -1,3 +1,4 @@
+import e from "express";
 import { select } from "../constants/selects.js";
 
 // Convertir HSL a RGB
@@ -92,26 +93,40 @@ export function exportColors() {
     const exportContent = container.querySelector(".export-container");
     if (!exportContent) {
       const content = document.createElement("div");
-      content.classList.add("export-container");
+      content.classList.add("export-container", "show");
 
-      const textHsl = document.createElement("label");
-      const textRgb = document.createElement("label");
-      const textOkLCH = document.createElement("label");
-      const textContrast = document.createElement("label");
+      const rows = [
+        { label: "HSL:", values: ["NaN", "NaN", "NaN"] },
+        { label: "RGB:", values: ["NaN", "NaN", "NaN"] },
+        { label: "OKLCH:", values: ["NaN", "NaN", "NaN"] },
+        { label: "Contraste:", values: ["NaN"] },
+      ];
 
-      textHsl.style.marginLeft = "10%";
-      textRgb.style.marginLeft = "10%";
-      textOkLCH.style.marginLeft = "10%";
-      textContrast.style.marginLeft = "10%";
+      rows.forEach(row => {
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("export-row");
 
-      content.appendChild(textHsl);
-      content.appendChild(textRgb);
-      content.appendChild(textOkLCH);
-      content.appendChild(textContrast);
+        const label = document.createElement("div");
+        label.classList.add("export-label");
+        label.textContent = row.label;
+
+        rowDiv.appendChild(label);
+
+        row.values.forEach(val => {
+          const value = document.createElement("div");
+          value.classList.add("export-value");
+          value.textContent = val;
+          rowDiv.appendChild(value);
+        });
+
+        content.appendChild(rowDiv);
+      });
+
       container.appendChild(content);
     }
   });
 }
+
 export function oklchToRgb(l: number, c: number, h: number | undefined): [number, number, number] {
   // Convertir de OKLCH a OKLab
   let a = 0, b = 0;
@@ -150,33 +165,48 @@ export function oklchToRgb(l: number, c: number, h: number | undefined): [number
   return [toSRGB(r), toSRGB(g), toSRGB(b_linear)];
 }
 
-
 export function updateExports() {
   const containers = document.querySelectorAll('[id^="color-container-"]');
   containers.forEach((container) => {
-    const exportContent = container.childNodes[5] as HTMLDivElement;
+    const exportContent = container.querySelector(".export-container")!;
     const slot = container.childNodes[1] as HTMLDivElement;
     const hue = slot.getAttribute("h") || "0";
     const saturation = slot.getAttribute("s") || "0";
     const lightness = slot.getAttribute("l") || "0";
     let [r, g, b] = [0, 0, 0];
+    let [h, s, l] = [0, 0, 0];
+    let [l_, c, h_] = ["NaN", "NaN", "NaN"];
+
+    const contrast = slot.getAttribute("contrast");
     if (select.value === "oklch") {
       [r, g, b] = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
-      let [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
-      (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${h}, ${s}, ${l})`;
-      (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
-      (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${lightness}, ${saturation}, ${hue})`;
-      (exportContent.childNodes[3] as HTMLLabelElement).innerText = `contraste: ${slot.getAttribute("contrast")}`;
+      [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
+      [l_, c, h_] = [lightness, saturation, hue];
     } else {
       [r, g, b] = hslToRgb(Number(hue), Number(saturation), Number(lightness));
-      let [l, c, h] = rgbToOklch(Number(r), Number(g), Number(b));
-      const hueString = h === undefined ? "NaN" : h.toFixed(3);
-      (exportContent.childNodes[0] as HTMLLabelElement).innerText = `hsl: (${hue}, ${saturation}, ${lightness})`;
-      (exportContent.childNodes[1] as HTMLLabelElement).innerText = `rgb: (${r}, ${g}, ${b})`;
-      (exportContent.childNodes[2] as HTMLLabelElement).innerText = `oklch:\n(${l.toFixed(3)}, ${c.toFixed(3)}, ${hueString})`;
-      (exportContent.childNodes[3] as HTMLLabelElement).innerText = `contraste: ${slot.getAttribute("contrast")}`;
+      let [lT, cT, hT] = rgbToOklch(Number(r), Number(g), Number(b));
+      h_ = hT === undefined ? "NaN" : hT.toFixed(3);
+      l_ = lT.toFixed(3);
+      c = cT.toFixed(3);
+      [h, s, l] = [Number(hue), Number(saturation), Number(lightness)];
     }
-
-
+    exportContent.childNodes.forEach((row) => {
+      const childs = row.childNodes;
+      if (childs[0].textContent === "HSL:") {
+        (childs[1] as HTMLDivElement).textContent = `${h}°`;
+        (childs[2] as HTMLDivElement).textContent = `${s}%`;
+        (childs[3] as HTMLDivElement).textContent = `${l}%`;
+      } else if (childs[0].textContent === "RGB:") {
+        (childs[1] as HTMLDivElement).textContent = `${r}`;
+        (childs[2] as HTMLDivElement).textContent = `${g}`;
+        (childs[3] as HTMLDivElement).textContent = `${b}`;
+      } else if (childs[0].textContent === "OKLCH:") {
+        (childs[1] as HTMLDivElement).textContent = `${l_}`;
+        (childs[2] as HTMLDivElement).textContent = `${c}`;
+        (childs[3] as HTMLDivElement).textContent = `${h_}°`;
+      } else if (childs[0].textContent === "Contraste:") {
+        (childs[1] as HTMLDivElement).textContent = contrast;
+      }
+    });
   });
 }

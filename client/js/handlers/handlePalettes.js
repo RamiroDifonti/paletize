@@ -4,8 +4,8 @@ import { colorblind, select, colorScheme, wcag } from "../constants/selects.js";
 import { simulateColorBlind } from "../utils/colorblind.js";
 import { palette1, palette2 } from "../constants/palette.js";
 import { hueSlider, satSlider1, lightSlider1, chromaSlider1 } from "../constants/sliders.js";
-import { calculateColors, limitColor, chooseTextColor } from "../utils/utils.js";
-import { updateExports } from "../utils/conversor.js";
+import { calculateColors, limitColor, chooseTextColor, calculateLuminance, calculateContrast } from "../utils/utils.js";
+import { updateExports, hslToRgb, oklchToRgb } from "../utils/conversor.js";
 import { updateAll } from "../core/colorWheel.js";
 // Crear las paletas
 export function createPalette(container, scheme) {
@@ -31,9 +31,9 @@ export function createPalette(container, scheme) {
             else {
                 label.innerText = "N/A";
             }
-            colorBox.setAttribute("contrast", limits[4].toFixed(3));
             let boxSaturation = Number(saturation);
             let boxLightness = Number(lightness);
+            colorBox.setAttribute("contrast", limits[4].toFixed(3));
             if (container.id !== "palette-1") {
                 if (limits[0] !== -1) {
                     boxSaturation = limits[0] === 100 ? limits[2] : limits[0];
@@ -195,7 +195,7 @@ export function loadPalette(container, scheme) {
         colorBox.setAttribute("h", adjustedHue.toString());
         colorBox.setAttribute("s", boxSaturation.toString());
         colorBox.setAttribute("l", boxLightness.toString());
-        const checkbox = colorBox.childNodes[0];
+        const checkbox = colorBox.childNodes[2];
         // Si el checkbox está marcado, actualizamos el color en la paleta
         if (checkbox.checked) {
             addColor(colorBox, limits);
@@ -264,23 +264,45 @@ function addColor(hslColor, limits) {
             slot.setAttribute("h", hue);
             slot.setAttribute("s", (satValue.toString() === "-1") ? saturation : satValue.toString());
             slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness : lightValue.toString());
-            slot.setAttribute("contrast", limits[4].toFixed(3));
             slot.style.backgroundColor = hslColor.style.backgroundColor;
             const textColor = chooseTextColor([Number(hue), Number(satValue), Number(lightValue)]);
             slot.style.color = textColor;
             const text = document.getElementById("contrast-text-" + i);
             if (text) {
                 if (hslColor.parentElement.id !== "palette-1") {
+                    slot.setAttribute("contrast", limits[4].toFixed(3));
                     if (limits[0] === -1) {
                         text.classList.remove("hidden");
-                        text.innerText = `Contraste no accesible\n${limits[4].toFixed(3)}`;
+                        text.innerText = `Contraste no accesible: ${limits[4].toFixed(3)}`;
+                        text.parentElement.style.paddingBottom = "5%";
+                        text.parentElement.style.paddingTop = "5%";
                     }
                     else {
                         text.classList.add("hidden");
+                        text.parentElement.style.paddingBottom = "15%";
+                        text.parentElement.style.paddingTop = "15%";
                     }
                 }
                 else {
                     text.classList.contains("hidden") ? "" : text.classList.add("hidden");
+                    if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+                        const hueValue = hueSlider.value;
+                        const rgbBranding = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hueValue));
+                        const rgb = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+                        const l1 = calculateLuminance(rgbBranding);
+                        const l2 = calculateLuminance(rgb);
+                        const contrast = calculateContrast(l1, l2);
+                        slot.setAttribute("contrast", contrast.toFixed(3));
+                    }
+                    else {
+                        const hueValue = hueSlider.value;
+                        const rgbBranding = hslToRgb(Number(hueValue), Number(saturation), Number(lightness));
+                        const rgb = hslToRgb(Number(hue), Number(saturation), Number(lightness));
+                        const l1 = calculateLuminance(rgbBranding);
+                        const l2 = calculateLuminance(rgb);
+                        const contrast = calculateContrast(l1, l2);
+                        slot.setAttribute("contrast", contrast.toFixed(3));
+                    }
                 }
             }
             // Que se muestre el padre
@@ -330,7 +352,7 @@ function addColor(hslColor, limits) {
         }
     }
     alert("No puedes agregar más de 5 colores a la paleta.");
-    hslColor.childNodes[0].checked = false;
+    hslColor.childNodes[2].checked = false;
 }
 // En el checkbox se guarda el número del color al que pertenece, en base a eso
 // lo eliminamos de la paleta
@@ -395,11 +417,31 @@ function updateColor(hslColor, limits) {
             hslColor.setAttribute("s", maxS.toString());
         if (maxS !== -1)
             hslColor.setAttribute("l", maxL.toString());
+        slot === null || slot === void 0 ? void 0 : slot.setAttribute("contrast", limits[4].toFixed(3));
+    }
+    else {
+        if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+            const hueValue = hueSlider.value;
+            const rgbBranding = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hueValue));
+            const rgb = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+            const l1 = calculateLuminance(rgbBranding);
+            const l2 = calculateLuminance(rgb);
+            const contrast = calculateContrast(l1, l2);
+            slot === null || slot === void 0 ? void 0 : slot.setAttribute("contrast", contrast.toFixed(3));
+        }
+        else {
+            const hueValue = hueSlider.value;
+            const rgbBranding = hslToRgb(Number(hueValue), Number(saturation), Number(lightness));
+            const rgb = hslToRgb(Number(hue), Number(saturation), Number(lightness));
+            const l1 = calculateLuminance(rgbBranding);
+            const l2 = calculateLuminance(rgb);
+            const contrast = calculateContrast(l1, l2);
+            slot === null || slot === void 0 ? void 0 : slot.setAttribute("contrast", contrast.toFixed(3));
+        }
     }
     slot === null || slot === void 0 ? void 0 : slot.setAttribute("h", hue);
     slot === null || slot === void 0 ? void 0 : slot.setAttribute("s", (satValue.toString() === "-1") ? saturation : satValue.toString());
     slot === null || slot === void 0 ? void 0 : slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness : lightValue.toString());
-    slot === null || slot === void 0 ? void 0 : slot.setAttribute("contrast", limits[4].toFixed(3));
     if (slot) {
         // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
         const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
@@ -411,10 +453,14 @@ function updateColor(hslColor, limits) {
             if (hslColor.parentElement.id !== "palette-1") {
                 if (limits[0] === -1) {
                     text.classList.remove("hidden");
-                    text.innerText = `Contraste no accesible\n${limits[3].toFixed(3)}`;
+                    text.innerText = `Contraste no accesible: ${limits[4].toFixed(3)}`;
+                    text.parentElement.style.paddingBottom = "5%";
+                    text.parentElement.style.paddingTop = "5%";
                 }
                 else {
                     text.classList.add("hidden");
+                    text.parentElement.style.paddingBottom = "15%";
+                    text.parentElement.style.paddingTop = "15%";
                 }
             }
             else {

@@ -67,6 +67,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 5%;
+  margin-top: 1%;
 }
 
 .main-content {
@@ -99,18 +100,16 @@
 }
 #color-wheel-1, #color-wheel-2  {
   height: 75%;
-  max-width: 350px;
-  max-height: 350px;
   aspect-ratio: 1;
   position: relative;
 }
 
 #palette-1, #palette-2 {
   margin-top: 5%;
-  justify-self: flex-end;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .color-box {
@@ -177,7 +176,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   flex: 0 0 30vh;
-  align-content: flex-start; /* 🔑 esto evita superposición vertical */
+  align-content: flex-start;
   height: 30vh;
 }
 .color-container {
@@ -240,7 +239,9 @@
   height: 100%;
 
   grid-template-rows: auto auto auto;
-  padding: 15% 0;
+  /* padding: 15% 0; */
+  padding-top: 15%;
+  padding-bottom: 15%;
   gap: 10%;
   font-size: var(--base-font-size);
   background-color: #ddd;
@@ -254,6 +255,22 @@
   justify-content: center;
   gap: 5%;
   background-color: #ddd;
+}
+
+.export-row {
+  display: grid;
+  grid-template-columns: minmax(50px, auto) repeat(3, 1fr);
+  gap: 5%;
+  margin-left: 3%;
+  margin-right: 3%;
+}
+
+.export-label {
+  font-weight: bold;
+}
+
+.export-value {
+  text-align: left;
 }
 
 .editor-panel.show {
@@ -272,10 +289,8 @@ input[type="range"] {
 
 @media (min-width: 678px) {
   /* La función de editar colores solo está disponible para dispositivos grandes */
-  .color:hover .edit-icon.show {
-    display: inline-block;
-  }
-  .color:hover .export-icon {
+  .edit-icon.show {
+    font-size: x-large;
     display: inline-block;
   }
   .export-container.show {
