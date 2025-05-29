@@ -10,6 +10,7 @@ import { hslToRgb, oklchToRgb, updateExports } from "../utils/conversor.js";
 import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
+import { availableSecondPalette } from "../utils/utils.js";
 
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", updateSeparation);
@@ -211,11 +212,13 @@ export function createAll() {
   createCircles(firstWheelCanvas.parentElement!, false);
   createCircles(secondWheelCanvas.parentElement!, true);
   updateExports();
+  availableSecondPalette();
 }
 export function updateAll() {
   updateCircles(firstWheelCanvas.parentElement!, false);
   updateCircles(secondWheelCanvas.parentElement!, true);
   updateExports();
+  availableSecondPalette();
 }
 
 // Exportar como si fuera módulo

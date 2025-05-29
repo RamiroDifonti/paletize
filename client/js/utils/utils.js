@@ -619,3 +619,18 @@ export function chooseTextColor(background) {
     const c2 = calculateColorContrast(rgbBackground, rgbBlack);
     return c1 > c2 ? `hsl(${white[0]}, ${white[1]}%, ${white[2]}%)` : `hsl(${black[0]}, ${black[1]}%, ${black[2]}%)`;
 }
+export function availableSecondPalette() {
+    const contrastText = document.querySelectorAll('#palette-2 .color-box');
+    let isValid = false;
+    // Si hay algún color válido en la paleta de contraste devuelve true
+    isValid = Array.from(contrastText).some((box) => {
+        return box.childNodes[0].textContent !== "N/A";
+    });
+    const label = document.querySelector(".text-contrast");
+    if (!isValid) {
+        label.style.display = "block";
+    }
+    else {
+        label.style.display = "none";
+    }
+}
