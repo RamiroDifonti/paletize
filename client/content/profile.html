@@ -52,6 +52,9 @@
                                 <input type="password" id="newPassword" name="newPassword" placeholder="nueva contraseña" required>
                                 <label for="confirmPassword">Confirmar Nueva Contraseña:</label>
                                 <input type="password" id="confirmPassword" name="confirmPassword" placeholder="repite contraseña" required>
+                                <label> Mostrar contraseñas</label>
+                                <input type="checkbox" id="showPasswords"> 
+                                
                                 <button type="submit" class = "data-button">Cambiar Contraseña</button>
                             </fieldset>
                         </form>
@@ -80,6 +83,19 @@
                 buttons.forEach(button => button.classList.remove('account-button'));
                 document.getElementById(`button${id}`).classList.add('account-button');
             }
+        </script>
+        <script>
+            document.getElementById('showPasswords').addEventListener('change', function () {
+                const passwordFields = [
+                    document.getElementById('currentPassword'),
+                    document.getElementById('newPassword'),
+                    document.getElementById('confirmPassword')
+                ];
+
+                passwordFields.forEach(field => {
+                    field.type = this.checked ? 'text' : 'password';
+                });
+            });
         </script>
     </body>
 </html>

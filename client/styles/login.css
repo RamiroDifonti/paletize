@@ -30,6 +30,10 @@ h3 {
     padding: 20px;
 }
 
+.pass {
+    aspect-ratio: 1;
+    width: 10%;
+}
 .data-button {
     align-self: center;
     margin-bottom: 2%;

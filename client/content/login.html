@@ -27,8 +27,12 @@
                                 <input type="text" name="email" placeholder="Tu email" required>
                             </label>
                             <label>Contraseña: 
-                                <input type="password" name="password" placeholder="Tu contraseña" required>
+                                <input type="password" name="password" id="passwordLogin" placeholder="Tu contraseña" required>
                             </label>
+                            <label> Mostrar contraseña:
+                                <input type="checkbox" class="pass" id="showPasswords"> 
+                            </label>
+                            
                         </fieldset>
                         <button class="data-button">Enviar</button>
                     </form>
@@ -51,10 +55,13 @@
                                 <input type="email" name="emailcheck" placeholder="Repite tu correo" required>
                             </label>
                             <label>Contraseña:
-                                <input type="password" name="password" placeholder="Tu contraseña" required>
+                                <input type="password" name="password" id="passwordRegister" placeholder="Tu contraseña" required>
                             </label>
                             <label>Repetir contraseña:
-                                <input type="password" name="passwordcheck" placeholder="Repite tu contraseña" required>
+                                <input type="password" name="passwordcheck" id="secondPasswordRegister" placeholder="Repite tu contraseña" required>
+                            </label>
+                            <label> Mostrar contraseñas:
+                                <input type="checkbox" class="pass" id="showPasswordsRegister"> 
                             </label>
                         </fieldset>
                         <button class="data-button">crear cuenta</button>
@@ -128,6 +135,29 @@
                 buttons.forEach(button => button.classList.remove('register-button'));
                 document.getElementById(`button${id}`).classList.add('register-button');
             }
+        </script>
+        <script>
+            document.getElementById('showPasswords').addEventListener('change', function () {
+                const passwordFields = [
+                    document.getElementById('passwordLogin')
+                ];
+
+                passwordFields.forEach(field => {
+                    field.type = this.checked ? 'text' : 'password';
+                });
+            });
+        </script>
+        <script>
+            document.getElementById('showPasswordsRegister').addEventListener('change', function () {
+                const passwordFields = [
+                    document.getElementById('passwordRegister'),
+                    document.getElementById('secondPasswordRegister')
+                ];
+
+                passwordFields.forEach(field => {
+                    field.type = this.checked ? 'text' : 'password';
+                });
+            });
         </script>
     </body>
 
