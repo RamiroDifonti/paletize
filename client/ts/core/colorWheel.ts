@@ -13,7 +13,7 @@ import { updateColorblind } from "../utils/colorblind.js";
 import { availableSecondPalette } from "../utils/utils.js";
 
 // Eventos que actualizan la página
-window.addEventListener("DOMContentLoaded", updateSeparation);
+window.addEventListener("DOMContentLoaded", () => updateSeparation());
 select?.addEventListener("change", createAll);
 wcag?.addEventListener("change", updateAll);
 contrastL?.addEventListener("change", updateAll);

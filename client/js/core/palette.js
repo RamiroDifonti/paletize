@@ -17,8 +17,9 @@ import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitVa
 import { colorScheme, select, contrastC, contrastS, contrastL, wcag } from "../constants/selects.js";
 import { loadPalette } from "../handlers/handlePalettes.js";
 import { palette1, palette2 } from "../constants/palette.js";
+import { updateSeparation } from "../handlers/schemeHandler.js";
 document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     // Contenedores de colores
     const colorContainers = document.querySelectorAll(".color-container");
     // Función para sincronizar slider y número
@@ -194,7 +195,21 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         const palette = yield res.json();
         document.querySelector('[name="name"]').value = palette.name;
         select.value = palette.colorModel;
-        const checkboxes = document.querySelectorAll(".color-checkbox");
+        console.log(palette);
+        contrastL.value = palette.secondContrast;
+        colorScheme.value = palette.colorScheme;
+        wcag.value = palette.wcagLevel;
+        updateSeparation(palette.colorSeparation);
+        // Borrar los colores de las paletas
+        palette1.innerHTML = "";
+        palette2.innerHTML = "";
+        for (let i = 1; i <= 5; i++) {
+            const slot = document.getElementById(`color-${i}`);
+            if (slot) {
+                slot.style.backgroundColor = "";
+                (_b = slot.parentElement) === null || _b === void 0 ? void 0 : _b.classList.add("hidden");
+            }
+        }
         if (palette.colorModel === "hsl") {
             const hBrand = palette.brandColor.split(",")[0].split("(")[1].trim();
             const sBrand = palette.brandColor.split(",")[1].split("%")[0].trim();
@@ -207,7 +222,10 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             hueValue.value = hBrand;
             contrastS.value = palette.firstContrast;
             const palettes = palette.colors;
+            createAll();
             updateAll();
+            const checkboxes = document.querySelectorAll(".color-checkbox");
+            console.log(checkboxes.length);
             palettes.forEach((color) => {
                 const h = color.split(",")[0].split("(")[1].trim();
                 const s = color.split(",")[1].split("%")[0].trim();
@@ -235,7 +253,9 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             hueValue.value = hBrand;
             contrastC.value = palette.firstContrast;
             const palettes = palette.colors;
+            createAll();
             updateAll();
+            const checkboxes = document.querySelectorAll(".color-checkbox");
             palettes.forEach((color) => {
                 const h = color.split(" ")[2].trim().split(")")[0];
                 const c = color.split(" ")[1].trim();
@@ -251,26 +271,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                 }
             });
         }
-        contrastL.value = palette.secondContrast;
-        colorScheme.value = palette.colorScheme;
-        wcag.value = palette.wcagLevel;
-        switch (palette.colorScheme) {
-            case 'analogous':
-                document.getElementById(`analogous`).value = palette.colorSeparation;
-                break;
-            case 'complementary':
-                document.getElementById(`complementary`).value = palette.colorSeparation;
-                break;
-            case 'triad':
-                document.getElementById(`triad`).value = palette.colorSeparation;
-                break;
-            case 'split-complementary':
-                document.getElementById(`split`).value = palette.colorSeparation;
-                break;
-            case 'square':
-                document.getElementById(`square`).value = palette.colorSeparation;
-                break;
-        }
+        // createAll();
         const response = yield fetch("/api/profile", { credentials: "include" });
         if (!response.ok) {
             throw new Error("No autorizado");

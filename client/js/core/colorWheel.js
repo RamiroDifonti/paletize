@@ -11,7 +11,7 @@ import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
 import { availableSecondPalette } from "../utils/utils.js";
 // Eventos que actualizan la página
-window.addEventListener("DOMContentLoaded", updateSeparation);
+window.addEventListener("DOMContentLoaded", () => updateSeparation());
 select === null || select === void 0 ? void 0 : select.addEventListener("change", createAll);
 wcag === null || wcag === void 0 ? void 0 : wcag.addEventListener("change", updateAll);
 contrastL === null || contrastL === void 0 ? void 0 : contrastL.addEventListener("change", updateAll);

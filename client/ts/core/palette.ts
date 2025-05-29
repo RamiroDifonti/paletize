@@ -9,6 +9,7 @@ import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitVa
 import { colorScheme, select, contrastC, contrastS, contrastL, wcag } from "../constants/selects.js";
 import { loadPalette } from "../handlers/handlePalettes.js";
 import { palette1, palette2 } from "../constants/palette.js";
+import { updateSeparation } from "../handlers/schemeHandler.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Contenedores de colores
@@ -199,8 +200,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       const palette = await res.json();
       (document.querySelector('[name="name"]') as HTMLInputElement).value = palette.name;
       select.value = palette.colorModel;
+      console.log(palette);
 
-      const checkboxes = document.querySelectorAll<HTMLInputElement>(".color-checkbox");
+      contrastL.value = palette.secondContrast;
+      colorScheme.value = palette.colorScheme;
+      wcag.value = palette.wcagLevel;
+      
+      updateSeparation(palette.colorSeparation);
+      // Borrar los colores de las paletas
+      palette1.innerHTML = "";
+      palette2.innerHTML = "";
+      for (let i = 1; i <= 5; i++) {
+        const slot = document.getElementById(`color-${i}`);
+        if (slot) {
+          slot.style.backgroundColor = "";
+          slot.parentElement?.classList.add("hidden");
+        }
+      }
       if (palette.colorModel === "hsl") {
         const hBrand = palette.brandColor.split(",")[0].split("(")[1].trim();
         const sBrand = palette.brandColor.split(",")[1].split("%")[0].trim();
@@ -212,10 +228,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         lightValue1.value = lBrand;
         hueSlider.value = hBrand;
         hueValue.value = hBrand;
-
         contrastS.value = palette.firstContrast;
         const palettes = palette.colors;
+
+        createAll();
         updateAll();
+
+        const checkboxes = document.querySelectorAll<HTMLInputElement>(".color-checkbox");
+        console.log(checkboxes.length);
         palettes.forEach((color: string) => {
           const h = color.split(",")[0].split("(")[1].trim();
           const s = color.split(",")[1].split("%")[0].trim();
@@ -244,10 +264,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         lightValue1.value = lBrand;
         hueSlider.value = hBrand;
         hueValue.value = hBrand;
-
         contrastC.value = palette.firstContrast;
         const palettes = palette.colors;
+
+        createAll();
         updateAll();
+        
+        const checkboxes = document.querySelectorAll<HTMLInputElement>(".color-checkbox");
         palettes.forEach((color: string) => {
           const h = color.split(" ")[2].trim().split(")")[0];
           const c = color.split(" ")[1].trim();
@@ -265,28 +288,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         });
       }
+      // createAll();
 
-      contrastL.value = palette.secondContrast;
-
-      colorScheme.value = palette.colorScheme;
-      wcag.value = palette.wcagLevel;
-      switch (palette.colorScheme) {
-        case 'analogous':
-          (document.getElementById(`analogous`) as HTMLInputElement).value = palette.colorSeparation;
-          break;
-        case 'complementary':
-          (document.getElementById(`complementary`) as HTMLInputElement).value = palette.colorSeparation;
-          break;
-        case 'triad':
-          (document.getElementById(`triad`) as HTMLInputElement).value = palette.colorSeparation;
-          break;
-        case 'split-complementary':
-          (document.getElementById(`split`) as HTMLInputElement).value = palette.colorSeparation;
-          break;
-        case 'square':
-          (document.getElementById(`square`) as HTMLInputElement).value = palette.colorSeparation;
-          break;
-      }
       const response = await fetch("/api/profile", { credentials: "include" });
       if (!response.ok) {
           throw new Error("No autorizado");
@@ -313,7 +316,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         like.children[0].classList.remove("bi-heart");
         like.children[0].classList.add("bi-heart-fill");
       }
-
       loadPalette(palette1, palette.colorScheme);
       loadPalette(palette2, palette.colorScheme);
       updateAll();
