@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                     if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
                         const colorPalette = parent.childNodes[index];
                         const hue = colorPalette.getAttribute("h");
-                        colorPalette.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
+                        colorPalette.childNodes[1].style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
                         colorDiv.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
                         circle.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
                         circleLH.style.backgroundColor = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                         if (select.value === "oklch") {
                             bgString = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
                         }
-                        colorPalette.style.backgroundColor = bgString;
+                        colorPalette.childNodes[1].style.backgroundColor = bgString;
                         colorDiv.style.backgroundColor = bgString;
                         circle.style.backgroundColor = bgString;
                         circleLH.style.backgroundColor = bgString;
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                     if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
                         const colorPalette = parent.childNodes[index];
                         const hue = colorPalette.getAttribute("h");
-                        colorPalette.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+                        colorPalette.childNodes[1].style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
                         colorDiv.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
                         circle.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
                         circleLH.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
@@ -195,7 +195,6 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         const palette = yield res.json();
         document.querySelector('[name="name"]').value = palette.name;
         select.value = palette.colorModel;
-        console.log(palette);
         contrastL.value = palette.secondContrast;
         colorScheme.value = palette.colorScheme;
         wcag.value = palette.wcagLevel;
@@ -206,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         for (let i = 1; i <= 5; i++) {
             const slot = document.getElementById(`color-${i}`);
             if (slot) {
-                slot.style.backgroundColor = "";
+                slot.childNodes[1].style.backgroundColor = "";
                 (_b = slot.parentElement) === null || _b === void 0 ? void 0 : _b.classList.add("hidden");
             }
         }
@@ -225,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             createAll();
             updateAll();
             const checkboxes = document.querySelectorAll(".color-checkbox");
-            console.log(checkboxes.length);
             palettes.forEach((color) => {
                 const h = color.split(",")[0].split("(")[1].trim();
                 const s = color.split(",")[1].split("%")[0].trim();
