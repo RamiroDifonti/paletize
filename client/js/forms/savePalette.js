@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const colors = [];
         for (let i = 1; i <= 5; i++) {
             const el = document.getElementById(`color-${i}`);
-            if (el) {
+            if (!el.parentElement.classList.contains('hidden')) {
                 const h = el.getAttribute('h');
                 const s = el.getAttribute('s');
                 const l = el.getAttribute('l');
@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wcagLevel,
             colorSeparation,
         };
+        console.log(data);
         // Enviar los datos a la API usando fetch
         if (id !== undefined) {
             const res = yield fetch(`/api/palette/user`);
@@ -106,7 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     if (!response.ok) {
                         console.error('Error al actualizar paleta');
+                        alert("Error al crear paleta. Por favor, inténtelo de nuevo más tarde.");
                         // Mostrar mensaje de error en la UI
+                    }
+                    else {
+                        alert('Paleta actualizada correctamente');
                     }
                     return;
                 }
@@ -126,7 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = yield response.json();
             if (!response.ok) {
                 console.error('Error al crear paleta');
+                alert("Error al crear paleta. Por favor, inténtelo de nuevo más tarde.");
                 // Mostrar mensaje de error en la UI
+            }
+            else {
+                alert('Paleta creada correctamente');
             }
         }
         catch (error) {

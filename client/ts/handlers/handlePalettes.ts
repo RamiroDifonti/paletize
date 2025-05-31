@@ -57,7 +57,7 @@ export function createPalette(container: HTMLElement, scheme : string) {
       if (select?.value === "oklch") {
         bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
       }
-      colorBox.style.backgroundColor = bgString;
+      (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor = bgString;
       colorBox.setAttribute("h", adjustedHue.toString());
       colorBox.setAttribute("s", boxSaturation.toString());
       colorBox.setAttribute("l", boxLightness.toString());
@@ -120,7 +120,7 @@ export function createPalette(container: HTMLElement, scheme : string) {
           if (select?.value === "oklch") {
             bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
           }
-          colorBox.style.backgroundColor = bgString;
+          (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor = bgString;
           colorBox.setAttribute("h", adjustedHue.toString());
           colorBox.setAttribute("s", boxSaturation.toString());
           colorBox.setAttribute("l", boxLightness.toString());
@@ -199,7 +199,7 @@ export function loadPalette(container: HTMLElement, scheme : string) {
     if (select?.value === "oklch") {
       bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
     }
-    colorBox.style.backgroundColor = bgString;
+    (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor = bgString;
     colorBox.setAttribute("h", adjustedHue.toString());
     colorBox.setAttribute("s", boxSaturation.toString());
     colorBox.setAttribute("l", boxLightness.toString());
@@ -270,7 +270,7 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
       slot.setAttribute("h", hue!);
       slot.setAttribute("s", (satValue.toString() === "-1") ? saturation! : satValue.toString());
       slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness! : lightValue.toString());
-      slot.style.backgroundColor = hslColor.style.backgroundColor;
+      slot.style.backgroundColor = (hslColor.childNodes[1] as HTMLDivElement).style.backgroundColor;
 
       const textColor = chooseTextColor([Number(hue), Number(satValue), Number(lightValue)]);
       slot.style.color = textColor;
@@ -379,7 +379,7 @@ function RemoveAllColors() {
   colorBoxs.forEach((colorBox, index) => {
     colorBox.id = "";
     if (colors[index]) {
-      (colors[index] as HTMLDivElement).style.backgroundColor = "";
+      ((colors[index] as HTMLDivElement).childNodes[1] as HTMLDivElement).style.backgroundColor = "";
       (colors[index] as HTMLDivElement).style.color = "";
       (colors[index] as HTMLDivElement).parentElement?.classList.add("hidden");
     }
@@ -388,8 +388,7 @@ function RemoveAllColors() {
 
 // Función para actualizar un color a la paleta
 function updateColor(hslColor: HTMLDivElement, limits: number[]) {
-
-  const color = hslColor.style.backgroundColor;
+  const color = (hslColor.childNodes[1] as HTMLDivElement).style.backgroundColor;
   const hslColorId = hslColor.id.split("-")[2];
   const id = parseInt(hslColorId);
   const slot = document.getElementById(`color-${id}`);

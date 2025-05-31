@@ -48,7 +48,7 @@ export function createCircles(wheel, isSaturationWheel) {
     existingCircles.forEach(circle => circle.remove());
     const hues = calculateColors(baseHue, colorScheme.value);
     const colorsWhite = Array.from(palette1.children).map((colorBox, index) => {
-        const color = window.getComputedStyle(colorBox).backgroundColor;
+        const color = colorBox.childNodes[1].style.backgroundColor;
         let distance;
         if (isSaturationWheel) {
             if (select.value === "oklch") {
@@ -79,7 +79,7 @@ export function createCircles(wheel, isSaturationWheel) {
     });
     // Obtener colores de palette2 (círculos negros)
     const colorsBlack = Array.from(palette2.children).map((colorBox, index) => {
-        const color = window.getComputedStyle(colorBox).backgroundColor;
+        const color = colorBox.childNodes[1].style.backgroundColor;
         let distance;
         if (isSaturationWheel) {
             if (select.value === "oklch") {
@@ -135,7 +135,7 @@ export function updateCircles(wheel, isSaturationWheel) {
     }
     const hues = calculateColors(baseHue, colorScheme.value);
     const colorsWhite = Array.from(palette1.children).map((colorBox, index) => {
-        const color = window.getComputedStyle(colorBox).backgroundColor;
+        const color = colorBox.childNodes[1].style.backgroundColor;
         let distance;
         if (isSaturationWheel) {
             if (select.value === "oklch") {
@@ -166,7 +166,7 @@ export function updateCircles(wheel, isSaturationWheel) {
     });
     // Obtener colores de palette2 (círculos negros)
     const colorsBlack = Array.from(palette2.children).map((colorBox, index) => {
-        const color = window.getComputedStyle(colorBox).backgroundColor;
+        const color = colorBox.childNodes[1].style.backgroundColor;
         let distance;
         if (isSaturationWheel) {
             if (select.value === "oklch") {

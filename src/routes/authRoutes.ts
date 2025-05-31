@@ -1,6 +1,6 @@
 import express from 'express';
 import { login, register, protectedSession, logout, apiProfile, changeEmail, changePassword, updateProfile } from '../controllers/authControllers'
-import { getIndex, getProfile, getLogin, getAccount } from '../controllers/authControllers';
+import { getIndex, getProfile, getLogin } from '../controllers/authControllers';
 import { authMiddleware } from '../middlewares/authMiddleware';
 
 export default (router: express.Router) => {
@@ -17,7 +17,6 @@ export default (router: express.Router) => {
     router.get("/", getIndex);
     router.get("/profile", authMiddleware, getProfile);
     router.get("/login", getLogin);
-    router.get("/account", authMiddleware, getAccount);
 };
 
 

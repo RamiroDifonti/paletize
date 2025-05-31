@@ -97,7 +97,7 @@ function generateWheelHSL(
   const minDimension = Math.min(rect.width, rect.height);
 
   // Ajustar el tamaño con un margen opcional
-  const size = 300;
+  const size = 500;
   canvas.width = size;
   canvas.height = size;
 

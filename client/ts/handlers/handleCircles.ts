@@ -53,7 +53,7 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
 
   const hues = calculateColors(baseHue, colorScheme.value);
   const colorsWhite = Array.from(palette1.children).map((colorBox, index) => {
-    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const color = (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor;
     let distance;
     if (isSaturationWheel) {
       if (select.value === "oklch") {
@@ -83,7 +83,7 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
   });
   // Obtener colores de palette2 (círculos negros)
   const colorsBlack = Array.from(palette2.children).map((colorBox, index) => {
-    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const color = (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor;
     let distance;
     if (isSaturationWheel) {
       if (select.value === "oklch") {
@@ -138,7 +138,7 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
 
   const hues = calculateColors(baseHue, colorScheme.value);
   const colorsWhite = Array.from(palette1.children).map((colorBox, index) => {
-    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const color = (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor;
     let distance;
     if (isSaturationWheel) {
       if (select.value === "oklch") {
@@ -168,7 +168,7 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
   });
   // Obtener colores de palette2 (círculos negros)
   const colorsBlack = Array.from(palette2.children).map((colorBox, index) => {
-    const color = window.getComputedStyle(colorBox).backgroundColor;
+    const color = (colorBox.childNodes[1] as HTMLDivElement).style.backgroundColor;
     let distance;
     if (isSaturationWheel) {
       if (select.value === "oklch") {

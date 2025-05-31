@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const secondContrast = (document.querySelector('.contrast-selection-l') as HTMLSelectElement)?.value;
     const colors: string[] = [];
     for (let i = 1; i <= 5; i++) {
-      const el = document.getElementById(`color-${i}`);
-      if (el) {
+      const el = document.getElementById(`color-${i}`)!;
+      if (!el.parentElement!.classList.contains('hidden')) {
         const h = el.getAttribute('h');
         const s = el.getAttribute('s');
         const l = el.getAttribute('l');
@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       wcagLevel,
       colorSeparation,
     };
+    console.log(data);
     // Enviar los datos a la API usando fetch
     if (id !== undefined) {
       const res = await fetch(`/api/palette/user`);
@@ -95,7 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           if (!response.ok) {
             console.error('Error al actualizar paleta');
+            alert("Error al crear paleta. Por favor, inténtelo de nuevo más tarde.");
             // Mostrar mensaje de error en la UI
+          } else {
+            alert('Paleta actualizada correctamente');
           }
           return;
         } catch (error) {
@@ -114,7 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
       if (!response.ok) {
         console.error('Error al crear paleta');
+        alert("Error al crear paleta. Por favor, inténtelo de nuevo más tarde.");
         // Mostrar mensaje de error en la UI
+      } else {
+        alert('Paleta creada correctamente');
       }
     } catch (error) {
       console.error('Error al crear solicitud');

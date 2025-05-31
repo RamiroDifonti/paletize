@@ -268,8 +268,6 @@ export const changePassword = async (req: express.Request, res: express.Response
     
 }
 
-
-
 export const getProfile = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.sendFile(path.join(__dirname, "../../client/content/profile.html"));
     return;
@@ -282,10 +280,5 @@ export const getLogin = async (_req: express.Request, res: express.Response): Pr
 
 export const getIndex = async (_req: express.Request, res: express.Response): Promise <void> => {
     res.sendFile(path.join(__dirname, "../../client/content/index.html"));
-    return;
-}
-
-export const getAccount = async (_req: express.Request, res: express.Response): Promise <void> => {
-    res.sendFile(path.join(__dirname, "../../client/content/account.html"));
     return;
 }
