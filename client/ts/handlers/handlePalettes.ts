@@ -250,10 +250,13 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
     // después de haber añadido otros colores
     if (isBranding && slot && slot.style.backgroundColor !== "") {
       let colors: Array<HTMLDivElement> = [];
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 5; i++) {
         const colorCheckbox = document.getElementById(`color-checkbox-${i}`) as HTMLDivElement;
         if (colorCheckbox) {
           colors.push(colorCheckbox);
+        }
+        if (i === 5) {
+          (colorCheckbox as HTMLInputElement).checked = false;
         }
       }
 
@@ -379,7 +382,7 @@ function RemoveAllColors() {
   colorBoxs.forEach((colorBox, index) => {
     colorBox.id = "";
     if (colors[index]) {
-      ((colors[index] as HTMLDivElement).childNodes[1] as HTMLDivElement).style.backgroundColor = "";
+      (colors[index] as HTMLDivElement).style.backgroundColor = "";
       (colors[index] as HTMLDivElement).style.color = "";
       (colors[index] as HTMLDivElement).parentElement?.classList.add("hidden");
     }

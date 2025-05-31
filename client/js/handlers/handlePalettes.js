@@ -244,10 +244,13 @@ function addColor(hslColor, limits) {
         // después de haber añadido otros colores
         if (isBranding && slot && slot.style.backgroundColor !== "") {
             let colors = [];
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 5; i++) {
                 const colorCheckbox = document.getElementById(`color-checkbox-${i}`);
                 if (colorCheckbox) {
                     colors.push(colorCheckbox);
+                }
+                if (i === 5) {
+                    colorCheckbox.checked = false;
                 }
             }
             RemoveAllColors();
@@ -376,7 +379,7 @@ function RemoveAllColors() {
         var _a;
         colorBox.id = "";
         if (colors[index]) {
-            colors[index].childNodes[1].style.backgroundColor = "";
+            colors[index].style.backgroundColor = "";
             colors[index].style.color = "";
             (_a = colors[index].parentElement) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
         }
