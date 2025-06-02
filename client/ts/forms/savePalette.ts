@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let brandColor = `hsl(${brandH}, ${brandS}%, ${brandL}%)`;
     if (colorModel === 'oklch') {
       brandS = (document.getElementById(`c-1`) as HTMLInputElement)?.value;
-      brandColor = `oklch(${brandL}% ${brandS} ${brandH})`;
+      brandColor = `oklch(${brandL} ${brandS} ${brandH})`;
     }
     const colorScheme = (document.querySelector('.color-type') as HTMLSelectElement)?.value as 'analogous' | 'complementary' | 'triad' | 'split-complementary' | 'square';
     const wcagLevel = (document.querySelector('.wcag-selection') as HTMLSelectElement)?.value as 'AA' | 'AAA';
