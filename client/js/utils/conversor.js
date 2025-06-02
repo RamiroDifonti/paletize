@@ -159,7 +159,7 @@ export function updateExports() {
         let [l_, c, h_] = ["NaN", "NaN", "NaN"];
         const contrast = slot.getAttribute("contrast");
         if (select.value === "oklch") {
-            [r, g, b] = oklchToRgb(Number(lightness) / 100, Number(saturation), Number(hue));
+            [r, g, b] = oklchToRgb(Number(lightness), Number(saturation), Number(hue));
             [h, s, l] = rgbToHsl(Number(r), Number(g), Number(b));
             [l_, c, h_] = [lightness, saturation, hue];
         }

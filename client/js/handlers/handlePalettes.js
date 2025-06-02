@@ -257,9 +257,11 @@ function addColor(hslColor, limits) {
                 if (colorCheckbox) {
                     colors.push(colorCheckbox);
                 }
-                if (i === 5) {
-                    colorCheckbox.checked = false;
-                }
+            }
+            if (colors.length >= 5) {
+                alert("No puedes agregar más de 5 colores a la paleta.");
+                hslColor.childNodes[2].checked = false;
+                return;
             }
             RemoveAllColors();
             addColor(hslColor, limits);
@@ -338,7 +340,6 @@ function addColor(hslColor, limits) {
                 }
                 editBox.setAttribute("palette", "2");
             }
-            console.log(minL, maxL, minS, maxS, satValue, lightValue);
             editBox.childNodes.forEach((child) => {
                 if (child instanceof HTMLElement) {
                     if (child.classList.contains("slider-container")) {

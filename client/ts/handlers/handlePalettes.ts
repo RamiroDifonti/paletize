@@ -265,11 +265,12 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
         if (colorCheckbox) {
           colors.push(colorCheckbox);
         }
-        if (i === 5) {
-          (colorCheckbox as HTMLInputElement).checked = false;
-        }
       }
-
+      if (colors.length >= 5) {
+        alert("No puedes agregar más de 5 colores a la paleta.");
+        (hslColor.childNodes[2] as HTMLInputElement).checked = false;
+        return;
+      }
       RemoveAllColors();
       addColor(hslColor, limits);
       for (let i = 0; i < colors.length; i++) {
@@ -343,7 +344,6 @@ function addColor(hslColor: HTMLDivElement, limits: number[]) {
         }
         (editBox as HTMLElement).setAttribute("palette", "2");
       }
-      console.log(minL, maxL, minS, maxS, satValue, lightValue);
       editBox.childNodes.forEach((child) => {
         if (child instanceof HTMLElement) {
           if (child.classList.contains("slider-container")) {
