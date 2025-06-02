@@ -12,8 +12,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { createAll, updateAll } from "./colorWheel.js";
 import { exportColors } from "../utils/conversor.js";
 import { updateOneCircle } from "../handlers/handleCircles.js";
-import { chromaSlider1, satSlider1, lightSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
-import { chromaValue1, satValue1, lightValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
+import { chromaSlider1, satSlider1, lightSlider1, lightOklchSlider1, hueSlider, analogousSlider, splitSlider, triadSlider, complementarySlider, squareSlider } from "../constants/sliders.js";
+import { chromaValue1, satValue1, lightValue1, lightOklchValue1, hueValue, analogousValue, splitValue, triadValue, complementaryValue, squareValue } from "../constants/values.js";
 import { colorScheme, select, contrastC, contrastS, contrastL, wcag } from "../constants/selects.js";
 import { loadPalette } from "../handlers/handlePalettes.js";
 import { palette1, palette2 } from "../constants/palette.js";
@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     connectSliderWithNumber(lightSlider1, lightValue1, createAll);
     connectSliderWithNumber(chromaSlider1, chromaValue1, createAll);
     connectSliderWithNumber(hueSlider, hueValue, createAll);
+    connectSliderWithNumber(lightOklchSlider1, lightOklchValue1, createAll);
     connectSliderWithNumber(analogousSlider, analogousValue, updateAll);
     connectSliderWithNumber(triadSlider, triadValue, updateAll);
     connectSliderWithNumber(complementarySlider, complementaryValue, updateAll);
@@ -66,9 +67,11 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         const panel = container.querySelector(`#panel-${colorId}`);
         const satSlider = container.querySelector(`#saturation-${colorId}`);
         const lightSlider = container.querySelector(`#lightness-${colorId}`);
+        const lightOklchSlider = container.querySelector(`#lightness-c-${colorId}`);
         const chromaSlider = container.querySelector(`#chroma-${colorId}`);
         const satNumber = container.querySelector(`#saturation-value-${colorId}`);
         const lightNumber = container.querySelector(`#lightness-value-${colorId}`);
+        const lightOklchNumber = container.querySelector(`#lightness-c-value-${colorId}`);
         const chromaNumber = container.querySelector(`#chroma-value-${colorId}`);
         // Poner un texto si no cumple con el contraste
         const text = document.createElement("label");
@@ -141,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                         const hue = colorPalette.getAttribute("h");
                         let bgString = `hsl(${hue}, ${satSlider.value}%, ${lightSlider.value}%)`;
                         if (select.value === "oklch") {
-                            bgString = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+                            bgString = `oklch(${lightSlider.value} ${chromaSlider.value} ${hue})`;
                         }
                         colorPalette.childNodes[1].style.backgroundColor = bgString;
                         colorDiv.style.backgroundColor = bgString;
@@ -167,11 +170,36 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                     if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
                         const colorPalette = parent.childNodes[index];
                         const hue = colorPalette.getAttribute("h");
-                        colorPalette.childNodes[1].style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
-                        colorDiv.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
-                        circle.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
-                        circleLH.style.backgroundColor = `oklch(${lightSlider.value}% ${chromaSlider.value} ${hue})`;
+                        colorPalette.childNodes[1].style.backgroundColor = `oklch(${lightOklchSlider.value} ${chromaSlider.value} ${hue})`;
+                        colorDiv.style.backgroundColor = `oklch(${lightOklchSlider.value} ${chromaSlider.value} ${hue})`;
+                        circle.style.backgroundColor = `oklch(${lightOklchSlider.value} ${chromaSlider.value} ${hue})`;
+                        circleLH.style.backgroundColor = `oklch(${lightOklchSlider.value} ${chromaSlider.value} ${hue})`;
                         updateOneCircle(circle, chromaSlider.valueAsNumber);
+                        return;
+                    }
+                });
+                return;
+            }
+            else if (lightOklchSlider.value !== lightOklchSlider.getAttribute("previousValue") && (lightOklchSlider.getAttribute("previousValue") !== null || lightOklchNumber.getAttribute("previousValue") !== null)) {
+                lightOklchSlider.setAttribute("previousValue", lightOklchSlider.value);
+                lightOklchNumber.setAttribute("previousValue", lightOklchSlider.value);
+                let color = "black";
+                const movingCircle = `circle-${color}-sh`;
+                const stationaryCircle = `circle-${color}-lh`;
+                const elements = document.querySelectorAll(`[id^="${movingCircle}"]`);
+                const colorDiv = document.getElementById(`color-${colorId}`);
+                elements.forEach((element, index) => {
+                    const circle = element;
+                    const circleLH = document.getElementById(`${stationaryCircle}-${index}`);
+                    if (circle.style.backgroundColor === colorDiv.style.backgroundColor) {
+                        const colorPalette = parent.childNodes[index];
+                        const hue = colorPalette.getAttribute("h");
+                        let bgString = `oklch(${lightOklchSlider.value} ${chromaSlider.value} ${hue})`;
+                        colorPalette.childNodes[1].style.backgroundColor = bgString;
+                        colorDiv.style.backgroundColor = bgString;
+                        circle.style.backgroundColor = bgString;
+                        circleLH.style.backgroundColor = bgString;
+                        updateOneCircle(circle, lightOklchSlider.valueAsNumber);
                         return;
                     }
                 });
@@ -181,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         // Sincronizar sliders y números
         connectSliderWithNumber(satSlider, satNumber, updateColor);
         connectSliderWithNumber(lightSlider, lightNumber, updateColor);
+        connectSliderWithNumber(lightOklchSlider, lightOklchNumber, updateColor);
         connectSliderWithNumber(chromaSlider, chromaNumber, updateColor);
         // Inicializa el color
         createAll();

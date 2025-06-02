@@ -4,6 +4,7 @@ export const satValue1 = document.querySelector("#s-1-value");
 export const lightValue1 = document.querySelector("#l-1-value");
 export const hueValue = document.querySelector("#h-value");
 export const chromaValue1 = document.querySelector("#c-1-value");
+export const lightOklchValue1 = document.querySelector("#lc-1-value");
 export const analogousValue = document.querySelector("#analogous-value");
 export const splitValue = document.querySelector("#split-value");
 export const triadValue = document.querySelector("#triad-value");

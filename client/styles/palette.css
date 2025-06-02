@@ -108,7 +108,7 @@
 }
 
 #palette-1, #palette-2 {
-  height: 20%;
+  height: 100px;
   display: flex;
   justify-content: center;
   gap: 1rem;
@@ -172,7 +172,6 @@
   display: none;
   color: red;
   font-weight: bold;
-  height: 5vh;
 }
 
 .palette{

@@ -3,8 +3,8 @@
 import { colorblind, select, colorScheme, wcag } from "../constants/selects.js";
 import { simulateColorBlind } from "../utils/colorblind.js";
 import { palette1, palette2 } from "../constants/palette.js";
-import { hueSlider, satSlider1, lightSlider1, chromaSlider1 } from "../constants/sliders.js";
-import { calculateColors, limitColor, chooseTextColor, calculateLuminance, calculateContrast } from "../utils/utils.js";
+import { hueSlider, satSlider1, lightSlider1, chromaSlider1, lightOklchSlider1 } from "../constants/sliders.js";
+import { calculateColors, limitColor, calculateLuminance, calculateContrast, chooseTextColorOKLCH, chooseTextColorHSL } from "../utils/utils.js";
 import { updateExports, hslToRgb, oklchToRgb } from "../utils/conversor.js";
 import { updateAll } from "../core/colorWheel.js";
 // Crear las paletas
@@ -14,10 +14,11 @@ export function createPalette(container, scheme) {
     if (colorBoxs.length > 0) {
         const hue = hueSlider.value;
         let saturation = satSlider1.value;
+        let lightness = lightSlider1.value;
         if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
             saturation = chromaSlider1.value;
+            lightness = lightOklchSlider1.value;
         }
-        const lightness = lightSlider1.value;
         const hues = calculateColors(hue, scheme);
         // Si ya existen, actualizamos los colores de fondo y comprobamos si su checkbox está marcado
         colorBoxs.forEach((colorBox, index) => {
@@ -51,7 +52,7 @@ export function createPalette(container, scheme) {
             }
             let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
             if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
-                bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
+                bgString = `oklch(${boxLightness} ${boxSaturation} ${adjustedHue})`;
             }
             colorBox.childNodes[1].style.backgroundColor = bgString;
             colorBox.setAttribute("h", adjustedHue.toString());
@@ -89,10 +90,11 @@ export function createPalette(container, scheme) {
             checkbox.addEventListener("change", () => {
                 if (checkbox.checked) {
                     let saturation = satSlider1.value;
+                    let lightness = lightSlider1.value;
                     if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
                         saturation = chromaSlider1.value;
+                        lightness = lightOklchSlider1.value;
                     }
-                    const lightness = lightSlider1.value;
                     const newHue = hueSlider.value;
                     adjustedHue = calculateColors(hueSlider.value, scheme)[index];
                     const limits = limitColor(Number(newHue), Number(adjustedHue), Number(saturation), Number(lightness));
@@ -113,7 +115,7 @@ export function createPalette(container, scheme) {
                     }
                     let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
                     if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
-                        bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
+                        bgString = `oklch(${boxLightness} ${boxSaturation} ${adjustedHue})`;
                     }
                     colorBox.childNodes[1].style.backgroundColor = bgString;
                     colorBox.setAttribute("h", adjustedHue.toString());
@@ -137,9 +139,14 @@ export function createPalette(container, scheme) {
                 colorPreview.appendChild(text);
                 colorBox.setAttribute("branding", "true");
             }
-            const saturation = satSlider1.value;
-            const lightness = lightSlider1.value;
-            const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+            let saturation = satSlider1.value;
+            let lightness = lightSlider1.value;
+            let textColor = chooseTextColorHSL([Number(hue), Number(saturation), Number(lightness)]);
+            if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+                saturation = chromaSlider1.value;
+                lightness = lightOklchSlider1.value;
+                textColor = chooseTextColorOKLCH([Number(lightness), Number(saturation), Number(hue)]);
+            }
             const limits = limitColor(Number(hue), Number(adjustedHue), Number(saturation), Number(lightness));
             const label = document.createElement("label");
             if (limits[0] !== -1) {
@@ -161,10 +168,11 @@ export function loadPalette(container, scheme) {
     // Primero se comprueba si se los color-box ya están creados o no
     const hue = hueSlider.value;
     let saturation = satSlider1.value;
+    let lightness = lightSlider1.value;
     if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
         saturation = chromaSlider1.value;
+        lightness = lightOklchSlider1.value;
     }
-    const lightness = lightSlider1.value;
     const hues = calculateColors(hue, scheme);
     // Si ya existen, actualizamos los colores de fondo y comprobamos si su checkbox está marcado
     colorBoxs.forEach((colorBox, index) => {
@@ -189,7 +197,7 @@ export function loadPalette(container, scheme) {
         }
         let bgString = `hsl(${adjustedHue}, ${boxSaturation}%, ${boxLightness}%)`;
         if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
-            bgString = `oklch(${boxLightness}% ${boxSaturation} ${adjustedHue})`;
+            bgString = `oklch(${boxLightness} ${boxSaturation} ${adjustedHue})`;
         }
         colorBox.childNodes[1].style.backgroundColor = bgString;
         colorBox.setAttribute("h", adjustedHue.toString());
@@ -268,7 +276,10 @@ function addColor(hslColor, limits) {
             slot.setAttribute("s", (satValue.toString() === "-1") ? saturation : satValue.toString());
             slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness : lightValue.toString());
             slot.style.backgroundColor = hslColor.childNodes[1].style.backgroundColor;
-            const textColor = chooseTextColor([Number(hue), Number(satValue), Number(lightValue)]);
+            let textColor = chooseTextColorHSL([Number(hue), Number(satValue), Number(lightValue)]);
+            if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+                textColor = chooseTextColorOKLCH([Number(lightValue), Number(satValue), Number(hue)]);
+            }
             slot.style.color = textColor;
             const text = document.getElementById("contrast-text-" + i);
             if (text) {
@@ -327,6 +338,7 @@ function addColor(hslColor, limits) {
                 }
                 editBox.setAttribute("palette", "2");
             }
+            console.log(minL, maxL, minS, maxS, satValue, lightValue);
             editBox.childNodes.forEach((child) => {
                 if (child instanceof HTMLElement) {
                     if (child.classList.contains("slider-container")) {
@@ -447,7 +459,10 @@ function updateColor(hslColor, limits) {
     slot === null || slot === void 0 ? void 0 : slot.setAttribute("l", (lightValue.toString() === "-1") ? lightness : lightValue.toString());
     if (slot) {
         // Cambiar el color del texto para que sea adecuado dependiendo del color que se añada
-        const textColor = chooseTextColor([Number(hue), Number(saturation), Number(lightness)]);
+        let textColor = chooseTextColorHSL([Number(hue), Number(saturation), Number(lightness)]);
+        if ((select === null || select === void 0 ? void 0 : select.value) === "oklch") {
+            textColor = chooseTextColorOKLCH([Number(lightness), Number(saturation), Number(hue)]);
+        }
         slot.style.color = textColor;
         hslColor.childNodes[1].style.color = textColor;
         slot.style.backgroundColor = color;

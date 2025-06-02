@@ -59,7 +59,12 @@ export function createCircles(wheel, isSaturationWheel) {
             }
         }
         else {
-            distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            if (select.value === "oklch") {
+                distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+            }
+            else {
+                distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            }
         }
         return { color, distance, index };
     });
@@ -86,7 +91,7 @@ export function createCircles(wheel, isSaturationWheel) {
                 distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
             }
             else {
-                distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+                distance = Number(colorBox.getAttribute("s")); // Luminosidad normalizada
             }
         }
         else {
@@ -146,7 +151,12 @@ export function updateCircles(wheel, isSaturationWheel) {
             }
         }
         else {
-            distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            if (select.value === "oklch") {
+                distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+            }
+            else {
+                distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            }
         }
         return { color, distance, index };
     });
@@ -177,7 +187,12 @@ export function updateCircles(wheel, isSaturationWheel) {
             }
         }
         else {
-            distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            if (select.value === "oklch") {
+                distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+            }
+            else {
+                distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+            }
         }
         return { color, distance, index };
     });
@@ -198,8 +213,13 @@ export function updateCircles(wheel, isSaturationWheel) {
 }
 export function updateOneCircle(circle, distance) {
     let normalizedDistance;
-    if (distance < 1 && distance >= 0) {
-        normalizedDistance = distance / 0.4; // Luminosidad normalizada
+    if (select.value === "oklch") {
+        if (circle.id.includes("lh")) {
+            normalizedDistance = distance / 0.4; // Luminosidad normalizada
+        }
+        else {
+            normalizedDistance = distance; // Luminosidad normalizada
+        }
     }
     else {
         normalizedDistance = distance / 100; // Luminosidad normalizada

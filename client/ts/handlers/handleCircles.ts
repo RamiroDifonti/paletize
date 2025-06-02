@@ -62,7 +62,11 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
         distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
       }
     } else {
-      distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      }
     }
     return { color, distance, index };
   });
@@ -89,7 +93,7 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
       if (select.value === "oklch") {
         distance = Number(colorBox.getAttribute("s")) / 0.4; // Luminosidad normalizada
       } else {
-        distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
+        distance = Number(colorBox.getAttribute("s")); // Luminosidad normalizada
       }
     } else {
       distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
@@ -147,7 +151,11 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
         distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
       }
     } else {
-      distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      }
     }
     return { color, distance, index };
   });
@@ -177,7 +185,11 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
         distance = Number(colorBox.getAttribute("s")) / 100; // Luminosidad normalizada
       }
     } else {
-      distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      }
     }
     return { color, distance, index };
   });
@@ -200,11 +212,17 @@ export function updateCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
 
 export function updateOneCircle(circle: HTMLDivElement, distance: number) {
   let normalizedDistance;
-  if (distance < 1 && distance >= 0) {
-    normalizedDistance = distance / 0.4; // Luminosidad normalizada
+
+  if (select.value === "oklch") {
+    if (circle.id.includes("lh")) { 
+      normalizedDistance = distance / 0.4; // Luminosidad normalizada
+    } else {
+      normalizedDistance = distance; // Luminosidad normalizada
+    }
   } else {
     normalizedDistance = distance / 100; // Luminosidad normalizada
   }
+
   const posX = circle.getAttribute("positionX");
   const posY = circle.getAttribute("positionY");
   const radius = circle.getAttribute("radius");

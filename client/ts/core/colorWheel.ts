@@ -3,7 +3,7 @@ import { select, wcag, contrastS, contrastC, contrastL, colorScheme, colorblind}
 import { firstWheelCanvas, secondWheelCanvas } from "../constants/canvas.js";
 import { hslContainers, oklchContainers } from "../constants/containers.js";
 import { palette1, palette2 } from "../constants/palette.js";
-import { chromaSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
+import { chromaSlider1, lightOklchSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
 
 // functions
 import { hslToRgb, oklchToRgb, updateExports } from "../utils/conversor.js";
@@ -11,6 +11,7 @@ import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
 import { availableSecondPalette } from "../utils/utils.js";
+import { lightValue1 } from "../constants/values.js";
 
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", () => updateSeparation());
@@ -67,6 +68,8 @@ function drawColorWheels() {
   if (representation === "hsl") {
     hslContainers.forEach(container => container.style.display = "flex");
     oklchContainers.forEach(container => container.style.display = "none");
+    lightSlider1.max = "100";
+    lightSlider1.step = "1";
     const lightness = lightSlider1;
     const saturation = satSlider1;
     generateWheelHSL(parseInt(lightness.value), false, firstWheelCanvas);
@@ -75,9 +78,9 @@ function drawColorWheels() {
   } else if (representation === "oklch") {
     hslContainers.forEach(container => container.style.display = "none");
     oklchContainers.forEach(container => container.style.display = "flex");
-    const lightness = lightSlider1;
+    const lightness = lightOklchSlider1;
     const chroma = chromaSlider1;
-    generateWheelOKLCH(parseInt(lightness.value), false, firstWheelCanvas);
+    generateWheelOKLCH(Number(lightness.value), false, firstWheelCanvas);
     generateWheelOKLCH(chroma.valueAsNumber, true, secondWheelCanvas);
   }
 }
@@ -94,7 +97,6 @@ function generateWheelHSL(
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   const rect = canvas.parentElement!.getBoundingClientRect();
-  const minDimension = Math.min(rect.width, rect.height);
 
   // Ajustar el tamaño con un margen opcional
   const size = 500;
@@ -129,7 +131,6 @@ function generateWheelHSL(
                   saturation = distance * 100;
                   lightness = value;
               }
-
               const [r, g, b] = hslToRgb(hue, saturation, lightness);
 
               data[index] = r;
@@ -185,8 +186,7 @@ function generateWheelOKLCH(
           lightness = distance;
         } else {
           chroma = distance * 0.4;
-          lightness = value / 100;
-          
+          lightness = value;
         }
         // Convertimos OKLCH a sRGB
         const [r, g, b] = oklchToRgb(lightness, chroma, hue);
