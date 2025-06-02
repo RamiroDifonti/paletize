@@ -69,7 +69,6 @@ async function loadItems () {
       colors.style.display = "flex";
       palette.colors.map((color: string) => {
         const colorDiv = document.createElement("div");
-        // colorDiv.style.width = "20%";
         colorDiv.className = "color";
         colorDiv.style.background = color;
         colorDiv.style.width = "20%";  // Tamaño de cada color

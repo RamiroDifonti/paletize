@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const l = el.getAttribute('l');
                 if (h && s && l) {
                     if (colorModel === 'oklch') {
-                        colors.push(`oklch(${l}% ${s} ${h})`);
+                        colors.push(`oklch(${l} ${s} ${h})`);
                     }
                     else {
                         colors.push(`hsl(${h}, ${s}%, ${l}%)`);
