@@ -96,7 +96,11 @@ export function createCircles(wheel: HTMLElement, isSaturationWheel: boolean) {
         distance = Number(colorBox.getAttribute("s")); // Luminosidad normalizada
       }
     } else {
-      distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      if (select.value === "oklch") {
+        distance = Number(colorBox.getAttribute("l")); // Luminosidad normalizada
+      } else {
+        distance = Number(colorBox.getAttribute("l")) / 100; // Luminosidad normalizada
+      }
     }
     return { color, distance, index };
   });

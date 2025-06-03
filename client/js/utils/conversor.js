@@ -90,8 +90,8 @@ export function exportColors() {
             content.classList.add("export-container", "show");
             const rows = [
                 { label: "HSL:", values: ["NaN", "NaN", "NaN"] },
-                { label: "RGB:", values: ["NaN", "NaN", "NaN"] },
                 { label: "OKLCH:", values: ["NaN", "NaN", "NaN"] },
+                { label: "RGB:", values: ["NaN", "NaN", "NaN"] },
                 { label: "Contraste:", values: ["NaN"] },
             ];
             rows.forEach(row => {

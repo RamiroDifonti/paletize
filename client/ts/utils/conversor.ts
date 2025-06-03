@@ -97,8 +97,8 @@ export function exportColors() {
 
       const rows = [
         { label: "HSL:", values: ["NaN", "NaN", "NaN"] },
-        { label: "RGB:", values: ["NaN", "NaN", "NaN"] },
         { label: "OKLCH:", values: ["NaN", "NaN", "NaN"] },
+        { label: "RGB:", values: ["NaN", "NaN", "NaN"] },
         { label: "Contraste:", values: ["NaN"] },
       ];
 
