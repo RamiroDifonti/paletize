@@ -605,8 +605,8 @@ export function calculateColors(hue, scheme) {
             // Split complementarios (Hue ±150°)
             const angleSplit = Number(splitSlider.value);
             colors.push(hueNumber);
-            colors.push((hueNumber + angleSplit) % 360);
-            colors.push((hueNumber - angleSplit + 360) % 360);
+            colors.push((hueNumber + angleSplit + 180) % 360);
+            colors.push((hueNumber - angleSplit - 180 + 360) % 360);
             break;
         case "triad": // +30 -30
             // Triadas (Hue ±120°)

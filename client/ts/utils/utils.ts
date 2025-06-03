@@ -1,6 +1,6 @@
 // utils.ts
 // This file contains the utility functions for the color wheel and palette generation
-import { palette2 } from "../constants/palette.js";
+import { palette1, palette2 } from "../constants/palette.js";
 import { wcag, contrastS, contrastC, contrastL, select } from "../constants/selects.js";
 import { analogousSlider, complementarySlider, splitSlider, triadSlider, squareSlider } from "../constants/sliders.js";
 
@@ -559,8 +559,9 @@ export function calculateColors(hue: string, scheme: string) {
           // Split complementarios (Hue ±150°)
           const angleSplit = Number(splitSlider.value);
           colors.push(hueNumber);
-          colors.push((hueNumber + angleSplit) % 360);
-          colors.push((hueNumber - angleSplit + 360) % 360);
+          colors.push((hueNumber + angleSplit + 180) % 360);
+          colors.push((hueNumber - angleSplit - 180 + 360) % 360);
+          
           break;
       case "triad":  // +30 -30
           // Triadas (Hue ±120°)

@@ -11,7 +11,6 @@ import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
 import { availableSecondPalette } from "../utils/utils.js";
-import { lightValue1 } from "../constants/values.js";
 
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", () => updateSeparation());
