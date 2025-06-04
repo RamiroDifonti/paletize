@@ -6,7 +6,7 @@ import { palette1, palette2 } from "../constants/palette.js";
 import { chromaSlider1, lightOklchSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
 
 // functions
-import { hslToRgb, oklchToRgb, updateExports } from "../utils/conversor.js";
+import { hslToRgb, oklchToRgb, updateBranding, updateExports } from "../utils/conversor.js";
 import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
@@ -14,7 +14,6 @@ import { availableSecondPalette } from "../utils/utils.js";
 
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", () => updateSeparation());
-select?.addEventListener("change", createAll);
 wcag?.addEventListener("change", updateAll);
 contrastL?.addEventListener("change", updateAll);
 contrastS?.addEventListener("change", updateAll);
@@ -23,6 +22,12 @@ colorblind?.addEventListener("change", () => {
   updateColorblind();
   updateAll();
 });
+
+select?.addEventListener("change", () => {
+  updateBranding();
+  createAll();
+});
+
 colorScheme?.addEventListener("change", () => {
   // Si el esquema acepta variaciones en la separación de los colores, que se muestre
   updateSeparation();
@@ -204,7 +209,6 @@ function generateWheelOKLCH(
 
   ctx.putImageData(imageData, 0, 0);
 }
-
 
 export function createAll() {
   drawColorWheels();

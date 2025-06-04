@@ -1,5 +1,7 @@
 import e from "express";
 import { select } from "../constants/selects.js";
+import { chromaSlider1, hueSlider, lightOklchSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
+import { chromaValue1, hueValue, lightOklchValue1, lightValue1, satValue1 } from "../constants/values.js";
 
 // Convertir HSL a RGB
 export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
@@ -185,9 +187,9 @@ export function updateExports() {
     } else {
       [r, g, b] = hslToRgb(Number(hue), Number(saturation), Number(lightness));
       let [lT, cT, hT] = rgbToOklch(Number(r), Number(g), Number(b));
-      h_ = hT === undefined ? "NaN" : hT.toFixed(3);
-      l_ = lT.toFixed(3);
-      c = cT.toFixed(3);
+      h_ = hT === undefined ? "NaN" : String(Math.round(hT));
+      l_ = lT.toFixed(2);
+      c = cT.toFixed(2);
       [h, s, l] = [Number(hue), Number(saturation), Number(lightness)];
     }
     exportContent.childNodes.forEach((row) => {
@@ -209,4 +211,32 @@ export function updateExports() {
       }
     });
   });
+}
+
+export function updateBranding() {
+  if (select.value === "oklch") {
+    const h = hueSlider.value;
+    const s = satSlider1.value;
+    const l = lightSlider1.value;
+    const [r, g, b] = hslToRgb(Number(h), Number(s), Number(l));
+    const [l_, c, h_] = rgbToOklch(Number(r), Number(g), Number(b));
+    lightOklchSlider1.value = l_.toFixed(2);
+    chromaSlider1.value = c.toFixed(2);
+    hueSlider.value = String(Math.round(h_ ?? Number(h)));
+    hueValue.value = hueSlider.value;
+    chromaValue1.value = chromaSlider1.value;
+    lightOklchValue1.value = lightOklchSlider1.value;
+  } else {
+    const h = hueSlider.value;
+    const c = chromaSlider1.value;
+    const l = lightOklchSlider1.value;
+    const [r, g, b] = oklchToRgb(Number(l), Number(c), Number(h));
+    const [h_, s, l_] = rgbToHsl(Number(r), Number(g), Number(b));
+    hueSlider.value = String(Math.round(h_));
+    satSlider1.value = String(Math.round(s));
+    lightSlider1.value = String(Math.round(l_));
+    hueValue.value = hueSlider.value;
+    satValue1.value = satSlider1.value;
+    lightValue1.value = lightSlider1.value;
+  }
 }

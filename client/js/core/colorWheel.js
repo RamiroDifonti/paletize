@@ -5,14 +5,13 @@ import { hslContainers, oklchContainers } from "../constants/containers.js";
 import { palette1, palette2 } from "../constants/palette.js";
 import { chromaSlider1, lightOklchSlider1, lightSlider1, satSlider1 } from "../constants/sliders.js";
 // functions
-import { hslToRgb, oklchToRgb, updateExports } from "../utils/conversor.js";
+import { hslToRgb, oklchToRgb, updateBranding, updateExports } from "../utils/conversor.js";
 import { updateSeparation } from "../handlers/schemeHandler.js";
 import { createCircles, updateCircles } from "../handlers/handleCircles.js";
 import { updateColorblind } from "../utils/colorblind.js";
 import { availableSecondPalette } from "../utils/utils.js";
 // Eventos que actualizan la página
 window.addEventListener("DOMContentLoaded", () => updateSeparation());
-select === null || select === void 0 ? void 0 : select.addEventListener("change", createAll);
 wcag === null || wcag === void 0 ? void 0 : wcag.addEventListener("change", updateAll);
 contrastL === null || contrastL === void 0 ? void 0 : contrastL.addEventListener("change", updateAll);
 contrastS === null || contrastS === void 0 ? void 0 : contrastS.addEventListener("change", updateAll);
@@ -20,6 +19,10 @@ contrastC === null || contrastC === void 0 ? void 0 : contrastC.addEventListener
 colorblind === null || colorblind === void 0 ? void 0 : colorblind.addEventListener("change", () => {
     updateColorblind();
     updateAll();
+});
+select === null || select === void 0 ? void 0 : select.addEventListener("change", () => {
+    updateBranding();
+    createAll();
 });
 colorScheme === null || colorScheme === void 0 ? void 0 : colorScheme.addEventListener("change", () => {
     var _a;
