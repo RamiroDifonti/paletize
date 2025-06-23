@@ -1,0 +1,5 @@
+Copyright (c) 2025 Ramiro Difonti
+
+Esta obra está bajo una licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0).
+
+Puedes copiar, distribuir, remezclar, transformar y construir a partir de este material, siempre que se dé el crédito adecuado, no se utilice con fines comerciales y las obras derivadas se licencien bajo los mismos términos
