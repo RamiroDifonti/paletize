@@ -52,7 +52,7 @@ export function simulateColorBlind (
 ): [number, number, number] {
   let rgb = hslToRgb(h, s, l);
   if (select.value === "oklch") {
-    rgb = oklchToRgb(l / 100, s, h);
+    rgb = oklchToRgb(l, s, h);
   }
   const matrix = colorBlindMatrices[type];
 
@@ -72,7 +72,7 @@ export function simulateColorBlind (
       h = 0;
     }
     c = Math.round(c * 100) / 100;
-    return [Math.round(l * 100), c, Math.round(h)];
+    return [Math.round(l * 100) / 100, c, Math.round(h)];
   } else {
     return rgbToHsl(rgbSim[0], rgbSim[1], rgbSim[2]);
   }
